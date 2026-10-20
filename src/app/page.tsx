@@ -2,6 +2,7 @@
 
 import { Navbar } from '@/components/Navbar';
 import { Hero } from '@/components/Hero';
+import { UnionWards } from '@/components/UnionWards';
 import { Manifesto } from '@/components/Manifesto';
 import { IslamicGuidance } from '@/components/IslamicGuidance';
 import { SocialActivities } from '@/components/SocialActivities';
@@ -21,6 +22,7 @@ export default function Home() {
     <main className="min-h-screen flex flex-col bg-slate-50 selection:bg-emerald-600 selection:text-white">
       <Navbar />
       {sectionVisibility.hero && <Hero />}
+      <UnionWards />
       {sectionVisibility.manifesto && <Manifesto />}
       {sectionVisibility.socialActivities && <SocialActivities />}
       {sectionVisibility.islamicGuidance && <IslamicGuidance />}

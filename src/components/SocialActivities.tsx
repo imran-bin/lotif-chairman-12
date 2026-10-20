@@ -305,7 +305,7 @@ export const SocialActivities: React.FC = () => {
       {/* ======================= VIDEO PLAYER MODAL ======================= */}
       {activeVideo && (
         <div 
-          className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-6 animate-in fade-in duration-200"
+          className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-2 sm:p-6 animate-in fade-in duration-200"
           onClick={() => setActiveVideo(null)}
         >
           <div 
@@ -313,28 +313,28 @@ export const SocialActivities: React.FC = () => {
             onClick={(e) => e.stopPropagation()}
           >
             {/* Modal Header */}
-            <div className="p-4 sm:p-5 bg-slate-950 flex items-start justify-between gap-4 border-b border-slate-800">
-              <div>
-                <div className="flex items-center gap-2 mb-1.5">
-                  <span className="bg-emerald-600 text-white text-[11px] font-bold px-2 py-0.5 rounded">
+            <div className="p-3 sm:p-5 bg-slate-950 flex items-start justify-between gap-3 border-b border-slate-800">
+              <div className="min-w-0">
+                <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mb-1.5">
+                  <span className="bg-emerald-600 text-white text-[10px] sm:text-[11px] font-bold px-2 py-0.5 rounded shrink-0">
                     {activeVideo.category}
                   </span>
-                  <span className="text-xs text-slate-400 flex items-center gap-1">
-                    <Calendar className="w-3 h-3 text-amber-400" />
+                  <span className="text-[11px] sm:text-xs text-slate-400 flex items-center gap-1 shrink-0">
+                    <Calendar className="w-3 h-3 text-amber-400 shrink-0" />
                     {activeVideo.date}
                   </span>
-                  <span className="text-xs text-slate-400 flex items-center gap-1">
-                    <MapPin className="w-3 h-3 text-emerald-400" />
-                    {activeVideo.location}
+                  <span className="text-[11px] sm:text-xs text-slate-400 flex items-center gap-1 truncate">
+                    <MapPin className="w-3 h-3 text-emerald-400 shrink-0" />
+                    <span>{activeVideo.location}</span>
                   </span>
                 </div>
-                <h3 className="text-base sm:text-xl font-bold text-white leading-snug">
+                <h3 className="text-sm sm:text-xl font-bold text-white leading-snug break-words">
                   {activeVideo.title}
                 </h3>
               </div>
               <button
                 onClick={() => setActiveVideo(null)}
-                className="p-2 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white transition shrink-0"
+                className="p-1.5 sm:p-2 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white transition shrink-0"
               >
                 <X className="w-5 h-5" />
               </button>

@@ -1,6 +1,13 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { DataProvider } from "@/context/DataContext";
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+  themeColor: "#064e3b",
+};
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://jugikhali-latif.vercel.app"),
@@ -40,7 +47,14 @@ export const metadata: Metadata = {
     images: ["/candidate-latif.jpg"],
   },
   icons: {
-    icon: "/favicon.ico",
+    icon: [
+      { url: "/candidate-icon.png?v=3", sizes: "256x256", type: "image/png" },
+      { url: "/favicon.ico?v=3", sizes: "any" }
+    ],
+    apple: [
+      { url: "/candidate-icon.png?v=3", sizes: "256x256", type: "image/png" }
+    ],
+    shortcut: "/candidate-icon.png?v=3",
   },
 };
 
@@ -52,6 +66,9 @@ export default function RootLayout({
   return (
     <html lang="bn" className="scroll-smooth">
       <head>
+        <link rel="icon" type="image/png" href="/candidate-icon.png?v=3" />
+        <link rel="shortcut icon" href="/candidate-icon.png?v=3" />
+        <link rel="apple-touch-icon" href="/candidate-icon.png?v=3" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link

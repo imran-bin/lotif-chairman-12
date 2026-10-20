@@ -108,36 +108,36 @@ export const GrievanceBox: React.FC = () => {
         </div>
 
         {/* Tab Selector */}
-        <div className="flex justify-center mb-8">
-          <div className="bg-white p-1.5 rounded-2xl border border-slate-200 shadow-xs flex gap-2">
+        <div className="flex justify-center mb-8 px-2 sm:px-0">
+          <div className="bg-white p-1.5 rounded-2xl border border-slate-200 shadow-xs flex flex-col sm:flex-row gap-2 w-full sm:w-auto max-w-md sm:max-w-none">
             <button
               onClick={() => { setActiveTab('submit'); setCreatedCode(null); }}
-              className={`px-5 py-2.5 rounded-xl text-sm font-bold transition-all flex items-center gap-2 ${
+              className={`w-full sm:w-auto px-4 sm:px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all flex items-center justify-center gap-2 ${
                 activeTab === 'submit'
                   ? 'bg-emerald-600 text-white shadow-sm'
                   : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
               }`}
             >
-              <Send className="w-4 h-4" />
-              নতুন অভিযোগ দাখিল
+              <Send className="w-4 h-4 shrink-0" />
+              <span>নতুন অভিযোগ দাখিল</span>
             </button>
             <button
               onClick={() => setActiveTab('track')}
-              className={`px-5 py-2.5 rounded-xl text-sm font-bold transition-all flex items-center gap-2 ${
+              className={`w-full sm:w-auto px-4 sm:px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all flex items-center justify-center gap-2 ${
                 activeTab === 'track'
                   ? 'bg-emerald-600 text-white shadow-sm'
                   : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
               }`}
             >
-              <Search className="w-4 h-4" />
-              অভিযোগের অগ্রগতি ট্র্যাকিং
+              <Search className="w-4 h-4 shrink-0" />
+              <span>অভিযোগের অগ্রগতি ট্র্যাকিং</span>
             </button>
           </div>
         </div>
 
         {/* Tab 1: Submit Form */}
         {activeTab === 'submit' && (
-          <div className="max-w-3xl mx-auto bg-white rounded-3xl p-6 sm:p-10 border border-slate-200 shadow-md">
+          <div className="max-w-3xl mx-auto bg-white rounded-3xl p-5 sm:p-10 border border-slate-200 shadow-md">
             {createdCode ? (
               <div className="text-center py-8 space-y-5 animate-in fade-in">
                 <div className="w-16 h-16 bg-emerald-100 text-emerald-700 rounded-full flex items-center justify-center mx-auto ring-8 ring-emerald-50">

@@ -188,12 +188,12 @@ export const EmergencyServices: React.FC = () => {
           </div>
 
           {/* Ward Filter */}
-          <div className="flex items-center gap-2 w-full sm:w-auto justify-end text-xs">
+          <div className="flex items-center gap-2 w-full sm:w-auto justify-between sm:justify-end text-xs">
             <span className="font-bold text-slate-500 whitespace-nowrap">ওয়ার্ড:</span>
             <select
               value={donorSearchWard}
               onChange={(e) => setDonorSearchWard(e.target.value)}
-              className="bg-white border border-slate-200 rounded-lg px-3 py-1.5 font-medium outline-none text-slate-800"
+              className="bg-white border border-slate-200 rounded-lg px-3 py-1.5 font-medium outline-none text-slate-800 flex-1 sm:flex-none max-w-full truncate"
             >
               <option value="সকল">সকল ওয়ার্ড ({jugikhaliWards.length}টি ওয়ার্ড)</option>
               {jugikhaliWards.map(w => (
@@ -251,8 +251,8 @@ export const EmergencyServices: React.FC = () => {
 
         {/* Add Donor Modal */}
         {showAddDonorModal && (
-          <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
-            <div className="bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl relative animate-in fade-in zoom-in-95">
+          <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+            <div className="bg-white rounded-3xl max-w-md w-full p-5 sm:p-8 shadow-2xl relative my-auto max-h-[94vh] overflow-y-auto animate-in fade-in zoom-in-95">
               <h3 className="text-xl font-bold text-slate-900 mb-1">
                 রক্তদাতা হিসেবে নিবন্ধন করুন
               </h3>

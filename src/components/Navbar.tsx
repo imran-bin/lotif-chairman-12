@@ -12,7 +12,8 @@ import {
   AlertCircle, 
   Coins, 
   Sprout,
-  HeartHandshake
+  HeartHandshake,
+  MapPin
 } from 'lucide-react';
 import { useData } from '@/context/DataContext';
 
@@ -23,6 +24,7 @@ export const Navbar: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
 
   const allNavLinks = [
+    { label: '৯টি ওয়ার্ড', href: '#wards', icon: MapPin, show: true },
     { label: 'ইশতেহার', href: '#manifesto', icon: FileText, show: sectionVisibility?.manifesto },
     { label: 'সামাজিক কাজ', href: '#social-activities', icon: HeartHandshake, show: sectionVisibility?.socialActivities },
     { label: 'ইসলামিক বার্তা', href: '#guidance', icon: ShieldCheck, show: sectionVisibility?.islamicGuidance },
@@ -117,9 +119,9 @@ export const Navbar: React.FC = () => {
         <div className="flex items-center justify-between h-20">
           
           {/* Logo & Candidate Identity + Jamaat Official Logo */}
-          <Link href="/" className="flex items-center gap-3 group">
+          <Link href="/" className="flex items-center gap-2 sm:gap-3 group min-w-0">
             {/* Candidate Photo */}
-            <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-emerald-600 shadow-md ring-2 ring-emerald-100 group-hover:scale-105 transition-transform duration-200">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full overflow-hidden border-2 border-emerald-600 shadow-md ring-2 ring-emerald-100 group-hover:scale-105 transition-transform duration-200 shrink-0">
               <img 
                 src={candidate.photoUrl || "/candidate-latif.jpg"} 
                 alt={candidate.name} 
@@ -128,7 +130,7 @@ export const Navbar: React.FC = () => {
             </div>
 
             {/* Official Jamaat-e-Islami Logo */}
-            <div className="w-11 h-11 rounded-full overflow-hidden border border-emerald-300 shadow-sm bg-white p-0.5 group-hover:scale-105 transition-transform duration-200">
+            <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-full overflow-hidden border border-emerald-300 shadow-sm bg-white p-0.5 group-hover:scale-105 transition-transform duration-200 shrink-0">
               <img 
                 src="/jamaat-logo.svg" 
                 alt="বাংলাদেশ জামায়াতে ইসলামী লোগো" 
@@ -136,16 +138,16 @@ export const Navbar: React.FC = () => {
               />
             </div>
 
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="font-bold text-xl sm:text-2xl text-slate-900 group-hover:text-emerald-700 transition">
+            <div className="min-w-0">
+              <div className="flex items-center gap-1.5 sm:gap-2">
+                <span className="font-bold text-base sm:text-2xl text-slate-900 group-hover:text-emerald-700 transition truncate leading-tight block">
                   {candidate.name}
                 </span>
-                <span className="hidden md:inline-flex bg-emerald-100 text-emerald-800 text-[11px] font-semibold px-2 py-0.5 rounded-full border border-emerald-200">
+                <span className="hidden md:inline-flex bg-emerald-100 text-emerald-800 text-[11px] font-semibold px-2 py-0.5 rounded-full border border-emerald-200 shrink-0">
                   চেয়ারম্যান পদপ্রার্থী
                 </span>
               </div>
-              <p className="text-xs text-slate-600 font-medium">
+              <p className="text-[11px] sm:text-xs text-slate-600 font-medium truncate">
                 {candidate.union} • <span className="text-emerald-700 font-semibold">{candidate.party}</span>
               </p>
             </div>
@@ -176,10 +178,10 @@ export const Navbar: React.FC = () => {
           </div>
 
           {/* Mobile Hamburger Button */}
-          <div className="flex items-center gap-2 lg:hidden">
+          <div className="flex items-center gap-2 lg:hidden shrink-0">
             <button
               onClick={() => setIsOpen(!isOpen)}
-              className="p-2 rounded-xl text-slate-700 hover:bg-slate-100 transition"
+              className="p-2.5 rounded-xl text-slate-700 hover:bg-slate-100 active:scale-95 transition"
               aria-label="Toggle Navigation Menu"
             >
               {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
@@ -191,7 +193,7 @@ export const Navbar: React.FC = () => {
 
       {/* Mobile Drawer */}
       {isOpen && (
-        <div className="lg:hidden border-t border-slate-200 bg-white/98 backdrop-blur-md px-4 pt-3 pb-6 shadow-xl animate-in slide-in-from-top-2">
+        <div className="lg:hidden border-t border-slate-200 bg-white/98 backdrop-blur-md px-4 pt-3 pb-6 shadow-xl animate-in slide-in-from-top-2 max-h-[calc(100vh-120px)] overflow-y-auto">
           <div className="flex flex-col gap-1">
             {navLinks.map((item) => {
               const Icon = item.icon;
@@ -200,10 +202,10 @@ export const Navbar: React.FC = () => {
                   key={item.label}
                   href={item.href}
                   onClick={() => setIsOpen(false)}
-                  className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-700 hover:bg-emerald-50 hover:text-emerald-700 font-semibold transition"
+                  className="flex items-center gap-3 px-3.5 py-3 rounded-xl text-slate-700 hover:bg-emerald-50 hover:text-emerald-700 font-bold text-sm transition active:bg-emerald-100"
                 >
-                  <Icon className="w-4 h-4 text-emerald-600" />
-                  {item.label}
+                  <Icon className="w-4 h-4 text-emerald-600 shrink-0" />
+                  <span>{item.label}</span>
                 </a>
               );
             })}
@@ -211,9 +213,16 @@ export const Navbar: React.FC = () => {
               <a
                 href="#grievance"
                 onClick={() => setIsOpen(false)}
-                className="w-full text-center bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2.5 rounded-xl shadow-sm transition"
+                className="w-full text-center bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl shadow-sm transition active:scale-98"
               >
                 অভিযোগ ও সমস্যা জানান
+              </a>
+              <a
+                href="tel:+8801735885527"
+                className="w-full text-center bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold py-2.5 rounded-xl transition flex items-center justify-center gap-2 text-xs"
+              >
+                <PhoneCall className="w-3.5 h-3.5 text-emerald-600" />
+                <span>হটলাইন: +880 1735-885527</span>
               </a>
             </div>
           </div>

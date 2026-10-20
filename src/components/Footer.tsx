@@ -12,6 +12,7 @@ import {
   ExternalLink 
 } from 'lucide-react';
 import { useData } from '@/context/DataContext';
+import { jugikhaliWards } from '@/data/initialData';
 
 export const Footer: React.FC = () => {
   const { candidate } = useData();
@@ -74,6 +75,12 @@ export const Footer: React.FC = () => {
             </h4>
             <ul className="space-y-2 text-xs">
               <li>
+                <a href="#wards" className="text-emerald-400 font-semibold hover:text-emerald-300 transition flex items-center gap-1.5">
+                  <MapPin className="w-3.5 h-3.5" />
+                  <span>১২ নং যুগিখালীর ৯টি ওয়ার্ড ও গ্রাম</span>
+                </a>
+              </li>
+              <li>
                 <a href="#manifesto" className="hover:text-emerald-400 transition">নির্বাচনী মূল ইশতেহার</a>
               </li>
               <li>
@@ -130,6 +137,31 @@ export const Footer: React.FC = () => {
 
         </div>
 
+        {/* 9 Wards Quick Reference Strip in Footer */}
+        <div className="py-6 border-b border-slate-800/80">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 mb-3">
+            <span className="text-xs font-bold text-white tracking-wide uppercase flex items-center gap-2">
+              <MapPin className="w-4 h-4 text-emerald-400" />
+              ১২ নং যুগিখালী ইউনিয়নের আওতাধীন ৯টি ওয়ার্ড ও গ্রাম তালিকা:
+            </span>
+            <a href="#wards" className="text-[11px] text-emerald-400 hover:text-emerald-300 font-semibold underline underline-offset-4">
+              বিস্তারিত ওয়ার্ড বিবরণী দেখুন →
+            </a>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2.5 text-xs">
+            {jugikhaliWards.map(w => (
+              <div key={w.number} className="bg-slate-900/90 border border-slate-800/90 rounded-xl p-2.5 hover:border-emerald-500/50 transition">
+                <div className="font-bold text-emerald-300 text-[11px] mb-1">
+                  {w.name}
+                </div>
+                <div className="text-[11px] text-slate-400 leading-snug">
+                  {w.villages.join(', ')}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
         {/* Bottom Bar */}
         <div className="pt-8 border-t border-slate-800/80 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-slate-400">
           <p className="text-center md:text-left">
@@ -137,9 +169,9 @@ export const Footer: React.FC = () => {
           </p>
 
           {/* Developer Credit */}
-          <div className="flex items-center gap-2 bg-slate-900/90 px-3.5 py-1.5 rounded-full border border-slate-800 shadow-xs">
+          <div className="flex flex-wrap items-center justify-center gap-2 bg-slate-900/90 px-3.5 py-1.5 rounded-2xl sm:rounded-full border border-slate-800 shadow-xs text-center">
             <span className="text-slate-400">Developed by <strong className="text-emerald-400 font-semibold">Imran</strong></span>
-            <span className="text-slate-600">•</span>
+            <span className="hidden sm:inline text-slate-600">•</span>
             <a 
               href="mailto:engg.imran22@gmail.com" 
               className="text-slate-300 hover:text-emerald-300 underline underline-offset-2 transition flex items-center gap-1 font-mono text-[11px]"

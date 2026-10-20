@@ -5,11 +5,21 @@
   --font-sans: 'Outfit', sans-serif;
 }
 
+html {
+  scroll-behavior: smooth;
+  max-width: 100vw;
+  overflow-x: hidden;
+  -webkit-text-size-adjust: 100%;
+}
+
 body {
   font-family: var(--font-bangla), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   background-color: #f8fafc;
   color: #0f172a;
+  max-width: 100vw;
   overflow-x: hidden;
+  position: relative;
+  -webkit-tap-highlight-color: transparent;
 }
 
 /* Custom scrollbar */

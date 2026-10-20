@@ -59,66 +59,66 @@ export const Hero: React.FC = () => {
             </div>
 
             {/* Candidate Title & Slogan */}
-            <div className="space-y-3">
-              <p className="text-amber-400 font-bold text-base sm:text-lg tracking-wider uppercase">
+            <div className="space-y-2.5 sm:space-y-3">
+              <p className="text-amber-400 font-bold text-xs sm:text-base tracking-wider uppercase">
                 {candidate.union} • {candidate.designation}
               </p>
-              <h1 className="text-4xl sm:text-5xl xl:text-6xl font-extrabold tracking-tight leading-tight text-white drop-shadow-sm">
+              <h1 className="text-3xl sm:text-5xl xl:text-6xl font-extrabold tracking-tight leading-tight text-white drop-shadow-sm">
                 {candidate.name}
               </h1>
-              <p className="text-xl sm:text-2xl text-emerald-100 font-medium pt-1">
+              <p className="text-lg sm:text-2xl text-emerald-100 font-medium pt-1">
                 &ldquo;{candidate.slogan}&rdquo;
               </p>
             </div>
 
             {/* Candidate Salam / Speech Quote Box */}
-            <div className="bg-white/10 backdrop-blur-md border border-white/15 rounded-2xl p-5 sm:p-6 text-emerald-50 shadow-xl relative overflow-hidden text-left">
+            <div className="bg-white/10 backdrop-blur-md border border-white/15 rounded-2xl p-4 sm:p-6 text-emerald-50 shadow-xl relative overflow-hidden text-left">
               <div className="absolute -right-6 -bottom-6 text-white/5 text-8xl font-serif select-none pointer-events-none">
                 “
               </div>
-              <p className="text-sm sm:text-base leading-relaxed italic text-emerald-100/90">
+              <p className="text-xs sm:text-base leading-relaxed italic text-emerald-100/90">
                 {candidate.salam}
               </p>
-              <div className="mt-4 pt-3 border-t border-white/10 flex items-center justify-between">
-                <span className="text-xs text-amber-300 font-medium">
+              <div className="mt-3 sm:mt-4 pt-3 border-t border-white/10 flex items-center justify-between">
+                <span className="text-[11px] sm:text-xs text-amber-300 font-medium">
                   {candidate.mainPledge}
                 </span>
               </div>
             </div>
 
             {/* Quick Action Buttons */}
-            <div className="flex flex-wrap items-center justify-center lg:justify-start gap-3 sm:gap-4 pt-2">
+            <div className="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center justify-center lg:justify-start gap-2.5 sm:gap-4 pt-2 w-full">
               <a
                 href="#manifesto"
-                className="bg-emerald-500 hover:bg-emerald-400 active:scale-95 text-emerald-950 font-bold px-6 py-3.5 rounded-xl shadow-lg shadow-emerald-500/20 transition-all flex items-center gap-2 group"
+                className="w-full sm:w-auto justify-center bg-emerald-500 hover:bg-emerald-400 active:scale-95 text-emerald-950 font-bold px-5 sm:px-6 py-3 sm:py-3.5 rounded-xl shadow-lg shadow-emerald-500/20 transition-all flex items-center gap-2 group"
               >
-                <FileCheck2 className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                <FileCheck2 className="w-5 h-5 group-hover:scale-110 transition-transform shrink-0" />
                 <span>নির্বাচনী ইশতেহার পড়ুন</span>
-                <ArrowRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
+                <ArrowRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform shrink-0" />
               </a>
 
               <a
                 href="#tracker"
-                className="bg-white/15 hover:bg-white/25 active:scale-95 text-white font-semibold px-6 py-3.5 rounded-xl border border-white/20 backdrop-blur-sm transition-all flex items-center gap-2"
+                className="w-full sm:w-auto justify-center bg-white/15 hover:bg-white/25 active:scale-95 text-white font-semibold px-5 sm:px-6 py-3 sm:py-3.5 rounded-xl border border-white/20 backdrop-blur-sm transition-all flex items-center gap-2"
               >
                 <span>স্মার্ট প্রমিজ ট্র্যাকার</span>
               </a>
 
               <a
                 href="#grievance"
-                className="bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 font-semibold px-5 py-3.5 rounded-xl border border-amber-500/40 transition-all flex items-center gap-2"
+                className="w-full sm:w-auto justify-center bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 font-semibold px-5 py-3 sm:py-3.5 rounded-xl border border-amber-500/40 transition-all flex items-center gap-2"
               >
-                <AlertCircle className="w-5 h-5 text-amber-400" />
+                <AlertCircle className="w-5 h-5 text-amber-400 shrink-0" />
                 <span>অভিযোগ দিন</span>
               </a>
             </div>
 
             {/* Pledge Support & Live Counter Box */}
-            <div className="pt-2 flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
+            <div className="pt-2 flex flex-col sm:flex-row items-stretch sm:items-center justify-center lg:justify-start gap-3 sm:gap-4 w-full">
               <button
                 onClick={handlePledge}
                 disabled={hasPledged}
-                className={`flex items-center gap-3 px-5 py-3 rounded-2xl font-bold transition-all shadow-md ${
+                className={`w-full sm:w-auto justify-center flex items-center gap-3 px-5 py-3 sm:py-3 rounded-2xl font-bold transition-all shadow-md ${
                   hasPledged 
                     ? 'bg-emerald-800 text-emerald-200 cursor-default border border-emerald-600'
                     : 'bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 active:scale-95 hover:shadow-amber-500/30'
@@ -126,21 +126,21 @@ export const Hero: React.FC = () => {
               >
                 {hasPledged ? (
                   <>
-                    <CheckCircle className="w-5 h-5 text-emerald-400" />
+                    <CheckCircle className="w-5 h-5 text-emerald-400 shrink-0" />
                     <span>সমর্থন জানানোর জন্য ধন্যবাদ!</span>
                   </>
                 ) : (
                   <>
-                    <Heart className="w-5 h-5 fill-current text-red-600 animate-bounce" />
+                    <Heart className="w-5 h-5 fill-current text-red-600 animate-bounce shrink-0" />
                     <span>আমি সমর্থন জানাচ্ছি</span>
                   </>
                 )}
               </button>
 
-              <div className="flex items-center gap-2 text-sm text-emerald-200 bg-white/5 px-4 py-2.5 rounded-xl border border-white/10">
-                <Users className="w-4 h-4 text-emerald-400" />
+              <div className="w-full sm:w-auto justify-center flex items-center gap-2 text-xs sm:text-sm text-emerald-200 bg-white/5 px-4 py-2.5 rounded-xl border border-white/10 text-center">
+                <Users className="w-4 h-4 text-emerald-400 shrink-0" />
                 <span>
-                  <strong className="text-white font-bold text-base">{candidate.totalSupporters.toLocaleString('bn-BD')}</strong> জন ভোটার সমর্থন জানিয়েছেন
+                  <strong className="text-white font-bold text-sm sm:text-base">{candidate.totalSupporters.toLocaleString('bn-BD')}</strong> জন ভোটার সমর্থন জানিয়েছেন
                 </span>
               </div>
             </div>
@@ -148,8 +148,8 @@ export const Hero: React.FC = () => {
           </div>
 
           {/* Right Column: Candidate Portrait Photo Card */}
-          <div className="lg:col-span-5 flex justify-center">
-            <div className="relative w-full max-w-md sm:max-w-lg">
+          <div className="lg:col-span-5 flex justify-center w-full px-1 sm:px-0">
+            <div className="relative w-full max-w-sm sm:max-w-md lg:max-w-lg">
               
               {/* Outer Decorative Ring */}
               <div className="absolute -inset-1.5 rounded-3xl bg-gradient-to-tr from-amber-400 via-emerald-400 to-emerald-600 opacity-70 blur-lg transition duration-1000 group-hover:opacity-100" />
