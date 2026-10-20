@@ -11,7 +11,8 @@ import {
   CheckCircle2, 
   AlertCircle, 
   Coins, 
-  Sprout 
+  Sprout,
+  HeartHandshake
 } from 'lucide-react';
 import { useData } from '@/context/DataContext';
 
@@ -23,9 +24,10 @@ export const Navbar: React.FC = () => {
 
   const navLinks = [
     { label: 'ইশতেহার', href: '#manifesto', icon: FileText },
+    { label: 'সামাজিক কাজ', href: '#social-activities', icon: HeartHandshake },
     { label: 'প্রমিজ ট্র্যাকার', href: '#tracker', icon: CheckCircle2 },
     { label: 'অভিযোগ বক্স', href: '#grievance', icon: AlertCircle },
-    { label: 'জরুরি সেবা ও রক্তদান', href: '#emergency', icon: PhoneCall },
+    { label: 'জরুরি সেবা', href: '#emergency', icon: PhoneCall },
     { label: 'বাজেট স্বচ্ছতা', href: '#budget', icon: Coins },
     { label: 'কৃষি কর্নার', href: '#agriculture', icon: Sprout },
   ];

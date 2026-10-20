@@ -2,6 +2,7 @@ import { Navbar } from '@/components/Navbar';
 import { Hero } from '@/components/Hero';
 import { Manifesto } from '@/components/Manifesto';
 import { IslamicGuidance } from '@/components/IslamicGuidance';
+import { SocialActivities } from '@/components/SocialActivities';
 import { PromiseTracker } from '@/components/PromiseTracker';
 import { GrievanceBox } from '@/components/GrievanceBox';
 import { EmergencyServices } from '@/components/EmergencyServices';
@@ -16,6 +17,7 @@ export default function Home() {
       <Navbar />
       <Hero />
       <Manifesto />
+      <SocialActivities />
       <IslamicGuidance />
       <PromiseTracker />
       <GrievanceBox />

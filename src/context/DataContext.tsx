@@ -10,6 +10,7 @@ import {
   BloodDonor,
   BudgetItem,
   AgricultureInfo,
+  SocialActivity,
   initialCandidateInfo,
   initialManifestoPillars,
   initialPromises,
@@ -17,7 +18,8 @@ import {
   initialEmergencyContacts,
   initialBloodDonors,
   initialBudget,
-  initialAgriculture
+  initialAgriculture,
+  initialSocialActivities
 } from '@/data/initialData';
 
 interface DataContextType {
@@ -29,11 +31,15 @@ interface DataContextType {
   bloodDonors: BloodDonor[];
   budget: BudgetItem;
   agriculture: AgricultureInfo;
+  socialActivities: SocialActivity[];
   
   // Actions for Citizen & Admin
   updatePromise: (id: string, updated: Partial<PromiseItem>) => void;
   addPromise: (item: Omit<PromiseItem, 'id'>) => void;
   deletePromise: (id: string) => void;
+  
+  addSocialActivity: (item: Omit<SocialActivity, 'id'>) => void;
+  deleteSocialActivity: (id: string) => void;
   
   addGrievance: (item: Omit<Grievance, 'id' | 'trackingCode' | 'submittedAt' | 'status'>) => string;
   updateGrievanceStatus: (id: string, status: Grievance['status'], adminResponse?: string) => void;
@@ -61,6 +67,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [bloodDonors, setBloodDonors] = useState<BloodDonor[]>(initialBloodDonors);
   const [budget, setBudget] = useState<BudgetItem>(initialBudget);
   const [agriculture] = useState<AgricultureInfo>(initialAgriculture);
+  const [socialActivities, setSocialActivities] = useState<SocialActivity[]>(initialSocialActivities);
   const [isLoaded, setIsLoaded] = useState(false);
 
   // Load from localStorage on client mount
@@ -99,6 +106,9 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       const savedBudget = localStorage.getItem(`${STORAGE_KEY_PREFIX}budget`);
       if (savedBudget) setBudget(JSON.parse(savedBudget));
+
+      const savedActivities = localStorage.getItem(`${STORAGE_KEY_PREFIX}activities`);
+      if (savedActivities) setSocialActivities(JSON.parse(savedActivities));
     } catch (e) {
       console.warn("Storage load error, using initial dataset", e);
     } finally {
@@ -216,6 +226,26 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     saveItem('budget', newBudget);
   };
 
+  const addSocialActivity = (activity: Omit<SocialActivity, 'id'>) => {
+    const newActivity: SocialActivity = {
+      ...activity,
+      id: `act_${Date.now()}`
+    };
+    setSocialActivities(prev => {
+      const next = [newActivity, ...prev];
+      saveItem('activities', next);
+      return next;
+    });
+  };
+
+  const deleteSocialActivity = (id: string) => {
+    setSocialActivities(prev => {
+      const next = prev.filter(a => a.id !== id);
+      saveItem('activities', next);
+      return next;
+    });
+  };
+
   const resetAllData = () => {
     if (typeof window !== 'undefined') {
       localStorage.clear();
@@ -225,6 +255,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setEmergencyContacts(initialEmergencyContacts);
       setBloodDonors(initialBloodDonors);
       setBudget(initialBudget);
+      setSocialActivities(initialSocialActivities);
     }
   };
 
@@ -239,9 +270,12 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
         bloodDonors,
         budget,
         agriculture,
+        socialActivities,
         updatePromise,
         addPromise,
         deletePromise,
+        addSocialActivity,
+        deleteSocialActivity,
         addGrievance,
         updateGrievanceStatus,
         updateCandidateInfo,

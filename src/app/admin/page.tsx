@@ -21,7 +21,8 @@ import {
   CloudUpload,
   RefreshCw,
   ExternalLink,
-  PhoneCall
+  PhoneCall,
+  Film
 } from 'lucide-react';
 import { useData } from '@/context/DataContext';
 import { PromiseItem, Grievance } from '@/data/initialData';
@@ -33,9 +34,11 @@ export default function AdminPage() {
     grievances, 
     budget, 
     bloodDonors,
+    socialActivities,
     updatePromise, 
     addPromise, 
     deletePromise, 
+    deleteSocialActivity,
     updateGrievanceStatus, 
     updateCandidateInfo,
     updateBudget,
@@ -62,7 +65,7 @@ export default function AdminPage() {
   }, []);
 
   // Active Tab
-  const [activeTab, setActiveTab] = useState<'overview' | 'promises' | 'grievances' | 'candidate' | 'budget' | 'deploy'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'activities' | 'promises' | 'grievances' | 'candidate' | 'budget' | 'deploy'>('overview');
 
   // Promise Editing State
   const [editingPromiseId, setEditingPromiseId] = useState<string | null>(null);
@@ -330,6 +333,7 @@ export default function AdminPage() {
         <div className="flex items-center gap-2 overflow-x-auto pb-4 mb-6 scrollbar-none border-b border-slate-200">
           {[
             { id: 'overview', label: 'ওভারভিউ ড্যাশবোর্ড', icon: BarChart3 },
+            { id: 'activities', label: 'সামাজিক কার্যক্রম ও ভিডিও', icon: Film, count: socialActivities.length },
             { id: 'promises', label: 'প্রমিজ ট্র্যাকার কন্ট্রোল', icon: FileText, count: totalPromises },
             { id: 'grievances', label: 'নাগরিক অভিযোগ বক্স', icon: AlertCircle, count: pendingGrievances },
             { id: 'candidate', label: 'প্রার্থী ও স্লোগান এডিটর', icon: Users },
@@ -508,6 +512,74 @@ export default function AdminPage() {
                 <RefreshCw className="w-3.5 h-3.5" />
                 <span>ফ্যাক্টরি রিসেট (ডিফল্ট ডাটা)</span>
               </button>
+            </div>
+          </div>
+        )}
+
+        {/* Tab: ACTIVITIES MANAGEMENT */}
+        {activeTab === 'activities' && (
+          <div className="space-y-6 animate-in fade-in">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-white p-6 rounded-2xl border border-slate-200">
+              <div>
+                <h2 className="text-xl sm:text-2xl font-black text-slate-900">
+                  মাঠপর্যায়ের সামাজিক কার্যক্রম ও সেবা ভিডিও
+                </h2>
+                <p className="text-xs sm:text-sm text-slate-500 mt-1">
+                  রোগী পরিদর্শন, চিকিৎসা সহায়তা ও সমাজকল্যাণমূলক কাজের ভিডিও ও তথ্য ব্যবস্থাপনা (মোট {socialActivities.length}টি)
+                </p>
+              </div>
+
+              <a
+                href="/#social-activities"
+                className="px-4 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white font-bold rounded-xl text-xs sm:text-sm flex items-center gap-2 transition shadow-xs"
+              >
+                <Plus className="w-4 h-4" />
+                <span>নতুন ভিডিও কার্যক্রম যোগ করুন</span>
+              </a>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+              {socialActivities.map((act) => (
+                <div key={act.id} className="bg-white p-5 rounded-2xl border border-slate-200/90 shadow-xs flex flex-col justify-between hover:border-emerald-300 transition">
+                  <div>
+                    <div className="flex items-center justify-between gap-2 mb-2">
+                      <span className="bg-emerald-100 text-emerald-800 text-[11px] font-bold px-2.5 py-0.5 rounded">
+                        {act.category}
+                      </span>
+                      <span className="text-xs text-slate-500 font-medium">{act.date}</span>
+                    </div>
+                    <h3 className="font-bold text-slate-900 text-base leading-snug">{act.title}</h3>
+                    <p className="text-xs text-slate-600 mt-2 line-clamp-3 leading-relaxed">{act.description}</p>
+                    <div className="mt-3 flex items-center gap-3 text-xs text-slate-500">
+                      <span className="text-emerald-700 font-semibold">স্থান: {act.location}</span>
+                      {act.duration && <span>দৈর্ঘ্য: {act.duration}</span>}
+                    </div>
+                  </div>
+
+                  <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between">
+                    <a
+                      href={act.videoUrl || '#'}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-xs text-blue-600 hover:text-blue-800 flex items-center gap-1 font-semibold"
+                    >
+                      <ExternalLink className="w-3.5 h-3.5" />
+                      <span>ভিডিও লিংক খুলুন</span>
+                    </a>
+                    <button
+                      onClick={() => {
+                        if (confirm(`আপনি কি "${act.title}" তালিকা থেকে মুছে ফেলতে চান?`)) {
+                          deleteSocialActivity(act.id);
+                        }
+                      }}
+                      className="text-xs text-rose-600 hover:text-rose-800 flex items-center gap-1 font-bold px-2.5 py-1 rounded-lg hover:bg-rose-50 transition"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                      <span>মুছুন</span>
+                    </button>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         )}
