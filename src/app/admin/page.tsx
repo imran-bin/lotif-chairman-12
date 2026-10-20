@@ -27,7 +27,10 @@ import {
   Eye,
   EyeOff,
   Megaphone,
-  CheckCircle2
+  CheckCircle2,
+  LayoutDashboard,
+  Menu,
+  X
 } from 'lucide-react';
 import { useData } from '@/context/DataContext';
 import { PromiseItem, Grievance, SectionVisibility } from '@/data/initialData';
@@ -165,9 +168,10 @@ export default function AdminPage() {
     }
   }, []);
 
-  // Active Tab
+  // Active Tab & Navigation
   const [activeTab, setActiveTab] = useState<'overview' | 'sections' | 'activities' | 'promises' | 'grievances' | 'candidate' | 'budget' | 'deploy'>('overview');
   const [sectionNotice, setSectionNotice] = useState<string | null>(null);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   // Promise Editing State
   const [editingPromiseId, setEditingPromiseId] = useState<string | null>(null);
@@ -384,90 +388,253 @@ export default function AdminPage() {
     );
   }
 
+  const menuItems = [
+    { 
+      id: 'overview', 
+      label: 'ড্যাশবোর্ড', 
+      subLabel: 'সার্বিক তথ্য ও পরিসংখ্যান',
+      icon: LayoutDashboard,
+    },
+    { 
+      id: 'sections', 
+      label: 'সেকশন নিয়ন্ত্রণ', 
+      subLabel: 'প্রচার মোড অন/অফ',
+      icon: Sliders, 
+      count: `${activeSectionsCount}/10`,
+      countColor: 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
+    },
+    { 
+      id: 'activities', 
+      label: 'সামাজিক কার্যক্রম ও ভিডিও', 
+      subLabel: 'রোগী দর্শন ও সেবা ডায়েরি',
+      icon: Film, 
+      count: socialActivities.length,
+      countColor: 'bg-teal-500/20 text-teal-300'
+    },
+    { 
+      id: 'promises', 
+      label: 'প্রমিজ ট্র্যাকার', 
+      subLabel: 'প্রতিশ্রুতি অগ্রগতি %',
+      icon: FileText, 
+      count: totalPromises,
+      countColor: 'bg-blue-500/20 text-blue-300'
+    },
+    { 
+      id: 'grievances', 
+      label: 'নাগরিক অভিযোগ বক্স', 
+      subLabel: 'জনতার সমস্যা ও সমাধান',
+      icon: AlertCircle, 
+      count: pendingGrievances > 0 ? `${pendingGrievances}টি নতুন` : undefined,
+      countColor: 'bg-amber-500 text-slate-950 font-black'
+    },
+    { 
+      id: 'candidate', 
+      label: 'প্রার্থী ও বক্তব্য এডিটর', 
+      subLabel: 'নাম, ছবি ও মূল বক্তব্য',
+      icon: Users 
+    },
+    { 
+      id: 'budget', 
+      label: 'বাজেট ও অর্থ হিসাব', 
+      subLabel: 'ইউপি বরাদ্দ ও প্রকল্প হিসাব',
+      icon: Coins 
+    },
+    { 
+      id: 'deploy', 
+      label: 'Vercel ও ক্লাউড গাইড', 
+      subLabel: 'লাইভ ডোমেন ও হোস্টিং',
+      icon: CloudUpload 
+    },
+  ];
+
   return (
-    <div className="min-h-screen bg-slate-100 flex flex-col">
+    <div className="min-h-screen bg-slate-100 flex">
       
-      {/* Top Navbar */}
-      <header className="bg-slate-900 text-white sticky top-0 z-40 border-b border-slate-800 shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-full overflow-hidden border border-emerald-400">
-              <img
-                src={candidate.photoUrl || "/candidate-latif.jpg"}
-                alt={candidate.name}
-                className="w-full h-full object-cover object-top"
-              />
-            </div>
-            <div>
-              <span className="font-bold text-base sm:text-lg block leading-none">
-                {candidate.name} <span className="text-xs font-normal text-emerald-400">• সুপার অ্যাডমিন</span>
-              </span>
-              <span className="text-[11px] text-slate-400">
-                ১২ নং যুগিখালী ইউনিয়ন পরিষদ
-              </span>
-            </div>
-          </div>
+      {/* Mobile Backdrop */}
+      {isSidebarOpen && (
+        <div 
+          className="fixed inset-0 bg-slate-950/75 backdrop-blur-xs z-40 lg:hidden transition-opacity"
+          onClick={() => setIsSidebarOpen(false)}
+        />
+      )}
 
-          <div className="flex items-center gap-3">
-            <Link
-              href="/"
-              target="_blank"
-              className="text-xs bg-slate-800 hover:bg-slate-700 text-slate-200 px-3 py-1.5 rounded-lg border border-slate-700 transition flex items-center gap-1.5"
-            >
-              <span>লাইভ সাইট দেখুন</span>
-              <ExternalLink className="w-3 h-3 text-emerald-400" />
-            </Link>
-
-            <button
-              onClick={handleLogout}
-              className="text-xs bg-rose-600/20 hover:bg-rose-600/30 text-rose-300 px-3 py-1.5 rounded-lg border border-rose-500/30 transition flex items-center gap-1.5"
-            >
-              <LogOut className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">লগআউট</span>
-            </button>
-          </div>
-        </div>
-      </header>
-
-      {/* Main Container */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1 w-full">
+      {/* Left Sidebar */}
+      <aside className={`fixed inset-y-0 left-0 z-50 w-72 bg-slate-900 border-r border-slate-800 text-white flex flex-col transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:h-screen lg:sticky lg:top-0 shrink-0 ${
+        isSidebarOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full'
+      }`}>
         
-        {/* Navigation Tabs */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-4 mb-6 scrollbar-none border-b border-slate-200">
-          {[
-            { id: 'overview', label: 'ওভারভিউ ড্যাশবোর্ড', icon: BarChart3 },
-            { id: 'sections', label: 'সেকশন নিয়ন্ত্রণ (প্রচার মোড)', icon: Sliders, count: `${activeSectionsCount}/10` },
-            { id: 'activities', label: 'সামাজিক কার্যক্রম ও ভিডিও', icon: Film, count: socialActivities.length },
-            { id: 'promises', label: 'প্রমিজ ট্র্যাকার কন্ট্রোল', icon: FileText, count: totalPromises },
-            { id: 'grievances', label: 'নাগরিক অভিযোগ বক্স', icon: AlertCircle, count: pendingGrievances },
-            { id: 'candidate', label: 'প্রার্থী ও স্লোগান এডিটর', icon: Users },
-            { id: 'budget', label: 'বাজেট ও অর্থ হিসাব', icon: Coins },
-            { id: 'deploy', label: 'Vercel ও ক্লাউড গাইড', icon: CloudUpload },
-          ].map((t) => {
-            const Icon = t.icon;
+        {/* Brand / Profile Header */}
+        <div className="p-4 sm:p-5 border-b border-slate-800 flex items-center justify-between">
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="relative shrink-0">
+              <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-emerald-400 shadow-xs">
+                <img
+                  src={candidate.photoUrl || "/candidate-latif.jpg"}
+                  alt={candidate.name}
+                  className="w-full h-full object-cover object-top"
+                />
+              </div>
+              <span className="absolute bottom-0 right-0 w-3 h-3 bg-emerald-500 border-2 border-slate-900 rounded-full" />
+            </div>
+            <div className="min-w-0">
+              <h2 className="font-bold text-sm text-white truncate leading-tight">
+                {candidate.name}
+              </h2>
+              <span className="text-[11px] text-emerald-400 font-semibold block mt-0.5">
+                সুপার অ্যাডমিন প্যানেল
+              </span>
+            </div>
+          </div>
+
+          {/* Close button on mobile */}
+          <button 
+            onClick={() => setIsSidebarOpen(false)}
+            className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 lg:hidden transition cursor-pointer"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+
+        {/* Union Council Pill */}
+        <div className="px-4 py-2 bg-slate-950/60 border-b border-slate-800/80 flex items-center justify-between text-[11px] text-slate-400 font-medium">
+          <span className="truncate">১২ নং যুগিখালী ইউনিয়ন পরিষদ</span>
+          <span className="text-emerald-400 font-bold shrink-0">সক্রিয়</span>
+        </div>
+
+        {/* Sidebar Nav Items */}
+        <div className="flex-1 overflow-y-auto p-3 space-y-1.5 scrollbar-thin scrollbar-thumb-slate-800">
+          <div className="px-3 pt-2 pb-1 text-[10px] font-extrabold text-slate-500 uppercase tracking-wider">
+            কন্ট্রোল মেনু
+          </div>
+
+          {menuItems.map((item) => {
+            const Icon = item.icon;
+            const isActive = activeTab === item.id;
             return (
               <button
-                key={t.id}
-                onClick={() => setActiveTab(t.id as any)}
-                className={`px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap transition flex items-center gap-2 ${
-                  activeTab === t.id
-                    ? 'bg-emerald-700 text-white shadow-sm'
-                    : 'bg-white text-slate-600 hover:bg-slate-200 border border-slate-200'
+                key={item.id}
+                onClick={() => {
+                  setActiveTab(item.id as any);
+                  setIsSidebarOpen(false);
+                }}
+                className={`w-full text-left p-2.5 rounded-xl transition-all duration-200 flex items-center justify-between group cursor-pointer ${
+                  isActive
+                    ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-md shadow-emerald-950/50 font-bold'
+                    : 'text-slate-300 hover:text-white hover:bg-slate-800/80 font-medium'
                 }`}
               >
-                <Icon className="w-4 h-4" />
-                <span>{t.label}</span>
-                {t.count !== undefined && (
-                  <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-extrabold ${
-                    activeTab === t.id ? 'bg-emerald-800 text-white' : 'bg-slate-200 text-slate-700'
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className={`p-2 rounded-lg transition ${
+                    isActive ? 'bg-white/20 text-white' : 'bg-slate-800 text-slate-400 group-hover:text-emerald-400 group-hover:bg-slate-700/60'
                   }`}>
-                    {t.count}
+                    <Icon className="w-4 h-4 shrink-0" />
+                  </div>
+                  <div className="min-w-0">
+                    <span className="text-xs sm:text-sm block truncate leading-tight">
+                      {item.label}
+                    </span>
+                    {item.subLabel && (
+                      <span className={`text-[10px] block truncate mt-0.5 ${
+                        isActive ? 'text-emerald-100 font-normal' : 'text-slate-500 group-hover:text-slate-400 font-normal'
+                      }`}>
+                        {item.subLabel}
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                {item.count !== undefined && (
+                  <span className={`text-[10px] px-2 py-0.5 rounded-full font-extrabold shrink-0 ml-2 ${
+                    isActive 
+                      ? 'bg-white text-emerald-950 shadow-2xs' 
+                      : (item.countColor || 'bg-slate-800 text-slate-300')
+                  }`}>
+                    {item.count}
                   </span>
                 )}
               </button>
             );
           })}
         </div>
+
+        {/* Sidebar Footer Actions */}
+        <div className="p-3 border-t border-slate-800 space-y-1.5 bg-slate-950/40">
+          <Link
+            href="/"
+            target="_blank"
+            className="w-full text-xs font-semibold text-slate-300 hover:text-white hover:bg-slate-800/90 p-2.5 rounded-xl transition flex items-center justify-between border border-slate-800"
+          >
+            <span className="flex items-center gap-2">
+              <ExternalLink className="w-3.5 h-3.5 text-emerald-400" />
+              <span>লাইভ সাইট দেখুন</span>
+            </span>
+            <span className="text-[10px] text-emerald-300 bg-emerald-950/80 px-1.5 py-0.5 rounded border border-emerald-800/60">
+              লাইভ
+            </span>
+          </Link>
+
+          <button
+            onClick={handleLogout}
+            className="w-full text-xs font-bold text-rose-300 hover:text-rose-100 hover:bg-rose-950/40 p-2.5 rounded-xl transition flex items-center gap-2 cursor-pointer border border-rose-900/40"
+          >
+            <LogOut className="w-3.5 h-3.5 text-rose-400" />
+            <span>লগআউট করুন</span>
+          </button>
+        </div>
+      </aside>
+
+      {/* Main Content View Area */}
+      <div className="flex-1 flex flex-col min-w-0 min-h-screen overflow-x-hidden">
+        
+        {/* Top Header Bar */}
+        <header className="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-slate-200/80 shadow-2xs h-16 flex items-center justify-between px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center gap-3">
+            {/* Mobile menu trigger */}
+            <button
+              onClick={() => setIsSidebarOpen(true)}
+              className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 lg:hidden transition cursor-pointer"
+              title="সাইড মেনু খুলুন"
+            >
+              <Menu className="w-5 h-5" />
+            </button>
+
+            {/* Breadcrumb & Title */}
+            <div>
+              <div className="flex items-center gap-1.5 text-[11px] text-slate-400 font-medium">
+                <span>সুপার অ্যাডমিন</span>
+                <span>/</span>
+                <span className="text-emerald-700 font-bold">
+                  {menuItems.find(m => m.id === activeTab)?.label || 'ড্যাশবোর্ড'}
+                </span>
+              </div>
+              <h1 className="text-base sm:text-lg font-black text-slate-900 leading-tight">
+                {menuItems.find(m => m.id === activeTab)?.label || 'ড্যাশবোর্ড'}
+              </h1>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2.5">
+            <Link
+              href="/"
+              target="_blank"
+              className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-700 bg-slate-100 hover:bg-emerald-50 hover:text-emerald-800 border border-slate-200 px-3 py-1.5 rounded-xl transition shadow-2xs"
+            >
+              <ExternalLink className="w-3.5 h-3.5 text-emerald-600" />
+              <span className="hidden sm:inline">লাইভ সাইট</span>
+            </Link>
+
+            <button
+              onClick={handleLogout}
+              className="inline-flex items-center gap-1.5 text-xs font-bold text-rose-700 bg-rose-50 hover:bg-rose-100 border border-rose-200 px-3 py-1.5 rounded-xl transition cursor-pointer"
+            >
+              <LogOut className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">লগআউট</span>
+            </button>
+          </div>
+        </header>
+
+        {/* Tab Content Wrapper */}
+        <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto">
 
         {/* Tab 1: OVERVIEW */}
         {activeTab === 'overview' && (
@@ -1585,6 +1752,7 @@ git push -u origin main`}
           </div>
         )}
 
+        </main>
       </div>
 
     </div>
