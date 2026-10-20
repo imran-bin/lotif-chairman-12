@@ -22,10 +22,107 @@ import {
   RefreshCw,
   ExternalLink,
   PhoneCall,
-  Film
+  Film,
+  Sliders,
+  Eye,
+  EyeOff,
+  Megaphone,
+  CheckCircle2
 } from 'lucide-react';
 import { useData } from '@/context/DataContext';
-import { PromiseItem, Grievance } from '@/data/initialData';
+import { PromiseItem, Grievance, SectionVisibility } from '@/data/initialData';
+
+interface SectionConfig {
+  key: keyof SectionVisibility;
+  name: string;
+  badge: string;
+  isCampaignEssential: boolean;
+  desc: string;
+  link: string;
+}
+
+const sectionList: SectionConfig[] = [
+  {
+    key: 'hero',
+    name: 'প্রধান ব্যানার ও পরিচিতি (Hero Section)',
+    badge: 'প্রচারণামূলক',
+    isCampaignEssential: true,
+    desc: 'প্রার্থীর ছবি, নাম, পদবী, দলীয় স্লোগান এবং সরাসরি ভোট ও দোয়ার আবেদন।',
+    link: '/#hero'
+  },
+  {
+    key: 'manifesto',
+    name: 'নির্বাচনী ইশতেহার (৪টি মূল স্তম্ভ)',
+    badge: 'প্রচারণামূলক',
+    isCampaignEssential: true,
+    desc: 'সুশাসন, নাগরিক সেবা, যুব উন্নয়ন এবং সৎ ও দক্ষ নেতৃত্বের বিস্তারিত অঙ্গীকার।',
+    link: '/#manifesto'
+  },
+  {
+    key: 'socialActivities',
+    name: 'সামাজিক কার্যক্রম ও সেবা ডায়েরি (ভিডিও রিপোর্ট)',
+    badge: 'প্রচারণামূলক',
+    isCampaignEssential: true,
+    desc: 'অসুস্থদের দেখতে যাওয়া, চিকিৎসা সহায়তা, শীতবস্ত্র বিতরণ ও উন্নয়নকাজের মাঠপর্যায়ের ভিডিও।',
+    link: '/#social-activities'
+  },
+  {
+    key: 'islamicGuidance',
+    name: 'ইসলামিক অনুশাসন ও কুরআনের বাণী',
+    badge: 'প্রচারণামূলক',
+    isCampaignEssential: true,
+    desc: 'কুরআন ও হাদিসের আলোকে ইনসাফভিত্তিক সমাজ ও নেতৃত্বের দায়িত্বশীলতার বার্তা।',
+    link: '/#guidance'
+  },
+  {
+    key: 'emergencyServices',
+    name: 'জরুরি সেবা ও রক্তদান ডিরেক্টরি',
+    badge: 'জনসেবা',
+    isCampaignEssential: true,
+    desc: 'অ্যাম্বুলেন্স, ফায়ার সার্ভিস, চিকিৎসক ও রক্তদাতাদের তালিকা—যা জনগণের সরাসরি উপকারে আসে।',
+    link: '/#emergency'
+  },
+  {
+    key: 'grievanceBox',
+    name: 'জনতার সরাসরি মতামত ও অভিযোগ বক্স',
+    badge: 'জনসংযোগ',
+    isCampaignEssential: true,
+    desc: 'গ্রামের বাসিন্দারা তাদের সমস্যা ও প্রত্যাশা চেয়ারম্যান পদপ্রার্থীকে জানাতে পারবেন।',
+    link: '/#grievance'
+  },
+  {
+    key: 'promiseTracker',
+    name: 'প্রমিজ ট্র্যাকার (প্রতিশ্রুতি বাস্তবায়ন অগ্রগতি %)',
+    badge: 'নির্বাচন-পরবর্তী পরিষদ কাজ',
+    isCampaignEssential: false,
+    desc: 'নির্বাচনে বিজয়ী হয়ে দায়িত্ব নেওয়ার পর কোন প্রতিশ্রুতি কত শতাংশ বাস্তবায়িত হলো তা দেখানোর জন্য।',
+    link: '/#tracker'
+  },
+  {
+    key: 'budgetTransparency',
+    name: 'বাজেট স্বচ্ছতা ও উন্নয়ন ব্যয়ের হিসাব',
+    badge: 'নির্বাচন-পরবর্তী পরিষদ কাজ',
+    isCampaignEssential: false,
+    desc: 'ইউনিয়ন পরিষদের সরকারি বরাদ্দ ও বাৎসরিক খরচের লাইভ খতিয়ান (চেয়ারম্যান নির্বাচিত হওয়ার পর প্রযোজ্য)।',
+    link: '/#budget'
+  },
+  {
+    key: 'agricultureCorner',
+    name: 'কৃষি কর্নার (সার ডিলার ও সরকারি মূল্যতালিকা)',
+    badge: 'পরিষদ সেবা',
+    isCampaignEssential: false,
+    desc: 'ইউনিয়নের সার ডিলারদের তালিকা ও সরকারি নির্ধারিত দামের তথ্য।',
+    link: '/#agriculture'
+  },
+  {
+    key: 'certificateGuide',
+    name: 'নাগরিক সনদ ও ওয়ারিশ আবেদন গাইডলাইন',
+    badge: 'নির্বাচন-পরবর্তী পরিষদ কাজ',
+    isCampaignEssential: false,
+    desc: 'জন্মনিবন্ধন, ওয়ারিশ সনদ ও চারিত্রিক সনদপত্র পাওয়ার নিয়মাবলি (ইউপি পরিষদ চালুর পর দরকার)।',
+    link: '/#certificate'
+  }
+];
 
 export default function AdminPage() {
   const { 
@@ -35,6 +132,10 @@ export default function AdminPage() {
     budget, 
     bloodDonors,
     socialActivities,
+    sectionVisibility,
+    updateSectionVisibility,
+    setCampaignMode,
+    setAllSectionsOn,
     updatePromise, 
     addPromise, 
     deletePromise, 
@@ -65,7 +166,8 @@ export default function AdminPage() {
   }, []);
 
   // Active Tab
-  const [activeTab, setActiveTab] = useState<'overview' | 'activities' | 'promises' | 'grievances' | 'candidate' | 'budget' | 'deploy'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'sections' | 'activities' | 'promises' | 'grievances' | 'candidate' | 'budget' | 'deploy'>('overview');
+  const [sectionNotice, setSectionNotice] = useState<string | null>(null);
 
   // Promise Editing State
   const [editingPromiseId, setEditingPromiseId] = useState<string | null>(null);
@@ -218,6 +320,7 @@ export default function AdminPage() {
   const avgProgress = Math.round(promises.reduce((a, b) => a + b.progress, 0) / (totalPromises || 1));
   const pendingGrievances = grievances.filter(g => g.status.includes('অপেক্ষমাণ')).length;
   const resolvedGrievances = grievances.filter(g => g.status.includes('সমাধানকৃত')).length;
+  const activeSectionsCount = sectionVisibility ? Object.values(sectionVisibility).filter(Boolean).length : 6;
 
   if (!isAuthenticated) {
     return (
@@ -333,6 +436,7 @@ export default function AdminPage() {
         <div className="flex items-center gap-2 overflow-x-auto pb-4 mb-6 scrollbar-none border-b border-slate-200">
           {[
             { id: 'overview', label: 'ওভারভিউ ড্যাশবোর্ড', icon: BarChart3 },
+            { id: 'sections', label: 'সেকশন নিয়ন্ত্রণ (প্রচার মোড)', icon: Sliders, count: `${activeSectionsCount}/10` },
             { id: 'activities', label: 'সামাজিক কার্যক্রম ও ভিডিও', icon: Film, count: socialActivities.length },
             { id: 'promises', label: 'প্রমিজ ট্র্যাকার কন্ট্রোল', icon: FileText, count: totalPromises },
             { id: 'grievances', label: 'নাগরিক অভিযোগ বক্স', icon: AlertCircle, count: pendingGrievances },
@@ -368,6 +472,28 @@ export default function AdminPage() {
         {/* Tab 1: OVERVIEW */}
         {activeTab === 'overview' && (
           <div className="space-y-8 animate-in fade-in">
+            {/* Campaign Mode Quick Banner */}
+            <div className="bg-gradient-to-r from-emerald-950 to-teal-900 text-white p-5 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-sm border border-emerald-800/80">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0">
+                  <Megaphone className="w-5 h-5" />
+                </div>
+                <div>
+                  <h4 className="font-bold text-sm sm:text-base">নির্বাচনী প্রচারণা মোড সক্রিয় রয়েছে</h4>
+                  <p className="text-xs text-emerald-200 mt-0.5">
+                    বর্তমানে ১০টি সেকশনের মধ্যে <strong>{activeSectionsCount}টি সেকশন</strong> চালু আছে। বাকি অপ্রয়োজনীয় সেকশনগুলো অফ রয়েছে।
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => setActiveTab('sections')}
+                className="px-4 py-2 bg-emerald-400 hover:bg-emerald-300 text-slate-950 font-black text-xs rounded-xl transition flex items-center gap-1.5 self-start sm:self-center shrink-0 cursor-pointer shadow-xs active:scale-95"
+              >
+                <Sliders className="w-3.5 h-3.5" />
+                <span>সেকশন নিয়ন্ত্রণ করুন</span>
+              </button>
+            </div>
+
             {/* Stat Cards */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs">
@@ -512,6 +638,182 @@ export default function AdminPage() {
                 <RefreshCw className="w-3.5 h-3.5" />
                 <span>ফ্যাক্টরি রিসেট (ডিফল্ট ডাটা)</span>
               </button>
+            </div>
+          </div>
+        )}
+
+        {/* Tab: SECTION VISIBILITY CONTROL (CAMPAIGN MODE) */}
+        {activeTab === 'sections' && (
+          <div className="space-y-6 animate-in fade-in">
+            {/* Notification alert */}
+            {sectionNotice && (
+              <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-300 text-emerald-800 text-sm font-semibold flex items-center justify-between shadow-xs animate-in fade-in">
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
+                  <span>{sectionNotice}</span>
+                </div>
+                <button onClick={() => setSectionNotice(null)} className="text-emerald-700 hover:text-emerald-900 text-xs font-bold px-2 py-1">
+                  ✕
+                </button>
+              </div>
+            )}
+
+            {/* Header Preset Control Card */}
+            <div className="bg-gradient-to-br from-emerald-950 via-teal-900 to-slate-900 text-white p-6 sm:p-8 rounded-3xl shadow-xl relative overflow-hidden border border-emerald-800/60">
+              <div className="absolute top-0 right-0 w-80 h-80 bg-emerald-500/10 blur-[100px] pointer-events-none rounded-full" />
+              
+              <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+                <div className="max-w-2xl">
+                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 text-xs font-bold border border-emerald-400/30 mb-3">
+                    <Sliders className="w-3.5 h-3.5 text-emerald-400" />
+                    <span>নির্বাচনী প্রচার মোড ও ওয়েবসাইট নিয়ন্ত্রণ</span>
+                  </div>
+                  <h2 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
+                    ওয়েবসাইট সেকশন অন/অফ নিয়ন্ত্রণ
+                  </h2>
+                  <p className="mt-2 text-xs sm:text-sm text-emerald-100/90 leading-relaxed">
+                    বর্তমানে ওয়েবসাইটটি <strong>নির্বাচনী প্রচারণার কাজে</strong> ব্যবহৃত হচ্ছে। তাই শুধুমাত্র প্রচারণার জন্য জরুরি সেকশনগুলো চালু রেখে বাকি প্রশাসনিক সেকশনগুলো (যেমন প্রমিজ ট্র্যাকার, ইউপি বাজেট হিসাব, সনদ গাইড) এক ক্লিকেই বন্ধ করে দেওয়া হয়েছে। আপনি প্রয়োজন অনুযায়ী যেকোনো সময় চালু বা বন্ধ করতে পারবেন।
+                  </p>
+                </div>
+
+                {/* Quick Presets Buttons */}
+                <div className="flex flex-col sm:flex-row lg:flex-col gap-3 shrink-0">
+                  <button
+                    onClick={() => {
+                      setCampaignMode();
+                      setSectionNotice("🎯 নির্বাচনী প্রচারণা মোড সক্রিয় করা হয়েছে! (প্রচারণার জন্য জরুরি ৬টি সেকশন অন এবং বাকি প্রশাসনিক সেকশনগুলো অফ করা হয়েছে)");
+                      setTimeout(() => setSectionNotice(null), 5000);
+                    }}
+                    className="px-5 py-3 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-400 hover:from-emerald-400 hover:to-teal-300 text-slate-950 font-black text-xs sm:text-sm shadow-lg shadow-emerald-500/25 active:scale-95 transition flex items-center justify-center gap-2 cursor-pointer"
+                  >
+                    <Megaphone className="w-4 h-4 text-slate-950" />
+                    <span>নির্বাচনী প্রচার মোড (এক ক্লিকে সেট)</span>
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      setAllSectionsOn();
+                      setSectionNotice("🏛️ সকল সেকশন সফলভাবে চালু করা হয়েছে (পূর্ণাঙ্গ পরিষদ মোড)!");
+                      setTimeout(() => setSectionNotice(null), 5000);
+                    }}
+                    className="px-5 py-3 rounded-2xl bg-white/10 hover:bg-white/20 text-white font-bold text-xs sm:text-sm border border-white/20 active:scale-95 transition flex items-center justify-center gap-2 cursor-pointer"
+                  >
+                    <Eye className="w-4 h-4 text-emerald-300" />
+                    <span>সব সেকশন চালু করুন</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Status Bar */}
+              <div className="mt-6 pt-5 border-t border-emerald-800/80 flex flex-wrap items-center gap-4 text-xs font-semibold text-emerald-200">
+                <span className="flex items-center gap-1.5">
+                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
+                  বর্তমানে ওয়েবসাইটে চালু: <strong className="text-white">{activeSectionsCount}টি সেকশন</strong>
+                </span>
+                <span className="flex items-center gap-1.5">
+                  <span className="w-2.5 h-2.5 rounded-full bg-slate-400" />
+                  বন্ধ (লুকানো): <strong className="text-white">{10 - activeSectionsCount}টি সেকশন</strong>
+                </span>
+                <span className="text-emerald-300/80 text-[11px] ml-auto">
+                  * এখানে পরিবর্তন করার সাথে সাথেই ওয়েবসাইটে লাইভ কার্যকর হয়
+                </span>
+              </div>
+            </div>
+
+            {/* Section Cards Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
+              {sectionList.map((sec) => {
+                const isVisible = sectionVisibility ? sectionVisibility[sec.key] : true;
+                return (
+                  <div
+                    key={sec.key}
+                    className={`p-5 rounded-2xl border transition-all duration-200 flex flex-col justify-between ${
+                      isVisible
+                        ? 'bg-white border-emerald-300 shadow-xs ring-1 ring-emerald-500/10'
+                        : 'bg-slate-50/90 border-slate-200 opacity-75'
+                    }`}
+                  >
+                    <div>
+                      {/* Top Badges & Switch */}
+                      <div className="flex items-start justify-between gap-3 mb-3">
+                        <div className="flex flex-wrap items-center gap-1.5">
+                          <span
+                            className={`text-[11px] font-bold px-2.5 py-0.5 rounded-md ${
+                              sec.isCampaignEssential
+                                ? 'bg-emerald-100 text-emerald-800 border border-emerald-200'
+                                : 'bg-slate-200 text-slate-700 border border-slate-300'
+                            }`}
+                          >
+                            {sec.badge}
+                          </span>
+
+                          <span
+                            className={`text-[11px] font-semibold px-2 py-0.5 rounded flex items-center gap-1 ${
+                              isVisible
+                                ? 'bg-emerald-50 text-emerald-700'
+                                : 'bg-slate-200 text-slate-600'
+                            }`}
+                          >
+                            {isVisible ? <Eye className="w-3 h-3 text-emerald-600" /> : <EyeOff className="w-3 h-3 text-slate-500" />}
+                            <span>{isVisible ? 'চালু (প্রদর্শিত)' : 'বন্ধ (লুকানো)'}</span>
+                          </span>
+                        </div>
+
+                        {/* Interactive Toggle Switch */}
+                        <button
+                          type="button"
+                          role="switch"
+                          aria-checked={isVisible}
+                          onClick={() => {
+                            updateSectionVisibility(sec.key, !isVisible);
+                            setSectionNotice(`"${sec.name}" ${!isVisible ? 'চালু করা হয়েছে' : 'বন্ধ করা হয়েছে'}!`);
+                            setTimeout(() => setSectionNotice(null), 3000);
+                          }}
+                          className={`relative inline-flex h-7 w-12 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-emerald-600 focus:ring-offset-2 ${
+                            isVisible ? 'bg-emerald-600' : 'bg-slate-300'
+                          }`}
+                        >
+                          <span
+                            className={`pointer-events-none inline-block h-6 w-6 transform rounded-full bg-white shadow-md ring-0 transition duration-200 ease-in-out ${
+                              isVisible ? 'translate-x-5' : 'translate-x-0'
+                            }`}
+                          />
+                        </button>
+                      </div>
+
+                      {/* Title */}
+                      <h3 className="text-base font-bold text-slate-900 leading-snug">
+                        {sec.name}
+                      </h3>
+
+                      {/* Description */}
+                      <p className="text-xs text-slate-600 mt-1.5 leading-relaxed">
+                        {sec.desc}
+                      </p>
+                    </div>
+
+                    {/* Bottom Preview Link */}
+                    <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
+                      <span className="text-[11px] text-slate-400">
+                        আইডি: #{sec.key}
+                      </span>
+                      {isVisible ? (
+                        <a
+                          href={sec.link}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="text-emerald-700 hover:text-emerald-800 font-bold flex items-center gap-1 hover:underline"
+                        >
+                          <span>হোমপেজে দেখুন</span>
+                          <ExternalLink className="w-3 h-3" />
+                        </a>
+                      ) : (
+                        <span className="text-slate-400 italic text-[11px]">বর্তমানে হোমপেজ থেকে লুকানো</span>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           </div>
         )}

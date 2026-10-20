@@ -1,3 +1,5 @@
+'use client';
+
 import { Navbar } from '@/components/Navbar';
 import { Hero } from '@/components/Hero';
 import { Manifesto } from '@/components/Manifesto';
@@ -10,22 +12,26 @@ import { BudgetTransparency } from '@/components/BudgetTransparency';
 import { AgricultureCorner } from '@/components/AgricultureCorner';
 import { CertificateGuide } from '@/components/CertificateGuide';
 import { Footer } from '@/components/Footer';
+import { useData } from '@/context/DataContext';
 
 export default function Home() {
+  const { sectionVisibility } = useData();
+
   return (
     <main className="min-h-screen flex flex-col bg-slate-50 selection:bg-emerald-600 selection:text-white">
       <Navbar />
-      <Hero />
-      <Manifesto />
-      <SocialActivities />
-      <IslamicGuidance />
-      <PromiseTracker />
-      <GrievanceBox />
-      <EmergencyServices />
-      <BudgetTransparency />
-      <AgricultureCorner />
-      <CertificateGuide />
+      {sectionVisibility.hero && <Hero />}
+      {sectionVisibility.manifesto && <Manifesto />}
+      {sectionVisibility.socialActivities && <SocialActivities />}
+      {sectionVisibility.islamicGuidance && <IslamicGuidance />}
+      {sectionVisibility.promiseTracker && <PromiseTracker />}
+      {sectionVisibility.grievanceBox && <GrievanceBox />}
+      {sectionVisibility.emergencyServices && <EmergencyServices />}
+      {sectionVisibility.budgetTransparency && <BudgetTransparency />}
+      {sectionVisibility.agricultureCorner && <AgricultureCorner />}
+      {sectionVisibility.certificateGuide && <CertificateGuide />}
       <Footer />
     </main>
   );
 }
+

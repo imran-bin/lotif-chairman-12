@@ -40,6 +40,19 @@ export interface PromiseItem {
   location?: string;
 }
 
+export interface SectionVisibility {
+  hero: boolean;
+  manifesto: boolean;
+  socialActivities: boolean;
+  islamicGuidance: boolean;
+  promiseTracker: boolean;
+  grievanceBox: boolean;
+  emergencyServices: boolean;
+  budgetTransparency: boolean;
+  agricultureCorner: boolean;
+  certificateGuide: boolean;
+}
+
 export interface SocialActivity {
   id: string;
   title: string;
@@ -538,4 +551,19 @@ export const initialSocialActivities: SocialActivity[] = [
     thumbnailUrl: "https://images.unsplash.com/photo-1497633762265-9d179a990aa6?auto=format&fit=crop&w=800&q=80"
   }
 ];
+
+// প্রচারণার জন্য জরুরি সেকশনগুলো চালু রেখে বাকিগুলো ডিফল্টভাবে অফ রাখা হয়েছে
+export const initialSectionVisibility: SectionVisibility = {
+  hero: true,               // প্রধান ব্যানার ও নির্বাচনী স্লোগান (ON)
+  manifesto: true,          // নির্বাচনী ইশতেহার ও ৪ স্তম্ভ (ON)
+  socialActivities: true,   // সামাজিক কাজ, রোগী দর্শন ও ভিডিও ডায়েরি (ON)
+  islamicGuidance: true,    // কুরআন-হাদিসের আলোকে ইনসাফ ও সুশাসন (ON)
+  grievanceBox: true,       // জনতার অভিযোগ ও মতামত বক্স (ON)
+  emergencyServices: true,  // জরুরি সেবা ও রক্তদান ডিরেক্টরি (ON)
+  promiseTracker: false,    // নির্বাচনী প্রতিশ্রুতি বাস্তবায়ন ট্র্যাকার (OFF - নির্বাচনের পরের বিষয়)
+  budgetTransparency: false,// ইউপি বাজেট ও উন্নয়ন প্রকল্পের খরচ (OFF - নির্বাচনের পরের বিষয়)
+  agricultureCorner: false, // সার ডিলার ও কৃষি তালিকা (OFF)
+  certificateGuide: false,  // নাগরিক সনদ ও ওয়ারিশ আবেদন গাইড (OFF - নির্বাচনের পরের বিষয়)
+};
+
 

@@ -11,6 +11,7 @@ import {
   BudgetItem,
   AgricultureInfo,
   SocialActivity,
+  SectionVisibility,
   initialCandidateInfo,
   initialManifestoPillars,
   initialPromises,
@@ -19,7 +20,8 @@ import {
   initialBloodDonors,
   initialBudget,
   initialAgriculture,
-  initialSocialActivities
+  initialSocialActivities,
+  initialSectionVisibility
 } from '@/data/initialData';
 
 interface DataContextType {
@@ -32,6 +34,12 @@ interface DataContextType {
   budget: BudgetItem;
   agriculture: AgricultureInfo;
   socialActivities: SocialActivity[];
+  sectionVisibility: SectionVisibility;
+  
+  // Section Visibility Controls
+  updateSectionVisibility: (section: keyof SectionVisibility, visible: boolean) => void;
+  setCampaignMode: () => void;
+  setAllSectionsOn: () => void;
   
   // Actions for Citizen & Admin
   updatePromise: (id: string, updated: Partial<PromiseItem>) => void;
@@ -68,6 +76,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [budget, setBudget] = useState<BudgetItem>(initialBudget);
   const [agriculture] = useState<AgricultureInfo>(initialAgriculture);
   const [socialActivities, setSocialActivities] = useState<SocialActivity[]>(initialSocialActivities);
+  const [sectionVisibility, setSectionVisibility] = useState<SectionVisibility>(initialSectionVisibility);
   const [isLoaded, setIsLoaded] = useState(false);
 
   // Load from localStorage on client mount
@@ -109,6 +118,11 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       const savedActivities = localStorage.getItem(`${STORAGE_KEY_PREFIX}activities`);
       if (savedActivities) setSocialActivities(JSON.parse(savedActivities));
+
+      const savedSections = localStorage.getItem(`${STORAGE_KEY_PREFIX}sections`);
+      if (savedSections) {
+        setSectionVisibility(prev => ({ ...prev, ...JSON.parse(savedSections) }));
+      }
     } catch (e) {
       console.warn("Storage load error, using initial dataset", e);
     } finally {
@@ -246,6 +260,36 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
   };
 
+  const updateSectionVisibility = (section: keyof SectionVisibility, visible: boolean) => {
+    setSectionVisibility(prev => {
+      const next = { ...prev, [section]: visible };
+      saveItem('sections', next);
+      return next;
+    });
+  };
+
+  const setCampaignMode = () => {
+    setSectionVisibility(initialSectionVisibility);
+    saveItem('sections', initialSectionVisibility);
+  };
+
+  const setAllSectionsOn = () => {
+    const allOn: SectionVisibility = {
+      hero: true,
+      manifesto: true,
+      socialActivities: true,
+      islamicGuidance: true,
+      promiseTracker: true,
+      grievanceBox: true,
+      emergencyServices: true,
+      budgetTransparency: true,
+      agricultureCorner: true,
+      certificateGuide: true,
+    };
+    setSectionVisibility(allOn);
+    saveItem('sections', allOn);
+  };
+
   const resetAllData = () => {
     if (typeof window !== 'undefined') {
       localStorage.clear();
@@ -256,6 +300,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setBloodDonors(initialBloodDonors);
       setBudget(initialBudget);
       setSocialActivities(initialSocialActivities);
+      setSectionVisibility(initialSectionVisibility);
     }
   };
 
@@ -271,6 +316,10 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
         budget,
         agriculture,
         socialActivities,
+        sectionVisibility,
+        updateSectionVisibility,
+        setCampaignMode,
+        setAllSectionsOn,
         updatePromise,
         addPromise,
         deletePromise,

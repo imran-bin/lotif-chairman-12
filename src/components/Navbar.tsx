@@ -19,18 +19,21 @@ import { useData } from '@/context/DataContext';
 const MarqueeTag = 'marquee' as unknown as React.ElementType;
 
 export const Navbar: React.FC = () => {
-  const { candidate } = useData();
+  const { candidate, sectionVisibility } = useData();
   const [isOpen, setIsOpen] = useState(false);
 
-  const navLinks = [
-    { label: 'ইশতেহার', href: '#manifesto', icon: FileText },
-    { label: 'সামাজিক কাজ', href: '#social-activities', icon: HeartHandshake },
-    { label: 'প্রমিজ ট্র্যাকার', href: '#tracker', icon: CheckCircle2 },
-    { label: 'অভিযোগ বক্স', href: '#grievance', icon: AlertCircle },
-    { label: 'জরুরি সেবা', href: '#emergency', icon: PhoneCall },
-    { label: 'বাজেট স্বচ্ছতা', href: '#budget', icon: Coins },
-    { label: 'কৃষি কর্নার', href: '#agriculture', icon: Sprout },
+  const allNavLinks = [
+    { label: 'ইশতেহার', href: '#manifesto', icon: FileText, show: sectionVisibility?.manifesto },
+    { label: 'সামাজিক কাজ', href: '#social-activities', icon: HeartHandshake, show: sectionVisibility?.socialActivities },
+    { label: 'ইসলামিক বার্তা', href: '#guidance', icon: ShieldCheck, show: sectionVisibility?.islamicGuidance },
+    { label: 'প্রমিজ ট্র্যাকার', href: '#tracker', icon: CheckCircle2, show: sectionVisibility?.promiseTracker },
+    { label: 'অভিযোগ বক্স', href: '#grievance', icon: AlertCircle, show: sectionVisibility?.grievanceBox },
+    { label: 'জরুরি সেবা', href: '#emergency', icon: PhoneCall, show: sectionVisibility?.emergencyServices },
+    { label: 'বাজেট স্বচ্ছতা', href: '#budget', icon: Coins, show: sectionVisibility?.budgetTransparency },
+    { label: 'কৃষি কর্নার', href: '#agriculture', icon: Sprout, show: sectionVisibility?.agricultureCorner },
   ];
+
+  const navLinks = allNavLinks.filter(l => l.show !== false);
 
   return (
     <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-emerald-100 shadow-xs transition-all">
