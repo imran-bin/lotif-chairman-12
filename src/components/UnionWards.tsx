@@ -3,8 +3,10 @@
 import React from 'react';
 import { MapPin, Users, HeartHandshake, ArrowRight, ShieldCheck, PhoneCall, AlertCircle, Droplet } from 'lucide-react';
 import { jugikhaliWards } from '@/data/initialData';
+import { useData } from '@/context/DataContext';
 
 export const UnionWards: React.FC = () => {
+  const { openGrievanceModal } = useData();
   return (
     <section id="wards" className="py-20 bg-gradient-to-b from-slate-50 via-white to-slate-50 relative overflow-hidden">
       {/* Background Subtle Accent */}
@@ -95,13 +97,13 @@ export const UnionWards: React.FC = () => {
 
               {/* Bottom Quick Links for this Ward */}
               <div className="mt-6 pt-4 border-t border-slate-100 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2 text-xs">
-                <a
-                  href="#grievance"
-                  className="flex-1 py-2.5 px-3 rounded-xl bg-slate-100 hover:bg-emerald-50 hover:text-emerald-800 text-slate-700 font-bold transition flex items-center justify-center gap-1.5 active:scale-95"
+                <button
+                  onClick={openGrievanceModal}
+                  className="flex-1 py-2.5 px-3 rounded-xl bg-slate-100 hover:bg-emerald-50 hover:text-emerald-800 text-slate-700 font-bold transition flex items-center justify-center gap-1.5 active:scale-95 cursor-pointer"
                 >
                   <AlertCircle className="w-3.5 h-3.5 text-amber-600 shrink-0" />
-                  <span>সমস্যা জানান</span>
-                </a>
+                  <span>সমস্যা জানান (পপআপ)</span>
+                </button>
 
                 <a
                   href="#emergency"

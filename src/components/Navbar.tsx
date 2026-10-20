@@ -20,7 +20,7 @@ import { useData } from '@/context/DataContext';
 const MarqueeTag = 'marquee' as unknown as React.ElementType;
 
 export const Navbar: React.FC = () => {
-  const { candidate, sectionVisibility } = useData();
+  const { candidate, sectionVisibility, openGrievanceModal } = useData();
   const [isOpen, setIsOpen] = useState(false);
 
   const allNavLinks = [
@@ -29,7 +29,16 @@ export const Navbar: React.FC = () => {
     { label: 'সামাজিক কাজ', href: '#social-activities', icon: HeartHandshake, show: sectionVisibility?.socialActivities },
     { label: 'ইসলামিক বার্তা', href: '#guidance', icon: ShieldCheck, show: sectionVisibility?.islamicGuidance },
     { label: 'প্রমিজ ট্র্যাকার', href: '#tracker', icon: CheckCircle2, show: sectionVisibility?.promiseTracker },
-    { label: 'অভিযোগ বক্স', href: '#grievance', icon: AlertCircle, show: sectionVisibility?.grievanceBox },
+    { 
+      label: 'অভিযোগ বক্স', 
+      href: '#', 
+      icon: AlertCircle, 
+      show: true,
+      onClick: (e: React.MouseEvent) => {
+        e.preventDefault();
+        openGrievanceModal();
+      }
+    },
     { label: 'জরুরি সেবা', href: '#emergency', icon: PhoneCall, show: sectionVisibility?.emergencyServices },
     { label: 'বাজেট স্বচ্ছতা', href: '#budget', icon: Coins, show: sectionVisibility?.budgetTransparency },
     { label: 'কৃষি কর্নার', href: '#agriculture', icon: Sprout, show: sectionVisibility?.agricultureCorner },
@@ -159,7 +168,8 @@ export const Navbar: React.FC = () => {
               <a
                 key={item.label}
                 href={item.href}
-                className="px-3 py-2 rounded-lg hover:text-emerald-700 hover:bg-emerald-50 transition-colors"
+                onClick={item.onClick}
+                className="px-3 py-2 rounded-lg hover:text-emerald-700 hover:bg-emerald-50 transition-colors cursor-pointer"
               >
                 {item.label}
               </a>
@@ -168,13 +178,13 @@ export const Navbar: React.FC = () => {
 
           {/* Desktop Right Action */}
           <div className="hidden sm:flex items-center gap-3">
-            <a
-              href="#grievance"
-              className="bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white text-sm font-semibold px-4 py-2.5 rounded-xl shadow-md hover:shadow-emerald-600/25 transition-all flex items-center gap-2"
+            <button
+              onClick={openGrievanceModal}
+              className="bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white text-sm font-bold px-4 py-2.5 rounded-xl shadow-md hover:shadow-emerald-600/30 transition-all flex items-center gap-2 glow-emerald cursor-pointer"
             >
-              <ShieldCheck className="w-4 h-4" />
-              অভিযোগ জানান
-            </a>
+              <ShieldCheck className="w-4 h-4 text-amber-300" />
+              <span>অভিযোগ জানান</span>
+            </button>
           </div>
 
           {/* Mobile Hamburger Button */}
@@ -201,8 +211,11 @@ export const Navbar: React.FC = () => {
                 <a
                   key={item.label}
                   href={item.href}
-                  onClick={() => setIsOpen(false)}
-                  className="flex items-center gap-3 px-3.5 py-3 rounded-xl text-slate-700 hover:bg-emerald-50 hover:text-emerald-700 font-bold text-sm transition active:bg-emerald-100"
+                  onClick={(e) => {
+                    setIsOpen(false);
+                    if (item.onClick) item.onClick(e);
+                  }}
+                  className="flex items-center gap-3 px-3.5 py-3 rounded-xl text-slate-700 hover:bg-emerald-50 hover:text-emerald-700 font-bold text-sm transition active:bg-emerald-100 cursor-pointer"
                 >
                   <Icon className="w-4 h-4 text-emerald-600 shrink-0" />
                   <span>{item.label}</span>
@@ -210,13 +223,15 @@ export const Navbar: React.FC = () => {
               );
             })}
             <div className="mt-3 pt-3 border-t border-slate-100 flex flex-col gap-2">
-              <a
-                href="#grievance"
-                onClick={() => setIsOpen(false)}
-                className="w-full text-center bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl shadow-sm transition active:scale-98"
+              <button
+                onClick={() => {
+                  setIsOpen(false);
+                  openGrievanceModal();
+                }}
+                className="w-full text-center bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl shadow-sm transition active:scale-98 glow-emerald"
               >
-                অভিযোগ ও সমস্যা জানান
-              </a>
+                অভিযোগ ও সমস্যা জানান (পপআপ)
+              </button>
               <a
                 href="tel:+8801735885527"
                 className="w-full text-center bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold py-2.5 rounded-xl transition flex items-center justify-center gap-2 text-xs"

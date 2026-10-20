@@ -7,7 +7,7 @@ import { Manifesto } from '@/components/Manifesto';
 import { IslamicGuidance } from '@/components/IslamicGuidance';
 import { SocialActivities } from '@/components/SocialActivities';
 import { PromiseTracker } from '@/components/PromiseTracker';
-import { GrievanceBox } from '@/components/GrievanceBox';
+import { GrievanceModal } from '@/components/GrievanceModal';
 import { EmergencyServices } from '@/components/EmergencyServices';
 import { BudgetTransparency } from '@/components/BudgetTransparency';
 import { AgricultureCorner } from '@/components/AgricultureCorner';
@@ -27,12 +27,14 @@ export default function Home() {
       {sectionVisibility.socialActivities && <SocialActivities />}
       {sectionVisibility.islamicGuidance && <IslamicGuidance />}
       {sectionVisibility.promiseTracker && <PromiseTracker />}
-      {sectionVisibility.grievanceBox && <GrievanceBox />}
       {sectionVisibility.emergencyServices && <EmergencyServices />}
       {sectionVisibility.budgetTransparency && <BudgetTransparency />}
       {sectionVisibility.agricultureCorner && <AgricultureCorner />}
       {sectionVisibility.certificateGuide && <CertificateGuide />}
       <Footer />
+      
+      {/* Grievance Interactive Popup Modal */}
+      <GrievanceModal />
     </main>
   );
 }

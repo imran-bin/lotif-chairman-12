@@ -15,7 +15,7 @@ import { useData } from '@/context/DataContext';
 import { jugikhaliWards } from '@/data/initialData';
 
 export const Footer: React.FC = () => {
-  const { candidate } = useData();
+  const { candidate, openGrievanceModal } = useData();
 
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -87,7 +87,12 @@ export const Footer: React.FC = () => {
                 <a href="#tracker" className="hover:text-emerald-400 transition">স্মার্ট প্রমিজ ট্র্যাকার</a>
               </li>
               <li>
-                <a href="#grievance" className="hover:text-emerald-400 transition">নাগরিক অভিযোগ ও সমস্যা বক্স</a>
+                <button 
+                  onClick={openGrievanceModal} 
+                  className="hover:text-emerald-400 transition text-left cursor-pointer"
+                >
+                  নাগরিক অভিযোগ ও সমস্যা বক্স (পপআপ)
+                </button>
               </li>
               <li>
                 <a href="#emergency" className="hover:text-emerald-400 transition">জরুরি অ্যাম্বুলেন্স ও পুলিশ</a>

@@ -54,3 +54,58 @@ html {
   background-image: radial-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px);
   background-size: 20px 20px;
 }
+
+/* ================= CSS GLOW & ANIMATION EFFECTS ================= */
+.glow-emerald {
+  box-shadow: 0 0 25px rgba(16, 185, 129, 0.45), 0 0 50px rgba(5, 150, 105, 0.25);
+}
+
+.glow-emerald-lg {
+  box-shadow: 0 0 35px rgba(16, 185, 129, 0.6), 0 0 70px rgba(5, 150, 105, 0.35);
+}
+
+.glow-amber {
+  box-shadow: 0 0 25px rgba(245, 158, 11, 0.5), 0 0 50px rgba(217, 119, 6, 0.25);
+}
+
+.glow-amber-lg {
+  box-shadow: 0 0 35px rgba(245, 158, 11, 0.65), 0 0 70px rgba(217, 119, 6, 0.35);
+}
+
+.glow-text-emerald {
+  text-shadow: 0 0 16px rgba(52, 211, 153, 0.65), 0 0 32px rgba(16, 185, 129, 0.35);
+}
+
+.glow-text-amber {
+  text-shadow: 0 0 16px rgba(251, 191, 36, 0.7), 0 0 32px rgba(245, 158, 11, 0.4);
+}
+
+@keyframes pulseGlowRing {
+  0%, 100% {
+    opacity: 0.6;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.03);
+  }
+}
+
+.animate-pulse-glow {
+  animation: pulseGlowRing 3s ease-in-out infinite;
+}
+
+@keyframes shimmerSweep {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.shimmer-bg {
+  background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.15) 50%, rgba(255,255,255,0) 100%);
+  background-size: 200% 100%;
+  animation: shimmerSweep 3.5s infinite;
+}

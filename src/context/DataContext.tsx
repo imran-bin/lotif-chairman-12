@@ -60,6 +60,11 @@ interface DataContextType {
   deleteBloodDonor: (id: string) => void;
   updateBudget: (budget: BudgetItem) => void;
   
+  // Grievance Popup Modal Control
+  isGrievanceModalOpen: boolean;
+  openGrievanceModal: () => void;
+  closeGrievanceModal: () => void;
+
   resetAllData: () => void;
   isLoaded: boolean;
 }
@@ -79,7 +84,11 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [agriculture] = useState<AgricultureInfo>(initialAgriculture);
   const [socialActivities, setSocialActivities] = useState<SocialActivity[]>(initialSocialActivities);
   const [sectionVisibility, setSectionVisibility] = useState<SectionVisibility>(initialSectionVisibility);
+  const [isGrievanceModalOpen, setIsGrievanceModalOpen] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
+
+  const openGrievanceModal = () => setIsGrievanceModalOpen(true);
+  const closeGrievanceModal = () => setIsGrievanceModalOpen(false);
 
   // Load from localStorage on client mount
   useEffect(() => {
@@ -360,6 +369,9 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
         approveBloodDonor,
         deleteBloodDonor,
         updateBudget,
+        isGrievanceModalOpen,
+        openGrievanceModal,
+        closeGrievanceModal,
         resetAllData,
         isLoaded
       }}
