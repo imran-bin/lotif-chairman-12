@@ -30,10 +30,13 @@ import {
   CheckCircle2,
   LayoutDashboard,
   Menu,
-  X
+  X,
+  Droplet,
+  Clock,
+  Search
 } from 'lucide-react';
 import { useData } from '@/context/DataContext';
-import { PromiseItem, Grievance, SectionVisibility } from '@/data/initialData';
+import { PromiseItem, Grievance, SectionVisibility, jugikhaliWards, SocialActivity } from '@/data/initialData';
 
 interface SectionConfig {
   key: keyof SectionVisibility;
@@ -142,10 +145,13 @@ export default function AdminPage() {
     updatePromise, 
     addPromise, 
     deletePromise, 
+    addSocialActivity,
     deleteSocialActivity,
     updateGrievanceStatus, 
     updateCandidateInfo,
     updateBudget,
+    approveBloodDonor,
+    deleteBloodDonor,
     resetAllData
   } = useData();
 
@@ -169,9 +175,24 @@ export default function AdminPage() {
   }, []);
 
   // Active Tab & Navigation
-  const [activeTab, setActiveTab] = useState<'overview' | 'sections' | 'activities' | 'promises' | 'grievances' | 'candidate' | 'budget' | 'deploy'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'sections' | 'activities' | 'blood' | 'grievances' | 'promises' | 'candidate' | 'budget' | 'deploy'>('overview');
   const [sectionNotice, setSectionNotice] = useState<string | null>(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
+  // Blood Donor Moderation State
+  const [bloodSearchText, setBloodSearchText] = useState('');
+  const [bloodFilterWard, setBloodFilterWard] = useState('সকল');
+  const [bloodApprovedSuccess, setBloodApprovedSuccess] = useState<string | null>(null);
+
+  // New Social Activity Form State (In Superadmin)
+  const [showNewActivityModal, setShowNewActivityModal] = useState(false);
+  const [newActTitle, setNewActTitle] = useState('');
+  const [newActCategory, setNewActCategory] = useState<SocialActivity['category']>('অসুস্থদের সেবা ও রোগী দর্শন');
+  const [newActLocation, setNewActLocation] = useState(jugikhaliWards[0].name);
+  const [newActDate, setNewActDate] = useState('');
+  const [newActVideoUrl, setNewActVideoUrl] = useState('');
+  const [newActAttendees, setNewActAttendees] = useState('মাওলানা আব্দুল লতিফ ও স্থানীয় ব্যক্তিবর্গ');
+  const [newActDesc, setNewActDesc] = useState('');
 
   // Promise Editing State
   const [editingPromiseId, setEditingPromiseId] = useState<string | null>(null);
@@ -325,6 +346,30 @@ export default function AdminPage() {
   const pendingGrievances = grievances.filter(g => g.status.includes('অপেক্ষমাণ')).length;
   const resolvedGrievances = grievances.filter(g => g.status.includes('সমাধানকৃত')).length;
   const activeSectionsCount = sectionVisibility ? Object.values(sectionVisibility).filter(Boolean).length : 6;
+  const pendingDonors = bloodDonors.filter(d => (d.status || 'approved') === 'pending');
+  const approvedDonors = bloodDonors.filter(d => (d.status || 'approved') === 'approved');
+  const pendingDonorsCount = pendingDonors.length;
+
+  const handleAddNewActivity = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newActTitle.trim() || !newActDesc.trim()) return;
+
+    addSocialActivity({
+      title: newActTitle.trim(),
+      category: newActCategory,
+      location: newActLocation.trim() || 'যুগিখালী ইউনিয়ন',
+      date: newActDate.trim() || new Intl.DateTimeFormat('bn-BD', { dateStyle: 'long' }).format(new Date()),
+      videoUrl: newActVideoUrl.trim() || 'https://www.youtube.com/embed/ScMzIvxBSi4',
+      duration: '৩:৩০ মিনিট',
+      attendees: newActAttendees.trim() || 'মাওলানা আব্দুল লতিফ ও স্থানীয় নেতৃবৃন্দ',
+      description: newActDesc.trim()
+    });
+
+    setShowNewActivityModal(false);
+    setNewActTitle('');
+    setNewActDesc('');
+    setNewActVideoUrl('');
+  };
 
   if (!isAuthenticated) {
     return (
@@ -426,6 +471,14 @@ export default function AdminPage() {
       icon: AlertCircle, 
       count: pendingGrievances > 0 ? `${pendingGrievances}টি নতুন` : undefined,
       countColor: 'bg-amber-500 text-slate-950 font-black'
+    },
+    { 
+      id: 'blood', 
+      label: 'রক্তদাতা যাচাই ও তালিকা', 
+      subLabel: 'ভেরিফিকেশন ও অনুমোদন',
+      icon: Droplet, 
+      count: pendingDonorsCount > 0 ? `${pendingDonorsCount}টি যাচাই বাকি` : undefined,
+      countColor: 'bg-rose-500 text-white font-black'
     },
     { 
       id: 'candidate', 
@@ -679,19 +732,25 @@ export default function AdminPage() {
                 </span>
               </div>
 
-              <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs">
+              <div 
+                onClick={() => setActiveTab('grievances')}
+                className="bg-white border border-slate-200 hover:border-amber-300 rounded-2xl p-5 shadow-xs cursor-pointer transition"
+              >
                 <span className="text-xs font-bold text-slate-500 uppercase block mb-1">নাগরিক অভিযোগ</span>
                 <span className="text-3xl font-extrabold text-amber-600">{grievances.length} টি</span>
-                <span className="text-[11px] text-rose-500 font-semibold block mt-1">
-                  {pendingGrievances} টি সমাধান প্রয়োজন
+                <span className={`text-[11px] font-bold block mt-1 ${pendingGrievances > 0 ? 'text-rose-500' : 'text-emerald-600'}`}>
+                  {pendingGrievances > 0 ? `${pendingGrievances}টি সমাধান প্রয়োজন` : 'সব সমাধানকৃত ✓'}
                 </span>
               </div>
 
-              <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs">
-                <span className="text-xs font-bold text-slate-500 uppercase block mb-1">নিবন্ধিত রক্তদাতা</span>
-                <span className="text-3xl font-extrabold text-rose-600">{bloodDonors.length} জন</span>
-                <span className="text-[11px] text-emerald-600 font-semibold block mt-1">
-                  জরুরি ২৪/৭ নেটওয়ার্ক
+              <div 
+                onClick={() => setActiveTab('blood')}
+                className="bg-white border border-slate-200 hover:border-rose-300 rounded-2xl p-5 shadow-xs cursor-pointer transition"
+              >
+                <span className="text-xs font-bold text-slate-500 uppercase block mb-1">রক্তদাতা নেটওয়ার্ক</span>
+                <span className="text-3xl font-extrabold text-rose-600">{approvedDonors.length} জন</span>
+                <span className={`text-[11px] font-bold block mt-1 ${pendingDonorsCount > 0 ? 'text-rose-600' : 'text-emerald-600'}`}>
+                  {pendingDonorsCount > 0 ? `⚠️ ${pendingDonorsCount}টি যাচাই বাকি` : 'সব অনুমোদিত ✓'}
                 </span>
               </div>
             </div>
@@ -998,13 +1057,13 @@ export default function AdminPage() {
                 </p>
               </div>
 
-              <a
-                href="/#social-activities"
-                className="px-4 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white font-bold rounded-xl text-xs sm:text-sm flex items-center gap-2 transition shadow-xs"
+              <button
+                onClick={() => setShowNewActivityModal(true)}
+                className="px-4 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white font-bold rounded-xl text-xs sm:text-sm flex items-center gap-2 transition shadow-xs cursor-pointer active:scale-95"
               >
                 <Plus className="w-4 h-4" />
                 <span>নতুন ভিডিও কার্যক্রম যোগ করুন</span>
-              </a>
+              </button>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
@@ -1041,7 +1100,7 @@ export default function AdminPage() {
                           deleteSocialActivity(act.id);
                         }
                       }}
-                      className="text-xs text-rose-600 hover:text-rose-800 flex items-center gap-1 font-bold px-2.5 py-1 rounded-lg hover:bg-rose-50 transition"
+                      className="text-xs text-rose-600 hover:text-rose-800 flex items-center gap-1 font-bold px-2.5 py-1 rounded-lg hover:bg-rose-50 transition cursor-pointer"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
                       <span>মুছুন</span>
@@ -1050,6 +1109,144 @@ export default function AdminPage() {
                 </div>
               ))}
             </div>
+
+            {/* Modal: New Activity in Superadmin */}
+            {showNewActivityModal && (
+              <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+                <div className="bg-white rounded-3xl max-w-xl w-full p-6 sm:p-8 shadow-2xl relative animate-in fade-in zoom-in-95 max-h-[90vh] overflow-y-auto">
+                  <div className="flex items-center justify-between pb-3 border-b border-slate-100 mb-4">
+                    <div>
+                      <h3 className="text-lg font-bold text-slate-900">
+                        নতুন সামাজিক কার্যক্রম বা ভিডিও যুক্ত করুন
+                      </h3>
+                      <p className="text-xs text-slate-500 mt-0.5">
+                        রোগী পরিদর্শন, চিকিৎসা সহায়তা বা মাঠপর্যায়ের কাজের ভিডিও তথ্য
+                      </p>
+                    </div>
+                    <button
+                      onClick={() => setShowNewActivityModal(false)}
+                      className="p-1.5 rounded-full hover:bg-slate-100 text-slate-500 transition"
+                    >
+                      <X className="w-5 h-5" />
+                    </button>
+                  </div>
+
+                  <form onSubmit={handleAddNewActivity} className="space-y-4 text-xs sm:text-sm">
+                    <div>
+                      <label className="block text-xs font-bold text-slate-700 mb-1">
+                        কার্যক্রমের শিরোনাম <span className="text-rose-500">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        placeholder="যেমন: ৩ নং ওয়ার্ডের অসুস্থ কৃষক মকবুল চাচার বাড়িতে দেখতে যাওয়া"
+                        value={newActTitle}
+                        onChange={(e) => setNewActTitle(e.target.value)}
+                        className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-emerald-500 font-medium"
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <div>
+                        <label className="block text-xs font-bold text-slate-700 mb-1">ক্যাটাগরি</label>
+                        <select
+                          value={newActCategory}
+                          onChange={(e) => setNewActCategory(e.target.value as any)}
+                          className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl outline-none"
+                        >
+                          <option value="অসুস্থদের সেবা ও রোগী দর্শন">অসুস্থদের সেবা ও রোগী দর্শন</option>
+                          <option value="ত্রাণ ও মানবিক সহায়তা">ত্রাণ ও মানবিক সহায়তা</option>
+                          <option value="মাঠপর্যায়ের উন্নয়ন">মাঠপর্যায়ের উন্নয়ন</option>
+                          <option value="শিক্ষা ও যুব উন্নয়ন">শিক্ষা ও যুব উন্নয়ন</option>
+                          <option value="অন্যান্য">অন্যান্য</option>
+                        </select>
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-bold text-slate-700 mb-1">ওয়ার্ড / স্থান *</label>
+                        <select
+                          value={newActLocation}
+                          onChange={(e) => setNewActLocation(e.target.value)}
+                          className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl outline-none"
+                        >
+                          {jugikhaliWards.map(w => (
+                            <option key={w.number} value={`${w.name} (${w.villages.join(', ')})`}>
+                              {w.name} ({w.villages.join(', ')})
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-bold text-slate-700 mb-1">
+                        YouTube ভিডিও লিংক
+                      </label>
+                      <input
+                        type="text"
+                        placeholder="https://www.youtube.com/watch?v=..."
+                        value={newActVideoUrl}
+                        onChange={(e) => setNewActVideoUrl(e.target.value)}
+                        className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-emerald-500"
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <div>
+                        <label className="block text-xs font-bold text-slate-700 mb-1">তারিখ</label>
+                        <input
+                          type="text"
+                          placeholder="যেমন: ২০ অক্টোবর ২০২৬"
+                          value={newActDate}
+                          onChange={(e) => setNewActDate(e.target.value)}
+                          className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl outline-none"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-bold text-slate-700 mb-1">উপস্থিত ব্যক্তিবর্গ</label>
+                        <input
+                          type="text"
+                          value={newActAttendees}
+                          onChange={(e) => setNewActAttendees(e.target.value)}
+                          className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl outline-none"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-bold text-slate-700 mb-1">
+                        কার্যক্রমের বিস্তারিত বিবরণ <span className="text-rose-500">*</span>
+                      </label>
+                      <textarea
+                        rows={3}
+                        required
+                        placeholder="ঘটনা ও সেবামূলক উদ্যোগের বিস্তারিত..."
+                        value={newActDesc}
+                        onChange={(e) => setNewActDesc(e.target.value)}
+                        className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl outline-none"
+                      />
+                    </div>
+
+                    <div className="flex justify-end gap-3 pt-3 border-t border-slate-100">
+                      <button
+                        type="button"
+                        onClick={() => setShowNewActivityModal(false)}
+                        className="px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-xl transition"
+                      >
+                        বাতিল
+                      </button>
+                      <button
+                        type="submit"
+                        className="px-5 py-2 bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs rounded-xl transition shadow-xs"
+                      >
+                        যুক্ত করুন
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            )}
           </div>
         )}
 
@@ -1372,26 +1569,59 @@ export default function AdminPage() {
                         </span>
                       </div>
 
-                      <div className="flex items-center gap-2">
-                        <span className={`text-xs font-bold px-2.5 py-0.5 rounded-full border ${
-                          g.status.includes('সমাধানকৃত')
-                            ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
-                            : g.status.includes('তদন্তাধীন')
-                            ? 'bg-blue-50 text-blue-800 border-blue-200'
-                            : 'bg-amber-50 text-amber-800 border-amber-200'
-                        }`}>
-                          {g.status}
-                        </span>
+                      <div className="flex flex-wrap items-center gap-1.5">
+                        <button
+                          type="button"
+                          onClick={() => updateGrievanceStatus(g.id, 'অপেক্ষমাণ (Pending)')}
+                          className={`px-2.5 py-1 rounded-lg text-xs font-bold transition flex items-center gap-1 cursor-pointer active:scale-95 ${
+                            g.status.includes('অপেক্ষমাণ')
+                              ? 'bg-amber-500 text-slate-950 ring-2 ring-amber-400 font-extrabold shadow-xs'
+                              : 'bg-amber-50 text-amber-800 hover:bg-amber-100 border border-amber-200'
+                          }`}
+                          title="অপেক্ষমাণ রাখুন"
+                        >
+                          <Clock className="w-3 h-3" />
+                          <span>অপেক্ষমাণ</span>
+                        </button>
 
                         <button
+                          type="button"
+                          onClick={() => updateGrievanceStatus(g.id, 'তদন্তাধীন (In Review)')}
+                          className={`px-2.5 py-1 rounded-lg text-xs font-bold transition flex items-center gap-1 cursor-pointer active:scale-95 ${
+                            g.status.includes('তদন্তাধীন')
+                              ? 'bg-blue-600 text-white ring-2 ring-blue-400 font-extrabold shadow-xs'
+                              : 'bg-blue-50 text-blue-800 hover:bg-blue-100 border border-blue-200'
+                          }`}
+                          title="তদন্তাধীন করুন"
+                        >
+                          <Search className="w-3 h-3" />
+                          <span>তদন্তাধীন</span>
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => updateGrievanceStatus(g.id, 'সমাধানকৃত (Resolved)')}
+                          className={`px-2.5 py-1 rounded-lg text-xs font-bold transition flex items-center gap-1 cursor-pointer active:scale-95 ${
+                            g.status.includes('সমাধানকৃত')
+                              ? 'bg-emerald-600 text-white ring-2 ring-emerald-400 font-extrabold shadow-xs'
+                              : 'bg-emerald-50 text-emerald-800 hover:bg-emerald-100 border border-emerald-200'
+                          }`}
+                          title="সমাধানকৃত হিসেবে চিহ্নিত করুন"
+                        >
+                          <Check className="w-3 h-3" />
+                          <span>সমাধানকৃত</span>
+                        </button>
+
+                        <button
+                          type="button"
                           onClick={() => {
                             setSelectedGrievance(g);
                             setGrievanceResponseText(g.adminResponse || '');
                             setGrievanceNewStatus(g.status);
                           }}
-                          className="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-3 py-1 rounded-lg transition"
+                          className="bg-slate-800 hover:bg-slate-900 text-white text-xs font-bold px-3 py-1 rounded-lg transition ml-1 cursor-pointer"
                         >
-                          পদক্ষেপ নিন
+                          মন্তব্য লিখুন
                         </button>
                       </div>
                     </div>
@@ -1481,6 +1711,233 @@ export default function AdminPage() {
                 </div>
               </div>
             )}
+          </div>
+        )}
+
+        {/* Tab: BLOOD DONOR VERIFICATION & DIRECTORY */}
+        {activeTab === 'blood' && (
+          <div className="space-y-6 animate-in fade-in">
+            {/* Header */}
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-white p-6 rounded-2xl border border-slate-200">
+              <div>
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-rose-50 text-rose-800 text-xs font-bold border border-rose-200 mb-2">
+                  <Droplet className="w-3.5 h-3.5 text-rose-600 fill-current" />
+                  <span>যুগিখালী যুব ব্লাড ব্যাংক ভেরিফিকেশন প্যানেল</span>
+                </div>
+                <h2 className="text-xl sm:text-2xl font-black text-slate-900">
+                  রক্তদাতা যাচাই, অনুমোদন ও তালিকা ব্যবস্থাপনা
+                </h2>
+                <p className="text-xs sm:text-sm text-slate-500 mt-1">
+                  জনগণ ওয়েবসাইট থেকে রক্তদাতা হিসেবে নিবন্ধন করলে তা প্রথমে এখানে &apos;অপেক্ষমাণ&apos; হিসেবে জমা থাকে। সুপারঅ্যাডমিন অনুমোদন করলেই কেবল মূল সাইটে প্রদর্শিত হবে।
+                </p>
+              </div>
+
+              {bloodApprovedSuccess && (
+                <div className="bg-emerald-100 text-emerald-800 border border-emerald-300 px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-2 animate-in fade-in">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                  <span>{bloodApprovedSuccess}</span>
+                </div>
+              )}
+            </div>
+
+            {/* Stat Counters */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between">
+                <div>
+                  <span className="text-xs font-bold text-slate-500 block mb-1">মোট রক্তদাতা আবেদন</span>
+                  <span className="text-3xl font-extrabold text-slate-900">{bloodDonors.length} জন</span>
+                </div>
+                <div className="w-12 h-12 rounded-2xl bg-slate-100 text-slate-700 flex items-center justify-center font-bold">
+                  <Users className="w-6 h-6" />
+                </div>
+              </div>
+
+              <div className="bg-white p-5 rounded-2xl border border-rose-200 bg-rose-50/40 shadow-xs flex items-center justify-between">
+                <div>
+                  <span className="text-xs font-bold text-rose-600 block mb-1">যাচাই বাকি (অপেক্ষমাণ)</span>
+                  <span className="text-3xl font-extrabold text-rose-700">{pendingDonorsCount} জন</span>
+                </div>
+                <div className="w-12 h-12 rounded-2xl bg-rose-100 text-rose-600 flex items-center justify-center font-bold">
+                  <Clock className="w-6 h-6" />
+                </div>
+              </div>
+
+              <div className="bg-white p-5 rounded-2xl border border-emerald-200 bg-emerald-50/40 shadow-xs flex items-center justify-between">
+                <div>
+                  <span className="text-xs font-bold text-emerald-700 block mb-1">অনুমোদিত ও ওয়েবসাইটে সক্রিয়</span>
+                  <span className="text-3xl font-extrabold text-emerald-700">{approvedDonors.length} জন</span>
+                </div>
+                <div className="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center font-bold">
+                  <CheckCircle2 className="w-6 h-6" />
+                </div>
+              </div>
+            </div>
+
+            {/* Section 1: PENDING DONORS */}
+            <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-xs space-y-4">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 border-b border-slate-100 pb-3">
+                <div className="flex items-center gap-2">
+                  <span className="w-3 h-3 rounded-full bg-rose-500 animate-pulse" />
+                  <h3 className="font-bold text-slate-900 text-lg">
+                    অপেক্ষমাণ রক্তদাতা আবেদনসমূহ ({pendingDonorsCount}টি)
+                  </h3>
+                </div>
+                <span className="text-xs text-slate-500 font-medium">অনুমোদনের পর স্বয়ংক্রিয়ভাবে মূল ওয়েবসাইটে দেখাবে</span>
+              </div>
+
+              {pendingDonors.length === 0 ? (
+                <div className="text-center py-10 bg-slate-50 rounded-xl border border-slate-100 space-y-2">
+                  <CheckCircle2 className="w-10 h-10 text-emerald-600 mx-auto" />
+                  <p className="text-sm font-bold text-slate-700">কোনো অপেক্ষমাণ রক্তদাতা আবেদন নেই</p>
+                  <p className="text-xs text-slate-400">নতুন কেউ পাবলিক ফর্ম পূরণ করলে সাথে সাথে এখানে প্রদর্শিত হবে।</p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {pendingDonors.map((donor) => (
+                    <div
+                      key={donor.id}
+                      className="bg-rose-50/40 border border-rose-200 rounded-2xl p-5 flex flex-col justify-between hover:shadow-md transition"
+                    >
+                      <div>
+                        <div className="flex items-start justify-between mb-3">
+                          <span className="w-11 h-11 rounded-xl bg-rose-600 text-white font-black flex items-center justify-center text-base shadow-xs">
+                            {donor.bloodGroup}
+                          </span>
+                          <span className="text-[11px] font-bold px-2.5 py-1 rounded-full bg-rose-200/80 text-rose-900 border border-rose-300">
+                            অপেক্ষমাণ
+                          </span>
+                        </div>
+
+                        <h4 className="font-bold text-slate-900 text-base mb-1">{donor.name}</h4>
+                        <p className="text-xs text-slate-600 mb-1.5">
+                          <strong>ঠিকানা:</strong> {donor.ward}{donor.village ? ` • ${donor.village}` : ''}
+                        </p>
+                        <p className="text-xs text-slate-600 mb-2">
+                          <strong>মোবাইল:</strong> <a href={`tel:${donor.phone}`} className="text-emerald-700 font-bold hover:underline">{donor.phone}</a>
+                        </p>
+                        {donor.registeredAt && (
+                          <p className="text-[11px] text-slate-400">নিবন্ধনের তারিখ: {donor.registeredAt}</p>
+                        )}
+                      </div>
+
+                      <div className="pt-3 border-t border-rose-200/60 flex items-center gap-2 mt-3">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            approveBloodDonor(donor.id);
+                            setBloodApprovedSuccess(`"${donor.name}"-এর রক্তদাতা আবেদন অনুমোদন করা হয়েছে!`);
+                            setTimeout(() => setBloodApprovedSuccess(null), 3000);
+                          }}
+                          className="flex-1 bg-emerald-600 hover:bg-emerald-700 active:scale-98 text-white text-xs font-bold py-2 px-3 rounded-xl transition shadow-xs flex items-center justify-center gap-1.5 cursor-pointer"
+                        >
+                          <Check className="w-4 h-4" />
+                          <span>অনুমোদন করুন (Accept)</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            if (confirm(`আপনি কি "${donor.name}"-এর আবেদন বাতিল ও মুছে ফেলতে চান?`)) {
+                              deleteBloodDonor(donor.id);
+                            }
+                          }}
+                          className="p-2 bg-white hover:bg-rose-100 text-rose-600 border border-rose-300 rounded-xl transition cursor-pointer"
+                          title="বাতিল ও মুছুন"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Section 2: APPROVED DONORS */}
+            <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-xs space-y-4">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-slate-100 pb-3">
+                <div>
+                  <h3 className="font-bold text-slate-900 text-lg">
+                    অনুমোদিত ও ওয়েবসাইটে দৃশ্যমান রক্তদাতাদের তালিকা ({approvedDonors.length} জন)
+                  </h3>
+                  <p className="text-xs text-slate-500">এই রক্তদাতাদের তথ্য সাধারণ নাগরিকরা মূল সাইটে দেখতে পাচ্ছেন</p>
+                </div>
+
+                {/* Filters */}
+                <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+                  <input
+                    type="text"
+                    placeholder="নাম বা মোবাইল দিয়ে খুঁজুন..."
+                    value={bloodSearchText}
+                    onChange={(e) => setBloodSearchText(e.target.value)}
+                    className="px-3 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-emerald-500 w-full sm:w-48"
+                  />
+                  <select
+                    value={bloodFilterWard}
+                    onChange={(e) => setBloodFilterWard(e.target.value)}
+                    className="px-3 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-xl outline-none font-medium"
+                  >
+                    <option value="সকল">সকল ওয়ার্ড</option>
+                    {jugikhaliWards.map(w => (
+                      <option key={w.number} value={w.name}>{w.name}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              {/* Grid of approved donors */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                {approvedDonors
+                  .filter(d => {
+                    const matchesWard = bloodFilterWard === 'সকল' || d.ward === bloodFilterWard;
+                    const matchesSearch = !bloodSearchText || 
+                      d.name.toLowerCase().includes(bloodSearchText.toLowerCase()) ||
+                      d.phone.includes(bloodSearchText) ||
+                      (d.village && d.village.toLowerCase().includes(bloodSearchText.toLowerCase()));
+                    return matchesWard && matchesSearch;
+                  })
+                  .map((donor) => (
+                    <div
+                      key={donor.id}
+                      className="bg-slate-50/60 border border-slate-200 rounded-2xl p-4 flex flex-col justify-between hover:border-emerald-300 transition"
+                    >
+                      <div>
+                        <div className="flex items-start justify-between mb-2">
+                          <span className="w-10 h-10 rounded-xl bg-rose-100 text-rose-700 font-extrabold flex items-center justify-center text-sm shadow-2xs">
+                            {donor.bloodGroup}
+                          </span>
+                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200">
+                            অনুমোদিত
+                          </span>
+                        </div>
+
+                        <h4 className="font-bold text-slate-900 text-sm">{donor.name}</h4>
+                        <p className="text-xs text-slate-500">
+                          {donor.ward}{donor.village ? ` • ${donor.village}` : ''}
+                        </p>
+                        <p className="text-xs text-slate-600 mt-1">
+                          <a href={`tel:${donor.phone}`} className="text-emerald-700 font-bold hover:underline">{donor.phone}</a>
+                        </p>
+                      </div>
+
+                      <div className="pt-3 border-t border-slate-200 mt-3 flex items-center justify-between">
+                        <span className="text-[11px] text-slate-400">{donor.lastDonated}</span>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            if (confirm(`আপনি কি "${donor.name}"-কে তালিকা থেকে মুছে ফেলতে চান?`)) {
+                              deleteBloodDonor(donor.id);
+                            }
+                          }}
+                          className="text-xs text-rose-600 hover:text-rose-800 flex items-center gap-1 font-semibold p-1 hover:bg-rose-50 rounded cursor-pointer"
+                          title="মুছে ফেলুন"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+              </div>
+            </div>
           </div>
         )}
 

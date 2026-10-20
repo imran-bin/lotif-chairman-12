@@ -45,25 +45,12 @@ const getYouTubeThumbnail = (url?: string) => {
 };
 
 export const SocialActivities: React.FC = () => {
-  const { socialActivities, addSocialActivity } = useData();
+  const { socialActivities } = useData();
 
   const [selectedCategory, setSelectedCategory] = useState<string>('সব');
   const [searchQuery, setSearchQuery] = useState('');
   const [activeVideo, setActiveVideo] = useState<SocialActivity | null>(null);
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [copiedId, setCopiedId] = useState<string | null>(null);
-
-  // New Activity Form State
-  const [newTitle, setNewTitle] = useState('');
-  const [newCategory, setNewCategory] = useState<SocialActivity['category']>('অসুস্থদের সেবা ও রোগী দর্শন');
-  const [newDate, setNewDate] = useState('');
-  const [newLocation, setNewLocation] = useState('');
-  const [newDuration, setNewDuration] = useState('৩:৩০ মিনিট');
-  const [newAttendees, setNewAttendees] = useState('মাওলানা আব্দুল লতিফ ও স্থানীয় ব্যক্তিবর্গ');
-  const [newDescription, setNewDescription] = useState('');
-  const [newVideoUrl, setNewVideoUrl] = useState('');
-  const [newThumbnailUrl, setNewThumbnailUrl] = useState('');
-  const [submitSuccess, setSubmitSuccess] = useState(false);
 
   const categories = [
     'সব',
@@ -99,38 +86,6 @@ export const SocialActivities: React.FC = () => {
     }
   };
 
-  const handleCreateActivity = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newTitle.trim() || !newDescription.trim() || !newLocation.trim()) {
-      alert("অনুগ্রহ করে শিরোনাম, স্থান ও বিবরণ পূরণ করুন।");
-      return;
-    }
-
-    addSocialActivity({
-      title: newTitle.trim(),
-      category: newCategory,
-      date: newDate.trim() || new Date().toLocaleDateString('bn-BD', { day: 'numeric', month: 'long', year: 'numeric' }),
-      location: newLocation.trim(),
-      duration: newDuration.trim() || '৩:০০ মিনিট',
-      attendees: newAttendees.trim() || 'মাওলানা আব্দুল লতিফ ও স্থানীয় নেতৃবৃন্দ',
-      description: newDescription.trim(),
-      videoUrl: newVideoUrl.trim() || 'https://www.youtube.com/embed/ScMzIvxBSi4',
-      thumbnailUrl: newThumbnailUrl.trim() || undefined
-    });
-
-    setSubmitSuccess(true);
-    setTimeout(() => {
-      setSubmitSuccess(false);
-      setIsAddModalOpen(false);
-      // Reset form
-      setNewTitle('');
-      setNewDescription('');
-      setNewLocation('');
-      setNewVideoUrl('');
-      setNewThumbnailUrl('');
-    }, 1500);
-  };
-
   return (
     <section id="social-activities" className="py-20 bg-gradient-to-b from-white via-emerald-50/30 to-slate-50 relative overflow-hidden">
       {/* Background Decorative Rings */}
@@ -164,13 +119,6 @@ export const SocialActivities: React.FC = () => {
               <Users className="w-4 h-4 text-emerald-600" />
               <span>সরাসরি সেবা ও পরিদর্শন</span>
             </span>
-            <button
-              onClick={() => setIsAddModalOpen(true)}
-              className="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-1.5 rounded-full transition shadow-xs flex items-center gap-1.5 font-semibold text-xs sm:text-sm active:scale-95"
-            >
-              <Plus className="w-4 h-4" />
-              <span>নতুন কার্যক্রম যোগ করুন</span>
-            </button>
           </div>
         </div>
 
@@ -426,164 +374,6 @@ export const SocialActivities: React.FC = () => {
                 </p>
               )}
             </div>
-          </div>
-        </div>
-      )}
-
-      {/* ======================= ADD ACTIVITY MODAL ======================= */}
-      {isAddModalOpen && (
-        <div 
-          className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200"
-          onClick={() => setIsAddModalOpen(false)}
-        >
-          <div 
-            className="bg-white rounded-2xl w-full max-w-xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[90vh]"
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* Header */}
-            <div className="p-5 bg-gradient-to-r from-emerald-800 to-teal-800 text-white flex items-center justify-between">
-              <div>
-                <h3 className="text-lg font-bold">নতুন সামাজিক কার্যক্রম বা ভিডিও যোগ করুন</h3>
-                <p className="text-xs text-emerald-100 mt-0.5">
-                  রোগী পরিদর্শন, সামাজিক সাহায্য কিংবা উন্নয়নকাজের ভিডিও তথ্য দিন
-                </p>
-              </div>
-              <button 
-                onClick={() => setIsAddModalOpen(false)}
-                className="p-1.5 rounded-full hover:bg-white/20 text-white transition"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            {/* Form */}
-            <form onSubmit={handleCreateActivity} className="p-6 overflow-y-auto space-y-4 text-xs sm:text-sm">
-              
-              {submitSuccess ? (
-                <div className="py-10 text-center space-y-3">
-                  <div className="w-14 h-14 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto">
-                    <Check className="w-8 h-8" />
-                  </div>
-                  <h4 className="text-lg font-bold text-slate-900">সফলভাবে যুক্ত হয়েছে!</h4>
-                  <p className="text-slate-600 text-xs">আপনার সামাজিক কার্যক্রমটি তালিকায় প্রদর্শন করা হচ্ছে।</p>
-                </div>
-              ) : (
-                <>
-                  <div>
-                    <label className="block font-semibold text-slate-800 mb-1">
-                      ভিডিও বা কার্যক্রমের শিরোনাম <span className="text-rose-500">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      value={newTitle}
-                      onChange={(e) => setNewTitle(e.target.value)}
-                      placeholder="যেমন: ৩ নং ওয়ার্ডের অসুস্থ কৃষক মকবুল চাচার বাড়িতে দেখতে যাওয়া"
-                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600"
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block font-semibold text-slate-800 mb-1">ক্যাটাগরি</label>
-                      <select
-                        value={newCategory}
-                        onChange={(e) => setNewCategory(e.target.value as SocialActivity['category'])}
-                        className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 bg-white"
-                      >
-                        <option value="অসুস্থদের সেবা ও রোগী দর্শন">অসুস্থদের সেবা ও রোগী দর্শন</option>
-                        <option value="ত্রাণ ও মানবিক সহায়তা">ত্রাণ ও মানবিক সহায়তা</option>
-                        <option value="মাঠপর্যায়ের উন্নয়ন">মাঠপর্যায়ের উন্নয়ন</option>
-                        <option value="শিক্ষা ও যুব উন্নয়ন">শিক্ষা ও যুব উন্নয়ন</option>
-                        <option value="অন্যান্য">অন্যান্য</option>
-                      </select>
-                    </div>
-
-                    <div>
-                      <label className="block font-semibold text-slate-800 mb-1">স্থান / ওয়ার্ড <span className="text-rose-500">*</span></label>
-                      <input
-                        type="text"
-                        required
-                        value={newLocation}
-                        onChange={(e) => setNewLocation(e.target.value)}
-                        placeholder="যেমন: ৩ নং ওয়ার্ড, উত্তরপাড়া"
-                        className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600"
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block font-semibold text-slate-800 mb-1">
-                      ভিডিও লিংক (YouTube URL বা Embed Link)
-                    </label>
-                    <input
-                      type="text"
-                      value={newVideoUrl}
-                      onChange={(e) => setNewVideoUrl(e.target.value)}
-                      placeholder="https://www.youtube.com/watch?v=..."
-                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600"
-                    />
-                    <p className="text-[11px] text-slate-500 mt-1">
-                      YouTube ভিডিওর লিংক দিলে স্বয়ংক্রিয়ভাবে ভিডিও ও থাম্বনেইল চলে আসবে।
-                    </p>
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block font-semibold text-slate-800 mb-1">তারিখ</label>
-                      <input
-                        type="text"
-                        value={newDate}
-                        onChange={(e) => setNewDate(e.target.value)}
-                        placeholder="যেমন: ২০ অক্টোবর ২০২৬"
-                        className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600"
-                      />
-                    </div>
-                    <div>
-                      <label className="block font-semibold text-slate-800 mb-1">উপস্থিত ব্যক্তিবর্গ</label>
-                      <input
-                        type="text"
-                        value={newAttendees}
-                        onChange={(e) => setNewAttendees(e.target.value)}
-                        placeholder="মাওলানা আব্দুল লতিফ ও স্থানীয় ব্যক্তিবর্গ"
-                        className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600"
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block font-semibold text-slate-800 mb-1">
-                      কার্যক্রমের বিস্তারিত বিবরণ <span className="text-rose-500">*</span>
-                    </label>
-                    <textarea
-                      required
-                      rows={4}
-                      value={newDescription}
-                      onChange={(e) => setNewDescription(e.target.value)}
-                      placeholder="অসুস্থ ব্যক্তি বা মানবিক সেবার বিস্তারিত তথ্য লিখুন..."
-                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 resize-none"
-                    />
-                  </div>
-
-                  <div className="pt-3 border-t border-slate-200 flex items-center justify-end gap-3">
-                    <button
-                      type="button"
-                      onClick={() => setIsAddModalOpen(false)}
-                      className="px-4 py-2.5 rounded-xl border border-slate-300 font-semibold text-slate-700 hover:bg-slate-100 transition"
-                    >
-                      বাতিল
-                    </button>
-                    <button
-                      type="submit"
-                      className="px-5 py-2.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold transition shadow-md shadow-emerald-700/20 flex items-center gap-1.5"
-                    >
-                      <Plus className="w-4 h-4" />
-                      <span>যুক্ত করুন</span>
-                    </button>
-                  </div>
-                </>
-              )}
-            </form>
           </div>
         </div>
       )}

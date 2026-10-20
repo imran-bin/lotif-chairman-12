@@ -56,6 +56,8 @@ interface DataContextType {
   pledgeSupport: () => void;
   
   addBloodDonor: (donor: Omit<BloodDonor, 'id'>) => void;
+  approveBloodDonor: (id: string) => void;
+  deleteBloodDonor: (id: string) => void;
   updateBudget: (budget: BudgetItem) => void;
   
   resetAllData: () => void;
@@ -111,7 +113,13 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
 
       const savedDonors = localStorage.getItem(`${STORAGE_KEY_PREFIX}donors`);
-      if (savedDonors) setBloodDonors(JSON.parse(savedDonors));
+      if (savedDonors) {
+        const parsed = JSON.parse(savedDonors);
+        setBloodDonors(parsed.map((d: BloodDonor) => ({
+          ...d,
+          status: d.status || 'approved'
+        })));
+      }
 
       const savedBudget = localStorage.getItem(`${STORAGE_KEY_PREFIX}budget`);
       if (savedBudget) setBudget(JSON.parse(savedBudget));
@@ -224,12 +232,31 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const addBloodDonor = (donor: Omit<BloodDonor, 'id'>) => {
+    const today = new Intl.DateTimeFormat('bn-BD', { dateStyle: 'medium' }).format(new Date());
     const newDonor: BloodDonor = {
       ...donor,
-      id: `b_${Date.now()}`
+      id: `b_${Date.now()}`,
+      status: donor.status || 'pending',
+      registeredAt: donor.registeredAt || today
     };
     setBloodDonors(prev => {
       const next = [newDonor, ...prev];
+      saveItem('donors', next);
+      return next;
+    });
+  };
+
+  const approveBloodDonor = (id: string) => {
+    setBloodDonors(prev => {
+      const next = prev.map(d => d.id === id ? { ...d, status: 'approved' as const } : d);
+      saveItem('donors', next);
+      return next;
+    });
+  };
+
+  const deleteBloodDonor = (id: string) => {
+    setBloodDonors(prev => {
+      const next = prev.filter(d => d.id !== id);
       saveItem('donors', next);
       return next;
     });
@@ -330,6 +357,8 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
         updateCandidateInfo,
         pledgeSupport,
         addBloodDonor,
+        approveBloodDonor,
+        deleteBloodDonor,
         updateBudget,
         resetAllData,
         isLoaded

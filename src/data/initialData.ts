@@ -92,14 +92,35 @@ export interface EmergencyContact {
   note?: string;
 }
 
+export interface WardInfo {
+  number: number;
+  name: string;
+  villages: string[];
+}
+
+export const jugikhaliWards: WardInfo[] = [
+  { number: 1, name: "১ নং ওয়ার্ড", villages: ["রাজনগর", "মানিকনগর"] },
+  { number: 2, name: "২ নং ওয়ার্ড", villages: ["যুগিখালী"] },
+  { number: 3, name: "৩ নং ওয়ার্ড", villages: ["পাইকপাড়া"] },
+  { number: 4, name: "৪ নং ওয়ার্ড", villages: ["কামারালি"] },
+  { number: 5, name: "৫ নং ওয়ার্ড", villages: ["তরুলিয়া", "তালুন্দিয়া", "মিরডাঙ্গা"] },
+  { number: 6, name: "৬ নং ওয়ার্ড", villages: ["বামনালী", "গোছমারা"] },
+  { number: 7, name: "৭ নং ওয়ার্ড", villages: ["ওফাপুর পূর্ব"] },
+  { number: 8, name: "৮ নং ওয়ার্ড", villages: ["ওফাপুর পশ্চিম", "বামনখালী"] },
+  { number: 9, name: "৯ নং ওয়ার্ড", villages: ["পাঁচনল", "হামিদপুর"] },
+];
+
 export interface BloodDonor {
   id: string;
   name: string;
   bloodGroup: string;
   ward: string;
+  village?: string;
   phone: string;
   lastDonated: string;
   isAvailable: boolean;
+  status?: 'pending' | 'approved';
+  registeredAt?: string;
 }
 
 export interface BudgetItem {
@@ -334,12 +355,12 @@ export const initialGrievances: Grievance[] = [
   {
     id: "g1",
     trackingCode: "JUG-2026-1042",
-    title: "৩ নং ওয়ার্ডের উত্তরপাড়ার রাস্তায় দীর্ঘদিনের জলাবদ্ধতা",
+    title: "৩ নং ওয়ার্ডের পাইকপাড়ার রাস্তায় দীর্ঘদিনের জলাবদ্ধতা",
     category: "জলাবদ্ধতা ও ড্রেন",
-    ward: "ওয়ার্ড ৩",
-    village: "উত্তর যুগিখালী",
+    ward: "৩ নং ওয়ার্ড",
+    village: "পাইকপাড়া",
     citizenName: "মো: রফিকুল ইসলাম",
-    phone: "01711-XXXXXX",
+    phone: "01711-234567",
     description: "মাদ্রাসার সামনের রাস্তায় একটু বৃষ্টি হলেই হাঁটু পানি জমে থাকে। ছাত্রছাত্রী ও বয়োবৃদ্ধদের যাতায়াত অসম্ভব হয়ে পড়েছে। জরুরি ড্রেন সংস্কার দরকার।",
     photoUrl: "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=600&auto=format&fit=crop&q=60",
     status: "সমাধানকৃত (Resolved)",
@@ -349,12 +370,12 @@ export const initialGrievances: Grievance[] = [
   {
     id: "g2",
     trackingCode: "JUG-2026-1089",
-    title: "পশ্চিমপাড়ার গভীর নলকূপ অকেজো হয়ে আছে",
+    title: "৬ নং ওয়ার্ডের বামনালী গ্রামের গভীর নলকূপ অকেজো হয়ে আছে",
     category: "বিশুদ্ধ পানি",
-    ward: "ওয়ার্ড ৬",
-    village: "পশ্চিম বিলপাড়া",
+    ward: "৬ নং ওয়ার্ড",
+    village: "বামনালী",
     citizenName: "আসমা বেগম",
-    phone: "01923-XXXXXX",
+    phone: "01923-456789",
     description: "গত দুই সপ্তাহ ধরে খাবার পানির টিউবওয়েলটি নষ্ট। ৫০টিরও বেশি পরিবার দূর থেকে খাবার পানি আনতে বাধ্য হচ্ছে।",
     status: "তদন্তাধীন (In Review)",
     submittedAt: "১৭ অক্টোবর ২০২৬",
@@ -363,12 +384,12 @@ export const initialGrievances: Grievance[] = [
   {
     id: "g3",
     trackingCode: "JUG-2026-1120",
-    title: "সার ডিলার নির্ধারিত দামের চেয়ে বেশি রাখছেন",
+    title: "৪ নং ওয়ার্ডের কামারালি বাজারে সার ডিলার নির্ধারিত দামের চেয়ে বেশি রাখছেন",
     category: "ঘুষ ও দুর্নীতি",
-    ward: "ওয়ার্ড ৪",
-    village: "দক্ষিণপাড়া",
+    ward: "৪ নং ওয়ার্ড",
+    village: "কামারালি",
     citizenName: "আব্দুল করিম (কৃষক)",
-    phone: "01845-XXXXXX",
+    phone: "01845-345678",
     description: "ইউরিয়া ও ডিএপি সারের সরকারি বস্তার দামের চেয়ে বস্তাপ্রতি ১৫০ টাকা বেশি রাখা হচ্ছে। অবিলম্বে নজরদারি দরকার।",
     status: "অপেক্ষমাণ (Pending)",
     submittedAt: "১৮ অক্টোবর ২০২৬",
@@ -425,14 +446,15 @@ export const initialEmergencyContacts: EmergencyContact[] = [
 ];
 
 export const initialBloodDonors: BloodDonor[] = [
-  { id: "b1", name: "হাফেজ শরিফুল ইসলাম", bloodGroup: "A+", ward: "ওয়ার্ড ১", phone: "01711-223344", lastDonated: "৩ মাস আগে", isAvailable: true },
-  { id: "b2", name: "মো: মেহেদী হাসান", bloodGroup: "O+", ward: "ওয়ার্ড ৩", phone: "01822-334455", lastDonated: "৪ মাস আগে", isAvailable: true },
-  { id: "b3", name: "মো: তারেক মাহমুদ", bloodGroup: "B+", ward: "ওয়ার্ড ৫", phone: "01933-445566", lastDonated: "২ মাস আগে", isAvailable: false },
-  { id: "b4", name: "মো: জাহিদুল হক", bloodGroup: "AB+", ward: "ওয়ার্ড ২", phone: "01644-556677", lastDonated: "৫ মাস আগে", isAvailable: true },
-  { id: "b5", name: "মো: সুমন রেজা", bloodGroup: "O-", ward: "ওয়ার্ড ৪", phone: "01755-667788", lastDonated: "৬ মাস আগে", isAvailable: true },
-  { id: "b6", name: "মো: ইমরান হোসেন", bloodGroup: "B-", ward: "ওয়ার্ড ৭", phone: "01866-778899", lastDonated: "৪ মাস আগে", isAvailable: true },
-  { id: "b7", name: "মাওলানা জুবায়ের আহমেদ", bloodGroup: "A+", ward: "ওয়ার্ড ৮", phone: "01777-889900", lastDonated: "১ মাস আগে", isAvailable: false },
-  { id: "b8", name: "মো: নাহিদ হাসান", bloodGroup: "AB-", ward: "ওয়ার্ড ৯", phone: "01988-990011", lastDonated: "৩ মাস আগে", isAvailable: true },
+  { id: "b1", name: "হাফেজ শরিফুল ইসলাম", bloodGroup: "A+", ward: "১ নং ওয়ার্ড", village: "রাজনগর", phone: "01711-223344", lastDonated: "৩ মাস আগে", isAvailable: true, status: "approved", registeredAt: "১০ অক্টোবর ২০২৬" },
+  { id: "b2", name: "মো: মেহেদী হাসান", bloodGroup: "O+", ward: "২ নং ওয়ার্ড", village: "যুগিখালী", phone: "01822-334455", lastDonated: "৪ মাস আগে", isAvailable: true, status: "approved", registeredAt: "১২ অক্টোবর ২০২৬" },
+  { id: "b3", name: "মো: তারেক মাহমুদ", bloodGroup: "B+", ward: "৩ নং ওয়ার্ড", village: "পাইকপাড়া", phone: "01933-445566", lastDonated: "২ মাস আগে", isAvailable: false, status: "approved", registeredAt: "১৫ অক্টোবর ২০২৬" },
+  { id: "b4", name: "মো: জাহিদুল হক", bloodGroup: "AB+", ward: "৪ নং ওয়ার্ড", village: "কামারালি", phone: "01644-556677", lastDonated: "৫ মাস আগে", isAvailable: true, status: "approved", registeredAt: "১৬ অক্টোবর ২০২৬" },
+  { id: "b5", name: "মো: সুমন রেজা", bloodGroup: "O-", ward: "৫ নং ওয়ার্ড", village: "তরুলিয়া", phone: "01755-667788", lastDonated: "৬ মাস আগে", isAvailable: true, status: "approved", registeredAt: "১৭ অক্টোবর ২০২৬" },
+  { id: "b6", name: "মো: ইমরান হোসেন", bloodGroup: "B-", ward: "৬ নং ওয়ার্ড", village: "বামনালী", phone: "01866-778899", lastDonated: "৪ মাস আগে", isAvailable: true, status: "approved", registeredAt: "১৮ অক্টোবর ২০২৬" },
+  { id: "b7", name: "মাওলানা জুবায়ের আহমেদ", bloodGroup: "A+", ward: "৭ নং ওয়ার্ড", village: "ওফাপুর পূর্ব", phone: "01777-889900", lastDonated: "১ মাস আগে", isAvailable: false, status: "approved", registeredAt: "১৯ অক্টোবর ২০২৬" },
+  { id: "b8", name: "মো: নাহিদ হাসান", bloodGroup: "AB-", ward: "৮ নং ওয়ার্ড", village: "বামনখালী", phone: "01988-990011", lastDonated: "৩ মাস আগে", isAvailable: true, status: "approved", registeredAt: "১৯ অক্টোবর ২০২৬" },
+  { id: "b9", name: "মো: আব্দুল্লাহ আল মামুন", bloodGroup: "O+", ward: "৯ নং ওয়ার্ড", village: "পাঁচনল", phone: "01799-112233", lastDonated: "২ মাস আগে", isAvailable: true, status: "approved", registeredAt: "২০ অক্টোবর ২০২৬" },
 ];
 
 export const initialBudget: BudgetItem = {

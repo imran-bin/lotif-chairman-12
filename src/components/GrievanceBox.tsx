@@ -15,6 +15,7 @@ import {
   ShieldAlert
 } from 'lucide-react';
 import { useData } from '@/context/DataContext';
+import { jugikhaliWards } from '@/data/initialData';
 
 export const GrievanceBox: React.FC = () => {
   const { grievances, addGrievance } = useData();
@@ -23,8 +24,9 @@ export const GrievanceBox: React.FC = () => {
   // Submit Form State
   const [citizenName, setCitizenName] = useState('');
   const [phone, setPhone] = useState('');
-  const [ward, setWard] = useState('ওয়ার্ড ১');
-  const [village, setVillage] = useState('');
+  const [ward, setWard] = useState(jugikhaliWards[0].name);
+  const [village, setVillage] = useState(jugikhaliWards[0].villages[0]);
+  const [customVillage, setCustomVillage] = useState('');
   const [category, setCategory] = useState<'রাস্তাঘাট' | 'জলাবদ্ধতা ও ড্রেন' | 'বিশুদ্ধ পানি' | 'ঘুষ ও দুর্নীতি' | 'বিদ্যুৎ ও সোলার' | 'অন্যান্য'>('রাস্তাঘাট');
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
@@ -37,18 +39,30 @@ export const GrievanceBox: React.FC = () => {
   const [trackedItem, setTrackedItem] = useState<(typeof grievances)[0] | null>(null);
   const [searched, setSearched] = useState(false);
 
+  const handleWardChange = (newWard: string) => {
+    setWard(newWard);
+    const wardObj = jugikhaliWards.find(w => w.name === newWard);
+    if (wardObj && wardObj.villages.length > 0) {
+      setVillage(wardObj.villages[0]);
+    } else {
+      setVillage('অন্যান্য');
+    }
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!citizenName || !phone || !description || !title) return;
+    if (!citizenName.trim() || !phone.trim() || !description.trim() || !title.trim()) return;
+
+    const finalVillage = village === 'অন্যান্য' ? (customVillage.trim() || 'যুগিখালী') : village;
 
     const code = addGrievance({
-      title,
-      citizenName,
-      phone,
+      title: title.trim(),
+      citizenName: citizenName.trim(),
+      phone: phone.trim(),
       ward,
-      village: village || 'যুগিখালী',
+      village: finalVillage,
       category,
-      description,
+      description: description.trim(),
       photoUrl: photoUrl || undefined
     });
 
@@ -57,6 +71,7 @@ export const GrievanceBox: React.FC = () => {
     setTitle('');
     setDescription('');
     setPhotoUrl('');
+    setCustomVillage('');
   };
 
   const handleCopy = (code: string) => {
@@ -218,12 +233,12 @@ export const GrievanceBox: React.FC = () => {
                     </label>
                     <select
                       value={ward}
-                      onChange={(e) => setWard(e.target.value)}
-                      className="w-full px-4 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:bg-white outline-none"
+                      onChange={(e) => handleWardChange(e.target.value)}
+                      className="w-full px-4 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:bg-white outline-none font-medium"
                     >
-                      {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((w) => (
-                        <option key={w} value={`ওয়ার্ড ${w}`}>
-                          ওয়ার্ড {w}
+                      {jugikhaliWards.map((w) => (
+                        <option key={w.number} value={w.name}>
+                          {w.name}
                         </option>
                       ))}
                     </select>
@@ -231,15 +246,29 @@ export const GrievanceBox: React.FC = () => {
 
                   <div>
                     <label className="block text-xs font-bold text-slate-700 mb-1.5">
-                      গ্রাম / পাড়ার নাম
+                      গ্রাম / এলাকা <span className="text-rose-500">*</span>
                     </label>
-                    <input
-                      type="text"
-                      placeholder="যেমন: পূর্ব বিলপাড়া"
+                    <select
                       value={village}
                       onChange={(e) => setVillage(e.target.value)}
-                      className="w-full px-4 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:bg-white outline-none"
-                    />
+                      className="w-full px-4 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:bg-white outline-none font-medium"
+                    >
+                      {(jugikhaliWards.find(w => w.name === ward)?.villages || []).map((v) => (
+                        <option key={v} value={v}>
+                          {v}
+                        </option>
+                      ))}
+                      <option value="অন্যান্য">অন্যান্য / নির্দিষ্ট পাড়া</option>
+                    </select>
+                    {village === 'অন্যান্য' && (
+                      <input
+                        type="text"
+                        placeholder="নির্দিষ্ট পাড়া বা এলাকার নাম লিখুন"
+                        value={customVillage}
+                        onChange={(e) => setCustomVillage(e.target.value)}
+                        className="w-full mt-2 px-3 py-2 text-xs bg-white border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none"
+                      />
+                    )}
                   </div>
 
                   <div>
@@ -249,7 +278,7 @@ export const GrievanceBox: React.FC = () => {
                     <select
                       value={category}
                       onChange={(e) => setCategory(e.target.value as any)}
-                      className="w-full px-4 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:bg-white outline-none"
+                      className="w-full px-4 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:bg-white outline-none font-medium"
                     >
                       <option value="রাস্তাঘাট">রাস্তাঘাট ভাঙা / সংস্কার</option>
                       <option value="জলাবদ্ধতা ও ড্রেন">জলাবদ্ধতা ও ড্রেনেজ</option>

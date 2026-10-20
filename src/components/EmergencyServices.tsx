@@ -14,6 +14,7 @@ import {
   Clock
 } from 'lucide-react';
 import { useData } from '@/context/DataContext';
+import { jugikhaliWards } from '@/data/initialData';
 
 export const EmergencyServices: React.FC = () => {
   const { emergencyContacts, bloodDonors, addBloodDonor } = useData();
@@ -24,16 +25,19 @@ export const EmergencyServices: React.FC = () => {
   // New Donor Form State
   const [donorName, setDonorName] = useState('');
   const [donorBlood, setDonorBlood] = useState('O+');
-  const [donorWard, setDonorWard] = useState('ওয়ার্ড ১');
+  const [donorWard, setDonorWard] = useState(jugikhaliWards[0].name);
+  const [donorVillage, setDonorVillage] = useState(jugikhaliWards[0].villages[0]);
   const [donorPhone, setDonorPhone] = useState('');
   const [addedSuccess, setAddedSuccess] = useState(false);
 
   const bloodGroups = ['সকল', 'A+', 'A-', 'B+', 'B-', 'O+', 'O-', 'AB+', 'AB-'];
 
+  // Only show approved donors on the public front-end
   const filteredDonors = bloodDonors.filter(donor => {
+    const isApproved = (donor.status || 'approved') === 'approved';
     const matchesGroup = selectedBloodGroup === 'সকল' || donor.bloodGroup === selectedBloodGroup;
     const matchesWard = donorSearchWard === 'সকল' || donor.ward === donorSearchWard;
-    return matchesGroup && matchesWard;
+    return isApproved && matchesGroup && matchesWard;
   });
 
   const getEmergencyIcon = (category: string) => {
@@ -51,17 +55,27 @@ export const EmergencyServices: React.FC = () => {
     }
   };
 
+  const handleWardChange = (newWard: string) => {
+    setDonorWard(newWard);
+    const wardObj = jugikhaliWards.find(w => w.name === newWard);
+    if (wardObj && wardObj.villages.length > 0) {
+      setDonorVillage(wardObj.villages[0]);
+    }
+  };
+
   const handleRegisterDonor = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!donorName || !donorPhone) return;
+    if (!donorName.trim() || !donorPhone.trim()) return;
 
     addBloodDonor({
-      name: donorName,
+      name: donorName.trim(),
       bloodGroup: donorBlood,
       ward: donorWard,
-      phone: donorPhone,
-      lastDonated: 'সবেমাত্র যুক্ত হয়েছেন',
-      isAvailable: true
+      village: donorVillage,
+      phone: donorPhone.trim(),
+      lastDonated: 'সবেমাত্র নিবন্ধিত',
+      isAvailable: true,
+      status: 'pending'
     });
 
     setAddedSuccess(true);
@@ -70,7 +84,7 @@ export const EmergencyServices: React.FC = () => {
       setShowAddDonorModal(false);
       setDonorName('');
       setDonorPhone('');
-    }, 1500);
+    }, 3200);
   };
 
   return (
@@ -181,9 +195,11 @@ export const EmergencyServices: React.FC = () => {
               onChange={(e) => setDonorSearchWard(e.target.value)}
               className="bg-white border border-slate-200 rounded-lg px-3 py-1.5 font-medium outline-none text-slate-800"
             >
-              <option value="সকল">সকল ওয়ার্ড</option>
-              {[1, 2, 3, 4, 5, 6, 7, 8, 9].map(w => (
-                <option key={w} value={`ওয়ার্ড ${w}`}>ওয়ার্ড {w}</option>
+              <option value="সকল">সকল ওয়ার্ড ({jugikhaliWards.length}টি ওয়ার্ড)</option>
+              {jugikhaliWards.map(w => (
+                <option key={w.number} value={w.name}>
+                  {w.name}: {w.villages.join(', ')}
+                </option>
               ))}
             </select>
           </div>
@@ -211,7 +227,9 @@ export const EmergencyServices: React.FC = () => {
                 </div>
 
                 <h4 className="font-bold text-slate-900 text-sm">{donor.name}</h4>
-                <p className="text-xs text-slate-500">{donor.ward} • {donor.lastDonated}</p>
+                <p className="text-xs text-slate-500">
+                  {donor.ward}{donor.village ? ` • ${donor.village}` : ''} • {donor.lastDonated}
+                </p>
               </div>
 
               <a
@@ -243,9 +261,18 @@ export const EmergencyServices: React.FC = () => {
               </p>
 
               {addedSuccess ? (
-                <div className="text-center py-6 space-y-2">
+                <div className="text-center py-6 space-y-3 animate-in fade-in">
                   <CheckCircle2 className="w-12 h-12 text-emerald-600 mx-auto" />
-                  <p className="font-bold text-slate-900">অভিনন্দন! নিবন্ধন সফল হয়েছে।</p>
+                  <h4 className="font-bold text-slate-900 text-base">নিবন্ধন সফলভাবে জমা হয়েছে!</h4>
+                  <p className="text-xs text-slate-600 leading-relaxed bg-emerald-50 border border-emerald-200 p-3.5 rounded-2xl">
+                    সুপার অ্যাডমিন কর্তৃক যাচাই ও অনুমোদনের পর রক্তদাতা তালিকায় আপনার নাম প্রকাশিত হবে। মহৎ এই উদ্যোগের জন্য ধন্যবাদ!
+                  </p>
+                  <button
+                    onClick={() => setShowAddDonorModal(false)}
+                    className="mt-2 px-5 py-2 bg-emerald-600 text-white rounded-xl text-xs font-bold hover:bg-emerald-700 transition"
+                  >
+                    ঠিক আছে
+                  </button>
                 </div>
               ) : (
                 <form onSubmit={handleRegisterDonor} className="space-y-4">
@@ -279,14 +306,27 @@ export const EmergencyServices: React.FC = () => {
                       <label className="block text-xs font-bold text-slate-700 mb-1">ওয়ার্ড নম্বর *</label>
                       <select
                         value={donorWard}
-                        onChange={(e) => setDonorWard(e.target.value)}
+                        onChange={(e) => handleWardChange(e.target.value)}
                         className="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl outline-none"
                       >
-                        {[1, 2, 3, 4, 5, 6, 7, 8, 9].map(w => (
-                          <option key={w} value={`ওয়ার্ড ${w}`}>ওয়ার্ড {w}</option>
+                        {jugikhaliWards.map(w => (
+                          <option key={w.number} value={w.name}>{w.name}</option>
                         ))}
                       </select>
                     </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-slate-700 mb-1">গ্রাম / এলাকা *</label>
+                    <select
+                      value={donorVillage}
+                      onChange={(e) => setDonorVillage(e.target.value)}
+                      className="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl outline-none"
+                    >
+                      {(jugikhaliWards.find(w => w.name === donorWard)?.villages || ['যুগিখালী']).map(v => (
+                        <option key={v} value={v}>{v}</option>
+                      ))}
+                    </select>
                   </div>
 
                   <div>
