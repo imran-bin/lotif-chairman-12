@@ -24,7 +24,7 @@ export const Navbar: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
 
   const allNavLinks = [
-    { label: sectionVisibility?.memberCandidates ? 'ওয়ার্ড ও মেম্বার প্রার্থী' : '৯টি ওয়ার্ড', href: '#wards', icon: MapPin, show: true },
+    { label: sectionVisibility?.memberCandidates ? 'মেম্বার ইশতেহার ও ওয়ার্ড' : '৯টি ওয়ার্ড', href: '#member-manifesto', icon: MapPin, show: true },
     { label: 'ইশতেহার', href: '#manifesto', icon: FileText, show: sectionVisibility?.manifesto },
     { label: 'সামাজিক কাজ', href: '#social-activities', icon: HeartHandshake, show: sectionVisibility?.socialActivities },
     { label: 'ইসলামিক বার্তা', href: '#guidance', icon: ShieldCheck, show: sectionVisibility?.islamicGuidance },

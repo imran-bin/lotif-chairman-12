@@ -493,6 +493,7 @@ export default function AdminPage() {
     const wardInfo = jugikhaliWards.find(w => w.number === mWardNumber);
     const wardName = wardInfo ? wardInfo.name : `${mWardNumber} নং ওয়ার্ড`;
     const cleanEducation = mEducation.filter(ed => ed.degree.trim() !== '');
+    const existingCand = editingMemberId ? memberCandidates.find(c => c.id === editingMemberId) : null;
 
     const candidatePayload = {
       name: mName.trim(),
@@ -508,6 +509,28 @@ export default function AdminPage() {
       shortQualifications: mShortQualifications.trim(),
       bio: mBio.trim(),
       manifestoPledge: mPledge.trim(),
+      manifestoPoints: existingCand?.manifestoPoints || [
+        {
+          title: "রাস্তাঘাট ও টেকসই ড্রেনেজ সংস্কার",
+          description: "ওয়ার্ডের সকল অভ্যন্তরীণ কাঁচা ও আধা-পাকা রাস্তা পাকাকরণ এবং বর্ষাকালে জলাবদ্ধতামুক্ত ড্রেন নির্মাণ।"
+        },
+        {
+          title: "সুপেয় সুমিষ্টি পানি ও স্বাস্থ্য সুরক্ষা",
+          description: "প্রতিটি পাড়ায় গভীর নলকূপ স্থাপন ও আর্সেনিকমুক্ত নিরাপদ মিষ্টি পানির নিশ্চয়তা।"
+        },
+        {
+          title: "মাদক, জুয়া ও অপরাধমুক্ত নিরাপদ সমাজ",
+          description: "তরুণ প্রজন্মকে মাদকের হাত থেকে রক্ষা করতে সামাজিক প্রতিরোধ কমিটি গঠন।"
+        },
+        {
+          title: "মেধাভিত্তিক যুব কর্মসংস্থান ও আইটি প্রশিক্ষণ",
+          description: "ওয়ার্ডের যুবকদের কারিগরি প্রশিক্ষণ এবং অসচ্ছল মেধাবী শিক্ষার্থীদের শিক্ষাবৃত্তি।"
+        },
+        {
+          title: "জবাবদিহিমূলক নাগরিক সেবা ও শতভাগ স্বচ্ছতা",
+          description: "নাগরিক সনদ, জন্মনিবন্ধন ও বয়স্ক/বিধবা ভাতায় শতভাগ ঘুষমুক্ত ও ন্যায়নিষ্ঠ সেবা।"
+        }
+      ],
       education: cleanEducation,
       isActive: mIsActive
     };
