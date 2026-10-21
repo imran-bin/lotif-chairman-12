@@ -24,7 +24,7 @@ export default function Home() {
       <Navbar />
       {sectionVisibility.hero && <Hero />}
       {sectionVisibility.memberCandidates !== false && <MemberCandidateBanner />}
-      <UnionWards />
+      {sectionVisibility.unionWards && <UnionWards />}
       {sectionVisibility.manifesto && <Manifesto />}
       {sectionVisibility.socialActivities && <SocialActivities />}
       {sectionVisibility.islamicGuidance && <IslamicGuidance />}

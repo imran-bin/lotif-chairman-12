@@ -322,10 +322,10 @@ export const MemberCandidateBanner: React.FC = () => {
                   </div>
 
                   <a
-                    href="#wards"
+                    href={sectionVisibility?.unionWards ? "#wards" : "#manifesto"}
                     className="px-4 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs transition flex items-center gap-1.5 shadow-md active:scale-95 shrink-0"
                   >
-                    <span>সকল ৯টি ওয়ার্ডের বিবরণী</span>
+                    <span>{sectionVisibility?.unionWards ? "সকল ৯টি ওয়ার্ডের বিবরণী" : "চেয়ারম্যানের মূল ইশতেহার"}</span>
                     <ChevronRight className="w-4 h-4" />
                   </a>
                 </div>

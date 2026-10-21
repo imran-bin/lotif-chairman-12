@@ -52,6 +52,7 @@ export interface SectionVisibility {
   agricultureCorner: boolean;
   certificateGuide: boolean;
   memberCandidates?: boolean;
+  unionWards?: boolean;
 }
 
 export interface EducationRecord {
@@ -620,7 +621,8 @@ export const initialSectionVisibility: SectionVisibility = {
   budgetTransparency: false,// ইউপি বাজেট ও উন্নয়ন প্রকল্পের খরচ (OFF - নির্বাচনের পরের বিষয়)
   agricultureCorner: false, // সার ডিলার ও কৃষি তালিকা (OFF)
   certificateGuide: false,  // নাগরিক সনদ ও ওয়ারিশ আবেদন গাইড (OFF - নির্বাচনের পরের বিষয়)
-  memberCandidates: true,   // ওয়ার্ডভিত্তিক ইউপি সদস্য প্রার্থী পরিচিতি (ON)
+  memberCandidates: true,   // ওয়ার্ডভিত্তিক ইউপি সদস্য প্রার্থী ও ৫ দফা ইশতেহার ব্যানার (ON)
+  unionWards: false,        // ৯টি ওয়ার্ড ও গ্রাম তালিকার গ্রিড (OFF - মেম্বার ব্যানারের সাথে অপ্রয়োজনীয় হলে অফ থাকবে, ব্যাকএন্ড থেকে অন করা যাবে)
 };
 
 export const initialMemberCandidates: MemberCandidate[] = [

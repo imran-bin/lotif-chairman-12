@@ -373,6 +373,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
       agricultureCorner: true,
       certificateGuide: true,
       memberCandidates: true,
+      unionWards: true,
     };
     setSectionVisibility(allOn);
     saveItem('sections', allOn);
