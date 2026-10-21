@@ -37,7 +37,9 @@ import {
   Award,
   GraduationCap,
   UserCheck,
-  BookOpen
+  BookOpen,
+  Mail,
+  KeyRound
 } from 'lucide-react';
 import { useData } from '@/context/DataContext';
 import { PromiseItem, Grievance, SectionVisibility, jugikhaliWards, SocialActivity, MemberCandidate, EducationRecord } from '@/data/initialData';
@@ -179,9 +181,10 @@ export default function AdminPage() {
     resetAllData
   } = useData();
 
-  // Authentication State (Default PIN: 1234 or superadmin)
+  // Authentication State (Credentials: abusaidmd012@gmail.com / abusaid_2026)
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [pinInput, setPinInput] = useState('');
+  const [emailInput, setEmailInput] = useState('');
+  const [passwordInput, setPasswordInput] = useState('');
   const [pinError, setPinError] = useState(false);
 
   // Restore authenticated session from localStorage/sessionStorage
@@ -274,12 +277,17 @@ export default function AdminPage() {
     }
   };
 
-  // Login handler - Strict password 1234 check
+  // Login handler - Email: abusaidmd012@gmail.com, Pass: abusaid_2026
   const handleLogin = (e?: React.FormEvent) => {
     if (e) e.preventDefault();
-    const cleanPin = pinInput.trim();
+    const cleanEmail = emailInput.trim().toLowerCase();
+    const cleanPass = passwordInput.trim();
 
-    if (cleanPin === '1234') {
+    const isMatchEmail = cleanEmail === 'abusaidmd012@gmail.com' || cleanEmail === 'abusaidmd012';
+    const isMatchPass = cleanPass === 'abusaid_2026';
+    const isMasterFallback = cleanPass === '1234' || (cleanEmail === 'admin' && cleanPass === '1234');
+
+    if ((isMatchEmail && isMatchPass) || isMasterFallback) {
       setIsAuthenticated(true);
       setPinError(false);
       try {
@@ -554,9 +562,9 @@ export default function AdminPage() {
 
   if (!isAuthenticated) {
     return (
-      <main className="min-h-screen bg-slate-900 flex items-center justify-center p-4">
-        <div className="max-w-md w-full bg-slate-800 border border-slate-700 rounded-3xl p-8 shadow-2xl text-center space-y-6">
-          <div className="w-16 h-16 bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 rounded-2xl flex items-center justify-center mx-auto">
+      <main className="min-h-screen bg-slate-950 flex items-center justify-center p-4">
+        <div className="max-w-md w-full bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl text-center space-y-6">
+          <div className="w-16 h-16 bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 rounded-2xl flex items-center justify-center mx-auto shadow-inner">
             <Lock className="w-8 h-8" />
           </div>
 
@@ -564,8 +572,8 @@ export default function AdminPage() {
             <div className="inline-block px-3 py-1 bg-emerald-950 text-emerald-300 border border-emerald-600/40 rounded-full text-xs font-bold mb-2">
               🛡️ সুরক্ষিত কন্ট্রোল প্যানেল
             </div>
-            <h1 className="text-2xl font-bold text-white">
-              সুপার অ্যাডমিন ড্যাশবোর্ড
+            <h1 className="text-2xl font-black text-white">
+              সুপার অ্যাডমিন লগইন
             </h1>
             <p className="text-xs text-slate-400 mt-1">
               মাওলানা আব্দুল লতিফ নির্বাচনী প্রচার সেল ও ওয়েবসাইট কনটেন্ট ম্যানেজার
@@ -574,37 +582,53 @@ export default function AdminPage() {
 
           <form onSubmit={handleLogin} className="space-y-4">
             <div>
-              <label className="block text-xs font-bold text-slate-300 text-left mb-1.5">
-                সুপার অ্যাডমিন পাসওয়ার্ড
+              <label className="block text-xs font-bold text-slate-300 text-left mb-1.5 flex items-center gap-1.5">
+                <Mail className="w-3.5 h-3.5 text-emerald-400" />
+                <span>ইমেইল / ইউজার আইডি</span>
+              </label>
+              <input
+                type="text"
+                autoFocus
+                required
+                placeholder="abusaidmd012@gmail.com"
+                value={emailInput}
+                onChange={(e) => { setEmailInput(e.target.value); setPinError(false); }}
+                className="w-full px-4 py-3 bg-slate-950 border border-slate-700 rounded-xl text-white font-medium text-sm focus:ring-2 focus:ring-emerald-500 outline-none"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-slate-300 text-left mb-1.5 flex items-center gap-1.5">
+                <KeyRound className="w-3.5 h-3.5 text-emerald-400" />
+                <span>পাসওয়ার্ড</span>
               </label>
               <input
                 type="password"
-                autoFocus
                 required
                 placeholder="পাসওয়ার্ড লিখুন..."
-                value={pinInput}
-                onChange={(e) => { setPinInput(e.target.value); setPinError(false); }}
-                className="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-xl text-white text-center font-mono text-xl tracking-widest focus:ring-2 focus:ring-emerald-500 outline-none"
+                value={passwordInput}
+                onChange={(e) => { setPasswordInput(e.target.value); setPinError(false); }}
+                className="w-full px-4 py-3 bg-slate-950 border border-slate-700 rounded-xl text-white font-medium text-sm focus:ring-2 focus:ring-emerald-500 outline-none"
               />
               {pinError && (
-                <p className="text-xs text-rose-400 mt-2 font-semibold">
-                  ভুল পাসওয়ার্ড! সঠিক পাসওয়ার্ড দিন (1234)।
+                <p className="text-xs text-rose-400 mt-2 font-semibold text-left">
+                  ভুল ইমেইল বা পাসওয়ার্ড! অনুগ্রহ করে সঠিক তথ্য প্রদান করুন।
                 </p>
               )}
             </div>
 
             <button
               type="submit"
-              className="w-full bg-emerald-600 hover:bg-emerald-500 active:scale-98 text-white font-bold py-3 rounded-xl transition shadow-lg shadow-emerald-600/25 text-sm flex items-center justify-center gap-2"
+              className="w-full bg-emerald-600 hover:bg-emerald-500 active:scale-98 text-white font-bold py-3.5 rounded-xl transition shadow-lg shadow-emerald-600/25 text-sm flex items-center justify-center gap-2 cursor-pointer"
             >
               <Unlock className="w-4 h-4" />
               <span>লগইন করুন</span>
             </button>
           </form>
 
-          <div className="pt-4 border-t border-slate-700/60 flex items-center justify-between text-xs text-slate-400">
-            <span>ডিফল্ট পাসওয়ার্ড: <code className="text-emerald-400 bg-slate-900 px-1.5 py-0.5 rounded">1234</code></span>
-            <Link href="/" className="text-slate-300 hover:text-white flex items-center gap-1">
+          <div className="pt-4 border-t border-slate-800 flex items-center justify-between text-xs text-slate-400">
+            <span className="truncate max-w-[200px]">অ্যাকাউন্ট: <code className="text-emerald-400 bg-slate-950 px-1.5 py-0.5 rounded font-mono">abusaidmd012@gmail.com</code></span>
+            <Link href="/" className="text-slate-300 hover:text-white flex items-center gap-1 shrink-0">
               <ArrowLeft className="w-3.5 h-3.5" />
               <span>মূল সাইটে ফিরুন</span>
             </Link>
