@@ -12,6 +12,7 @@ import {
   AgricultureInfo,
   SocialActivity,
   SectionVisibility,
+  MemberCandidate,
   initialCandidateInfo,
   initialManifestoPillars,
   initialPromises,
@@ -21,7 +22,8 @@ import {
   initialBudget,
   initialAgriculture,
   initialSocialActivities,
-  initialSectionVisibility
+  initialSectionVisibility,
+  initialMemberCandidates
 } from '@/data/initialData';
 
 interface DataContextType {
@@ -35,11 +37,17 @@ interface DataContextType {
   agriculture: AgricultureInfo;
   socialActivities: SocialActivity[];
   sectionVisibility: SectionVisibility;
+  memberCandidates: MemberCandidate[];
   
   // Section Visibility Controls
   updateSectionVisibility: (section: keyof SectionVisibility, visible: boolean) => void;
   setCampaignMode: () => void;
   setAllSectionsOn: () => void;
+  
+  // Member Candidates Management (Ward-wise)
+  addMemberCandidate: (candidate: Omit<MemberCandidate, 'id'>) => void;
+  updateMemberCandidate: (id: string, updated: Partial<MemberCandidate>) => void;
+  deleteMemberCandidate: (id: string) => void;
   
   // Actions for Citizen & Admin
   updatePromise: (id: string, updated: Partial<PromiseItem>) => void;
@@ -84,6 +92,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [agriculture] = useState<AgricultureInfo>(initialAgriculture);
   const [socialActivities, setSocialActivities] = useState<SocialActivity[]>(initialSocialActivities);
   const [sectionVisibility, setSectionVisibility] = useState<SectionVisibility>(initialSectionVisibility);
+  const [memberCandidates, setMemberCandidates] = useState<MemberCandidate[]>(initialMemberCandidates);
   const [isGrievanceModalOpen, setIsGrievanceModalOpen] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
 
@@ -135,6 +144,20 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       const savedActivities = localStorage.getItem(`${STORAGE_KEY_PREFIX}activities`);
       if (savedActivities) setSocialActivities(JSON.parse(savedActivities));
+
+      const savedCandidates = localStorage.getItem(`${STORAGE_KEY_PREFIX}member_candidates`);
+      if (savedCandidates) {
+        try {
+          const parsed = JSON.parse(savedCandidates);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            setMemberCandidates(parsed);
+          } else {
+            setMemberCandidates(initialMemberCandidates);
+          }
+        } catch {
+          setMemberCandidates(initialMemberCandidates);
+        }
+      }
 
       const savedSections = localStorage.getItem(`${STORAGE_KEY_PREFIX}sections`);
       if (savedSections) {
@@ -296,6 +319,34 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
   };
 
+  const addMemberCandidate = (candidateData: Omit<MemberCandidate, 'id'>) => {
+    const newCandidate: MemberCandidate = {
+      ...candidateData,
+      id: `mc_${Date.now()}`
+    };
+    setMemberCandidates(prev => {
+      const next = [newCandidate, ...prev];
+      saveItem('member_candidates', next);
+      return next;
+    });
+  };
+
+  const updateMemberCandidate = (id: string, updated: Partial<MemberCandidate>) => {
+    setMemberCandidates(prev => {
+      const next = prev.map(c => c.id === id ? { ...c, ...updated } : c);
+      saveItem('member_candidates', next);
+      return next;
+    });
+  };
+
+  const deleteMemberCandidate = (id: string) => {
+    setMemberCandidates(prev => {
+      const next = prev.filter(c => c.id !== id);
+      saveItem('member_candidates', next);
+      return next;
+    });
+  };
+
   const updateSectionVisibility = (section: keyof SectionVisibility, visible: boolean) => {
     setSectionVisibility(prev => {
       const next = { ...prev, [section]: visible };
@@ -321,6 +372,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
       budgetTransparency: true,
       agricultureCorner: true,
       certificateGuide: true,
+      memberCandidates: true,
     };
     setSectionVisibility(allOn);
     saveItem('sections', allOn);
@@ -337,6 +389,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setBudget(initialBudget);
       setSocialActivities(initialSocialActivities);
       setSectionVisibility(initialSectionVisibility);
+      setMemberCandidates(initialMemberCandidates);
     }
   };
 
@@ -353,9 +406,13 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
         agriculture,
         socialActivities,
         sectionVisibility,
+        memberCandidates,
         updateSectionVisibility,
         setCampaignMode,
         setAllSectionsOn,
+        addMemberCandidate,
+        updateMemberCandidate,
+        deleteMemberCandidate,
         updatePromise,
         addPromise,
         deletePromise,

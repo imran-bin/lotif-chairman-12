@@ -51,6 +51,35 @@ export interface SectionVisibility {
   budgetTransparency: boolean;
   agricultureCorner: boolean;
   certificateGuide: boolean;
+  memberCandidates?: boolean;
+}
+
+export interface EducationRecord {
+  degree: string;
+  year?: string;
+  institution?: string;
+  result?: string;
+}
+
+export interface MemberCandidate {
+  id: string;
+  name: string;
+  fatherName: string;
+  motherName: string;
+  wardNumber: number;
+  wardName: string;
+  village: string;
+  designation: string;
+  party: string;
+  symbol?: string;
+  photoUrl: string;
+  phone?: string;
+  email?: string;
+  bio?: string;
+  shortQualifications: string;
+  education: EducationRecord[];
+  manifestoPledge?: string;
+  isActive: boolean;
 }
 
 export interface SocialActivity {
@@ -586,6 +615,37 @@ export const initialSectionVisibility: SectionVisibility = {
   budgetTransparency: false,// ইউপি বাজেট ও উন্নয়ন প্রকল্পের খরচ (OFF - নির্বাচনের পরের বিষয়)
   agricultureCorner: false, // সার ডিলার ও কৃষি তালিকা (OFF)
   certificateGuide: false,  // নাগরিক সনদ ও ওয়ারিশ আবেদন গাইড (OFF - নির্বাচনের পরের বিষয়)
+  memberCandidates: true,   // ওয়ার্ডভিত্তিক ইউপি সদস্য প্রার্থী পরিচিতি (ON)
 };
+
+export const initialMemberCandidates: MemberCandidate[] = [
+  {
+    id: "member-ward-3-afsar",
+    name: "মো: আফছার আলী",
+    fatherName: "মো: ওমর আলী",
+    motherName: "সাজেদা খাতুন",
+    wardNumber: 3,
+    wardName: "৩ নং ওয়ার্ড",
+    village: "পাইকপাড়া",
+    designation: "ইউপি সাধারণ সদস্য (মেম্বার) পদপ্রার্থী",
+    party: "বাংলাদেশ জামায়াতে ইসলামী সমর্থিত",
+    photoUrl: "/member-afsar.png",
+    phone: "+880 1712-000000",
+    shortQualifications: "বিএ (অনার্স), এমএ (ডাবল), বিএমএড & এলএলবি",
+    bio: "৩ নং ওয়ার্ড পাইকপাড়াকে ইনসাফভিত্তিক, সৎ ও উচ্চশিক্ষিত নেতৃত্বের মাধ্যমে একটি আদর্শ আধুনিক মডেল ওয়ার্ড হিসেবে গড়ে তুলতে এবং চেয়ারম্যান পদপ্রার্থী মাওলানা আব্দুল লতিফের দুর্নীতিমুক্ত ইউনিয়ন পরিষদের হাতকে শক্তিশালী করতে আপনাদের মূল্যবান দোয়া, সমর্থন ও ভোট প্রত্যাশী।",
+    manifestoPledge: "রাস্তাঘাট ও কালভার্ট সংস্কার, সুপেয় মিষ্টি পানি নিশ্চিতকরণ, মাদক ও বৈষম্যমুক্ত সমাজ এবং মেধাভিত্তিক যুব কর্মসংস্থান সৃষ্টি করাই আমার প্রধান অঙ্গীকার।",
+    education: [
+      { degree: "দাখিল", year: "২০০৩", institution: "কামারালি দাখিল মাদ্রাসা", result: "জিপিএ ৩.৫৮" },
+      { degree: "আলিম", year: "২০০৫", institution: "চাকলা সি: ফাজিল মাদ্রাসা", result: "জিপিএ ৩.০০" },
+      { degree: "ফাজিল (বিএ)", year: "২০০৭", institution: "কলারোয়া আলিয়া মাদ্রাসা (ইসলামী বিশ্ববিদ্যালয়)", result: "প্রথম বিভাগ" },
+      { degree: "কামিল (এমএ)", year: "২০০৯", institution: "যশোর আমিনিয়া কামিল (স্নাতকোত্তর) মাদ্রাসা (ইসলামী বিশ্ববিদ্যালয়)", result: "সিজিপিএ ৩.৬৫" },
+      { degree: "বিএ (সম্মান/অনার্স)", year: "২০০৯", institution: "সরকারী মাইকেল মধুসূদন দত্ত কলেজ, যশোর (জাতীয় বিশ্ববিদ্যালয়)", result: "দ্বিতীয় বিভাগ" },
+      { degree: "এমএ (মাস্টার্স)", year: "২০১০", institution: "জাতীয় বিশ্ববিদ্যালয়", result: "দ্বিতীয় বিভাগ" },
+      { degree: "এলএলবি (আইন)", year: "২০১৫", institution: "জাতীয় বিশ্ববিদ্যালয়", result: "দ্বিতীয় বিভাগ" },
+      { degree: "বিএমএড", year: "২০২৬", institution: "জাতীয় বিশ্ববিদ্যালয় / উন্মুক্ত", result: "সিজিপিএ ৩.২৩" }
+    ],
+    isActive: true
+  }
+];
 
 

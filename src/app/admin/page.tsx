@@ -33,10 +33,14 @@ import {
   X,
   Droplet,
   Clock,
-  Search
+  Search,
+  Award,
+  GraduationCap,
+  UserCheck,
+  BookOpen
 } from 'lucide-react';
 import { useData } from '@/context/DataContext';
-import { PromiseItem, Grievance, SectionVisibility, jugikhaliWards, SocialActivity } from '@/data/initialData';
+import { PromiseItem, Grievance, SectionVisibility, jugikhaliWards, SocialActivity, MemberCandidate, EducationRecord } from '@/data/initialData';
 
 interface SectionConfig {
   key: keyof SectionVisibility;
@@ -127,6 +131,14 @@ const sectionList: SectionConfig[] = [
     isCampaignEssential: false,
     desc: 'জন্মনিবন্ধন, ওয়ারিশ সনদ ও চারিত্রিক সনদপত্র পাওয়ার নিয়মাবলি (ইউপি পরিষদ চালুর পর দরকার)।',
     link: '/#certificate'
+  },
+  {
+    key: 'memberCandidates',
+    name: 'ওয়ার্ডভিত্তিক ইউপি সদস্য প্রার্থী পরিচিতি',
+    badge: 'প্রচারণামূলক',
+    isCampaignEssential: true,
+    desc: '১ থেকে ৯ নং ওয়ার্ডের ইউপি সদস্য (মেম্বার) প্রার্থীদের ছবি, নাম, বিস্তারিত শিক্ষাগত যোগ্যতা ও অঙ্গীকার।',
+    link: '/#wards'
   }
 ];
 
@@ -139,6 +151,10 @@ export default function AdminPage() {
     bloodDonors,
     socialActivities,
     sectionVisibility,
+    memberCandidates,
+    addMemberCandidate,
+    updateMemberCandidate,
+    deleteMemberCandidate,
     updateSectionVisibility,
     setCampaignMode,
     setAllSectionsOn,
@@ -175,7 +191,7 @@ export default function AdminPage() {
   }, []);
 
   // Active Tab & Navigation
-  const [activeTab, setActiveTab] = useState<'overview' | 'sections' | 'activities' | 'blood' | 'grievances' | 'promises' | 'candidate' | 'budget' | 'deploy'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'sections' | 'activities' | 'memberCandidates' | 'blood' | 'grievances' | 'promises' | 'candidate' | 'budget' | 'deploy'>('overview');
   const [sectionNotice, setSectionNotice] = useState<string | null>(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
@@ -371,6 +387,140 @@ export default function AdminPage() {
     setNewActVideoUrl('');
   };
 
+  // Member Candidates Management State
+  const [candFilterWard, setCandFilterWard] = useState<string>('সকল');
+  const [candSearchText, setCandSearchText] = useState<string>('');
+  const [showMemberModal, setShowMemberModal] = useState<boolean>(false);
+  const [editingMemberId, setEditingMemberId] = useState<string | null>(null);
+
+  // Form fields for Member Candidate
+  const [mName, setMName] = useState('');
+  const [mFatherName, setMFatherName] = useState('');
+  const [mMotherName, setMMotherName] = useState('');
+  const [mWardNumber, setMWardNumber] = useState<number>(3);
+  const [mVillage, setMVillage] = useState('পাইকপাড়া');
+  const [mDesignation, setMDesignation] = useState('ইউপি সাধারণ সদস্য (মেম্বার) পদপ্রার্থী');
+  const [mParty, setMParty] = useState('বাংলাদেশ জামায়াতে ইসলামী সমর্থিত');
+  const [mPhotoUrl, setMPhotoUrl] = useState('/member-afsar.png');
+  const [mPhone, setMPhone] = useState('');
+  const [mShortQualifications, setMShortQualifications] = useState('');
+  const [mBio, setMBio] = useState('');
+  const [mPledge, setMPledge] = useState('');
+  const [mIsActive, setMIsActive] = useState<boolean>(true);
+  const [mEducation, setMEducation] = useState<EducationRecord[]>([
+    { degree: '', year: '', institution: '', result: '' }
+  ]);
+
+  const openNewMemberModal = () => {
+    setEditingMemberId(null);
+    setMName('');
+    setMFatherName('');
+    setMMotherName('');
+    setMWardNumber(1);
+    setMVillage(jugikhaliWards[0].villages[0]);
+    setMDesignation('ইউপি সাধারণ সদস্য (মেম্বার) পদপ্রার্থী');
+    setMParty('বাংলাদেশ জামায়াতে ইসলামী সমর্থিত');
+    setMPhotoUrl('/member-afsar.png');
+    setMPhone('');
+    setMShortQualifications('');
+    setMBio('');
+    setMPledge('');
+    setMIsActive(true);
+    setMEducation([
+      { degree: 'দাখিল / এসএসসি', year: '', institution: '', result: '' },
+      { degree: 'আলিম / এইচএসসি', year: '', institution: '', result: '' },
+      { degree: 'স্নাতক (সম্মান / ফাজিল)', year: '', institution: '', result: '' },
+      { degree: 'মাস্টার্স / কামিল', year: '', institution: '', result: '' }
+    ]);
+    setShowMemberModal(true);
+  };
+
+  const openEditMemberModal = (cand: MemberCandidate) => {
+    setEditingMemberId(cand.id);
+    setMName(cand.name);
+    setMFatherName(cand.fatherName || '');
+    setMMotherName(cand.motherName || '');
+    setMWardNumber(cand.wardNumber);
+    setMVillage(cand.village || '');
+    setMDesignation(cand.designation || 'ইউপি সাধারণ সদস্য (মেম্বার) পদপ্রার্থী');
+    setMParty(cand.party || 'বাংলাদেশ জামায়াতে ইসলামী সমর্থিত');
+    setMPhotoUrl(cand.photoUrl || '/member-afsar.png');
+    setMPhone(cand.phone || '');
+    setMShortQualifications(cand.shortQualifications || '');
+    setMBio(cand.bio || '');
+    setMPledge(cand.manifestoPledge || '');
+    setMIsActive(cand.isActive);
+    setMEducation(cand.education && cand.education.length > 0 ? [...cand.education] : [
+      { degree: '', year: '', institution: '', result: '' }
+    ]);
+    setShowMemberModal(true);
+  };
+
+  const handleMemberPhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 2 * 1024 * 1024) {
+        alert('ছবির সাইজ সর্বোচ্চ ২ মেগাবাইট হতে হবে!');
+        return;
+      }
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setMPhotoUrl(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const addEducationRow = () => {
+    setMEducation(prev => [...prev, { degree: '', year: '', institution: '', result: '' }]);
+  };
+
+  const removeEducationRow = (index: number) => {
+    setMEducation(prev => prev.filter((_, idx) => idx !== index));
+  };
+
+  const updateEducationField = (index: number, field: keyof EducationRecord, value: string) => {
+    setMEducation(prev => prev.map((item, idx) => idx === index ? { ...item, [field]: value } : item));
+  };
+
+  const handleSaveMemberCandidate = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!mName.trim()) {
+      alert('প্রার্থীর নাম দেওয়া আবশ্যক!');
+      return;
+    }
+
+    const wardInfo = jugikhaliWards.find(w => w.number === mWardNumber);
+    const wardName = wardInfo ? wardInfo.name : `${mWardNumber} নং ওয়ার্ড`;
+    const cleanEducation = mEducation.filter(ed => ed.degree.trim() !== '');
+
+    const candidatePayload = {
+      name: mName.trim(),
+      fatherName: mFatherName.trim(),
+      motherName: mMotherName.trim(),
+      wardNumber: mWardNumber,
+      wardName,
+      village: mVillage.trim() || (wardInfo ? wardInfo.villages[0] : ''),
+      designation: mDesignation.trim(),
+      party: mParty.trim(),
+      photoUrl: mPhotoUrl.trim() || '/member-afsar.png',
+      phone: mPhone.trim(),
+      shortQualifications: mShortQualifications.trim(),
+      bio: mBio.trim(),
+      manifestoPledge: mPledge.trim(),
+      education: cleanEducation,
+      isActive: mIsActive
+    };
+
+    if (editingMemberId) {
+      updateMemberCandidate(editingMemberId, candidatePayload);
+    } else {
+      addMemberCandidate(candidatePayload);
+    }
+
+    setShowMemberModal(false);
+  };
+
   if (!isAuthenticated) {
     return (
       <main className="min-h-screen bg-slate-900 flex items-center justify-center p-4">
@@ -445,7 +595,7 @@ export default function AdminPage() {
       label: 'সেকশন নিয়ন্ত্রণ', 
       subLabel: 'প্রচার মোড অন/অফ',
       icon: Sliders, 
-      count: `${activeSectionsCount}/10`,
+      count: `${activeSectionsCount}/${sectionList.length}`,
       countColor: 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
     },
     { 
@@ -455,6 +605,14 @@ export default function AdminPage() {
       icon: Film, 
       count: socialActivities.length,
       countColor: 'bg-teal-500/20 text-teal-300'
+    },
+    { 
+      id: 'memberCandidates', 
+      label: 'ওয়ার্ড মেম্বার প্রার্থী', 
+      subLabel: 'ওয়ার্ডভিত্তিক প্রার্থী ও শিক্ষাগত যোগ্যতা',
+      icon: Award, 
+      count: `${memberCandidates.length} জন`,
+      countColor: 'bg-emerald-500/20 text-emerald-300'
     },
     { 
       id: 'promises', 
@@ -715,7 +873,18 @@ export default function AdminPage() {
             </div>
 
             {/* Stat Cards */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+              <div 
+                onClick={() => setActiveTab('memberCandidates')}
+                className="bg-white border border-slate-200 hover:border-emerald-300 rounded-2xl p-5 shadow-xs cursor-pointer transition"
+              >
+                <span className="text-xs font-bold text-slate-500 uppercase block mb-1">ওয়ার্ড মেম্বার প্রার্থী</span>
+                <span className="text-3xl font-extrabold text-emerald-700">{memberCandidates.length} জন</span>
+                <span className="text-[11px] font-bold text-emerald-600 block mt-1">
+                  {memberCandidates.filter(c => c.isActive).length} জন সক্রিয় প্রার্থী ✓
+                </span>
+              </div>
+
               <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs">
                 <span className="text-xs font-bold text-slate-500 uppercase block mb-1">মোট নির্বাচনী অঙ্গীকার</span>
                 <span className="text-3xl font-extrabold text-slate-900">{totalPromises} টি</span>
@@ -1241,6 +1410,672 @@ export default function AdminPage() {
                         className="px-5 py-2 bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs rounded-xl transition shadow-xs"
                       >
                         যুক্ত করুন
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Tab: WARD MEMBER CANDIDATES MANAGEMENT */}
+        {activeTab === 'memberCandidates' && (
+          <div className="space-y-6 animate-in fade-in">
+            {/* Header Banner */}
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-white p-6 rounded-2xl border border-slate-200 shadow-xs">
+              <div>
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
+                    ইউপি মেম্বার পোর্টাল
+                  </span>
+                  <span className="text-xs text-slate-500 font-semibold">
+                    ১২ নং যুগিখালী ইউনিয়ন
+                  </span>
+                </div>
+                <h2 className="text-xl sm:text-2xl font-black text-slate-900">
+                  ওয়ার্ডভিত্তিক ইউপি সদস্য (মেম্বার) প্রার্থী ব্যবস্থাপনা
+                </h2>
+                <p className="text-xs sm:text-sm text-slate-500 mt-1">
+                  ১ থেকে ৯ নং ওয়ার্ডের জামায়াত সমর্থিত ও দায়িত্বশীল প্রার্থীদের নাম, ছবি, বংশ পরিচিতি ও সম্পূর্ণ শিক্ষাগত যোগ্যতা যোগ ও এডিট করুন (মোট {memberCandidates.length} জন প্রার্থী)।
+                </p>
+              </div>
+
+              <button
+                onClick={openNewMemberModal}
+                className="px-4 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white font-bold rounded-xl text-xs sm:text-sm flex items-center gap-2 transition shadow-xs cursor-pointer active:scale-95 shrink-0"
+              >
+                <Plus className="w-4 h-4" />
+                <span>নতুন মেম্বার প্রার্থী যোগ করুন</span>
+              </button>
+            </div>
+
+            {/* Filter and Search Bar */}
+            <div className="bg-white p-4 rounded-2xl border border-slate-200 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 shadow-2xs">
+              <div className="flex flex-wrap items-center gap-1.5 overflow-x-auto pb-1 md:pb-0">
+                <button
+                  onClick={() => setCandFilterWard('সকল')}
+                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer ${
+                    candFilterWard === 'সকল'
+                      ? 'bg-emerald-700 text-white shadow-xs'
+                      : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                  }`}
+                >
+                  সকল ওয়ার্ড ({memberCandidates.length})
+                </button>
+                {jugikhaliWards.map((w) => {
+                  const count = memberCandidates.filter(c => c.wardNumber === w.number).length;
+                  return (
+                    <button
+                      key={w.number}
+                      onClick={() => setCandFilterWard(String(w.number))}
+                      className={`px-3 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer flex items-center gap-1.5 ${
+                        candFilterWard === String(w.number)
+                          ? 'bg-emerald-700 text-white shadow-xs'
+                          : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                      }`}
+                    >
+                      <span>{w.name}</span>
+                      {count > 0 && (
+                        <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-black ${
+                          candFilterWard === String(w.number) ? 'bg-white text-emerald-900' : 'bg-emerald-600 text-white'
+                        }`}>
+                          {count}
+                        </span>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+
+              <div className="relative min-w-[240px]">
+                <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                <input
+                  type="text"
+                  placeholder="প্রার্থীর নাম বা গ্রাম খুঁজুন..."
+                  value={candSearchText}
+                  onChange={(e) => setCandSearchText(e.target.value)}
+                  className="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:ring-2 focus:ring-emerald-500 font-medium"
+                />
+              </div>
+            </div>
+
+            {/* Candidates List Cards */}
+            {(() => {
+              const filtered = memberCandidates.filter(c => {
+                const matchesWard = candFilterWard === 'সকল' || c.wardNumber === Number(candFilterWard);
+                const matchesSearch = candSearchText === '' || 
+                  c.name.toLowerCase().includes(candSearchText.toLowerCase()) ||
+                  c.village.toLowerCase().includes(candSearchText.toLowerCase()) ||
+                  (c.fatherName && c.fatherName.toLowerCase().includes(candSearchText.toLowerCase())) ||
+                  (c.shortQualifications && c.shortQualifications.toLowerCase().includes(candSearchText.toLowerCase()));
+                return matchesWard && matchesSearch;
+              });
+
+              if (filtered.length === 0) {
+                return (
+                  <div className="bg-white p-12 rounded-3xl border border-slate-200 text-center space-y-4">
+                    <div className="w-16 h-16 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center mx-auto">
+                      <Users className="w-8 h-8" />
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-slate-800 text-lg">কোনো মেম্বার প্রার্থী পাওয়া যায়নি</h3>
+                      <p className="text-xs text-slate-500 mt-1 max-w-md mx-auto">
+                        {candFilterWard !== 'সকল' ? `${candFilterWard} নং ওয়ার্ডের জন্য এখনো কোনো প্রার্থী যুক্ত করা হয়নি।` : 'অনুসন্ধানের সাথে কোনো প্রার্থীর তথ্য মিলছে না।'}
+                      </p>
+                    </div>
+                    <button
+                      onClick={openNewMemberModal}
+                      className="px-4 py-2 bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs rounded-xl transition inline-flex items-center gap-1.5 cursor-pointer shadow-xs"
+                    >
+                      <Plus className="w-3.5 h-3.5" />
+                      <span>নতুন প্রার্থী যোগ করুন</span>
+                    </button>
+                  </div>
+                );
+              }
+
+              return (
+                <div className="grid grid-cols-1 gap-6">
+                  {filtered.map((cand) => (
+                    <div
+                      key={cand.id}
+                      className="bg-white rounded-3xl p-6 sm:p-7 border border-slate-200/90 shadow-xs hover:border-emerald-300 transition space-y-6"
+                    >
+                      {/* Top Header of Candidate Card */}
+                      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-5 border-b border-slate-100">
+                        <div className="flex items-start sm:items-center gap-4">
+                          <div className="relative shrink-0">
+                            <img
+                              src={cand.photoUrl || '/member-afsar.png'}
+                              alt={cand.name}
+                              className="w-20 h-24 sm:w-24 sm:h-28 object-cover rounded-2xl border-2 border-emerald-500 shadow-md bg-slate-100"
+                              onError={(e) => {
+                                (e.target as HTMLImageElement).src = '/candidate-latif.jpg';
+                              }}
+                            />
+                            <span className={`absolute -bottom-1 -right-1 text-[10px] font-black px-2 py-0.5 rounded-full border shadow-2xs ${
+                              cand.isActive ? 'bg-emerald-600 text-white border-white' : 'bg-slate-400 text-white border-white'
+                            }`}>
+                              {cand.isActive ? 'প্রদর্শিত' : 'লুকানো'}
+                            </span>
+                          </div>
+
+                          <div className="space-y-1">
+                            <div className="flex flex-wrap items-center gap-2">
+                              <span className="px-2.5 py-0.5 rounded-md bg-emerald-100 text-emerald-900 font-extrabold text-xs">
+                                {cand.wardName || `${cand.wardNumber} নং ওয়ার্ড`} • {cand.village}
+                              </span>
+                              <span className="px-2.5 py-0.5 rounded-md bg-teal-50 text-teal-800 font-bold text-xs border border-teal-200">
+                                {cand.party}
+                              </span>
+                            </div>
+
+                            <h3 className="text-xl sm:text-2xl font-black text-slate-900">
+                              {cand.name}
+                            </h3>
+
+                            <p className="text-xs text-slate-600 font-semibold">
+                              {cand.designation}
+                            </p>
+
+                            {(cand.fatherName || cand.motherName) && (
+                              <p className="text-xs text-slate-500 flex flex-wrap gap-x-3 pt-0.5">
+                                {cand.fatherName && <span><strong>পিতা:</strong> {cand.fatherName}</span>}
+                                {cand.motherName && <span><strong>মাতা:</strong> {cand.motherName}</span>}
+                              </p>
+                            )}
+
+                            {cand.phone && (
+                              <p className="text-xs text-emerald-800 font-bold flex items-center gap-1.5 pt-1">
+                                <PhoneCall className="w-3.5 h-3.5 text-emerald-600" />
+                                <span>{cand.phone}</span>
+                              </p>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Top Actions: Edit / Status / Delete */}
+                        <div className="flex sm:flex-col gap-2 w-full sm:w-auto self-end sm:self-center shrink-0">
+                          <button
+                            onClick={() => openEditMemberModal(cand)}
+                            className="flex-1 sm:flex-initial px-3.5 py-2 bg-slate-100 hover:bg-emerald-50 hover:text-emerald-800 text-slate-700 font-bold text-xs rounded-xl transition flex items-center justify-center gap-1.5 cursor-pointer border border-slate-200"
+                          >
+                            <Edit3 className="w-3.5 h-3.5 text-emerald-600" />
+                            <span>সম্পাদনা করুন</span>
+                          </button>
+
+                          <button
+                            onClick={() => {
+                              updateMemberCandidate(cand.id, { isActive: !cand.isActive });
+                            }}
+                            className={`flex-1 sm:flex-initial px-3.5 py-2 font-bold text-xs rounded-xl transition flex items-center justify-center gap-1.5 cursor-pointer border ${
+                              cand.isActive
+                                ? 'bg-amber-50 text-amber-800 border-amber-200 hover:bg-amber-100'
+                                : 'bg-emerald-50 text-emerald-800 border-emerald-200 hover:bg-emerald-100'
+                            }`}
+                          >
+                            {cand.isActive ? (
+                              <>
+                                <EyeOff className="w-3.5 h-3.5" />
+                                <span>হাইড করুন</span>
+                              </>
+                            ) : (
+                              <>
+                                <Eye className="w-3.5 h-3.5" />
+                                <span>সাইটে দেখান</span>
+                              </>
+                            )}
+                          </button>
+
+                          <button
+                            onClick={() => {
+                              if (confirm(`আপনি কি "${cand.name}"-এর তথ্য তালিকা থেকে মুছে ফেলতে চান?`)) {
+                                deleteMemberCandidate(cand.id);
+                              }
+                            }}
+                            className="flex-1 sm:flex-initial px-3.5 py-2 bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold text-xs rounded-xl transition flex items-center justify-center gap-1.5 cursor-pointer border border-rose-200"
+                          >
+                            <Trash2 className="w-3.5 h-3.5 text-rose-600" />
+                            <span>মুছুন</span>
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Qualifications & Bio Highlights */}
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="bg-emerald-50/70 p-4 rounded-2xl border border-emerald-100 space-y-1.5">
+                          <div className="flex items-center gap-2 text-xs font-bold text-emerald-900">
+                            <GraduationCap className="w-4 h-4 text-emerald-700" />
+                            <span>শিক্ষাগত যোগ্যতা সারসংক্ষেপ:</span>
+                          </div>
+                          <p className="text-sm font-extrabold text-emerald-950">
+                            {cand.shortQualifications || 'উচ্চশিক্ষিত ও যোগ্য প্রার্থী'}
+                          </p>
+                          {cand.bio && (
+                            <p className="text-xs text-slate-600 pt-1 leading-relaxed">
+                              &ldquo;{cand.bio}&rdquo;
+                            </p>
+                          )}
+                        </div>
+
+                        <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-1.5">
+                          <div className="flex items-center gap-2 text-xs font-bold text-slate-700">
+                            <Sparkles className="w-4 h-4 text-amber-600" />
+                            <span>মূল নির্বাচনী অঙ্গীকার:</span>
+                          </div>
+                          <p className="text-xs text-slate-700 leading-relaxed font-medium">
+                            {cand.manifestoPledge || 'ইনসাফভিত্তিক সমাজ ও রাস্তাঘাট সংস্কারে নিবেদিত।' }
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Detailed Education Milestones Table */}
+                      <div className="space-y-3">
+                        <div className="flex items-center justify-between">
+                          <h4 className="text-xs font-extrabold text-slate-800 uppercase tracking-wider flex items-center gap-2">
+                            <BookOpen className="w-4 h-4 text-emerald-600" />
+                            <span>সম্পূর্ণ শিক্ষাগত যোগ্যতার সনদ ও ফলাফল ({cand.education?.length || 0}টি ডিগ্রি)</span>
+                          </h4>
+                          <span className="text-[11px] text-slate-500 font-medium">
+                            পরীক্ষা, পাসের সন, প্রতিষ্ঠান ও প্রাপ্ত বিভাগ/জিপিএ
+                          </span>
+                        </div>
+
+                        {cand.education && cand.education.length > 0 ? (
+                          <div className="overflow-x-auto rounded-2xl border border-slate-200">
+                            <table className="w-full text-left text-xs text-slate-700">
+                              <thead className="bg-slate-100 text-slate-800 font-bold border-b border-slate-200">
+                                <tr>
+                                  <th className="py-2.5 px-3">ক্রম</th>
+                                  <th className="py-2.5 px-3">ডিগ্রি / পরীক্ষার নাম</th>
+                                  <th className="py-2.5 px-3">পাসের সন</th>
+                                  <th className="py-2.5 px-3">শিক্ষা প্রতিষ্ঠান / বোর্ড / বিশ্ববিদ্যালয়</th>
+                                  <th className="py-2.5 px-3 text-right">ফলাফল / বিভাগ</th>
+                                </tr>
+                              </thead>
+                              <tbody className="divide-y divide-slate-100 bg-white">
+                                {cand.education.map((edu, idx) => (
+                                  <tr key={idx} className="hover:bg-slate-50/80 transition">
+                                    <td className="py-2.5 px-3 font-mono font-bold text-slate-400">০{idx + 1}</td>
+                                    <td className="py-2.5 px-3 font-bold text-slate-900">{edu.degree}</td>
+                                    <td className="py-2.5 px-3 font-semibold text-emerald-800">{edu.year || '—'}</td>
+                                    <td className="py-2.5 px-3 text-slate-600">{edu.institution || '—'}</td>
+                                    <td className="py-2.5 px-3 text-right">
+                                      <span className="inline-block px-2.5 py-1 rounded-md bg-emerald-50 text-emerald-800 font-bold border border-emerald-200/80">
+                                        {edu.result || 'উত্তীর্ণ'}
+                                      </span>
+                                    </td>
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
+                          </div>
+                        ) : (
+                          <p className="text-xs text-slate-400 italic">কোনো সনদের তথ্য যোগ করা হয়নি।</p>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              );
+            })()}
+
+            {/* Modal: Add or Edit Member Candidate */}
+            {showMemberModal && (
+              <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+                <div className="bg-white rounded-3xl max-w-3xl w-full p-6 sm:p-8 shadow-2xl relative animate-in fade-in zoom-in-95 max-h-[92vh] overflow-y-auto space-y-5">
+                  <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+                    <div>
+                      <h3 className="text-lg sm:text-xl font-black text-slate-900">
+                        {editingMemberId ? 'প্রার্থীর তথ্য সম্পাদনা করুন' : 'নতুন ওয়ার্ড মেম্বার প্রার্থী যোগ করুন'}
+                      </h3>
+                      <p className="text-xs text-slate-500 mt-0.5">
+                        ১২ নং যুগিখালী ইউনিয়ন পরিষদের ওয়ার্ডভিত্তিক প্রার্থী ও শিক্ষাগত তথ্য
+                      </p>
+                    </div>
+                    <button
+                      onClick={() => setShowMemberModal(false)}
+                      className="p-1.5 rounded-full hover:bg-slate-100 text-slate-500 transition cursor-pointer"
+                    >
+                      <X className="w-5 h-5" />
+                    </button>
+                  </div>
+
+                  <form onSubmit={handleSaveMemberCandidate} className="space-y-5 text-xs sm:text-sm">
+                    {/* Basic Info: Name, Father, Mother */}
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                      <div>
+                        <label className="block text-xs font-bold text-slate-700 mb-1">
+                          প্রার্থীর পুরো নাম <span className="text-rose-500">*</span>
+                        </label>
+                        <input
+                          type="text"
+                          required
+                          placeholder="যেমন: মো: আফছার আলী"
+                          value={mName}
+                          onChange={(e) => setMName(e.target.value)}
+                          className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-emerald-500 font-semibold"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-bold text-slate-700 mb-1">
+                          পিতার নাম
+                        </label>
+                        <input
+                          type="text"
+                          placeholder="যেমন: মো: ওমর আলী"
+                          value={mFatherName}
+                          onChange={(e) => setMFatherName(e.target.value)}
+                          className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-emerald-500"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-bold text-slate-700 mb-1">
+                          মাতার নাম
+                        </label>
+                        <input
+                          type="text"
+                          placeholder="যেমন: সাজেদা খাতুন"
+                          value={mMotherName}
+                          onChange={(e) => setMMotherName(e.target.value)}
+                          className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-emerald-500"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Ward, Village, Designation */}
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                      <div>
+                        <label className="block text-xs font-bold text-slate-700 mb-1">
+                          ওয়ার্ড নির্বাচন <span className="text-rose-500">*</span>
+                        </label>
+                        <select
+                          value={mWardNumber}
+                          onChange={(e) => {
+                            const wNum = Number(e.target.value);
+                            setMWardNumber(wNum);
+                            const found = jugikhaliWards.find(w => w.number === wNum);
+                            if (found && found.villages.length > 0) {
+                              setMVillage(found.villages[0]);
+                            }
+                          }}
+                          className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-emerald-500 font-bold"
+                        >
+                          {jugikhaliWards.map(w => (
+                            <option key={w.number} value={w.number}>
+                              {w.name} ({w.villages.join(', ')})
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-bold text-slate-700 mb-1">
+                          গ্রাম / এলাকা
+                        </label>
+                        <input
+                          type="text"
+                          placeholder="যেমন: পাইকপাড়া"
+                          value={mVillage}
+                          onChange={(e) => setMVillage(e.target.value)}
+                          className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-emerald-500"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-bold text-slate-700 mb-1">
+                          পদবী
+                        </label>
+                        <select
+                          value={mDesignation}
+                          onChange={(e) => setMDesignation(e.target.value)}
+                          className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-emerald-500"
+                        >
+                          <option value="ইউপি সাধারণ সদস্য (মেম্বার) পদপ্রার্থী">ইউপি সাধারণ সদস্য (মেম্বার) পদপ্রার্থী</option>
+                          <option value="সংরক্ষিত মহিলা সদস্য পদপ্রার্থী">সংরক্ষিত মহিলা সদস্য পদপ্রার্থী</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    {/* Party, Short Qualifications, Phone */}
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                      <div>
+                        <label className="block text-xs font-bold text-slate-700 mb-1">
+                          দল ও সমর্থন
+                        </label>
+                        <input
+                          type="text"
+                          value={mParty}
+                          onChange={(e) => setMParty(e.target.value)}
+                          className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-emerald-500 font-medium"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-bold text-slate-700 mb-1">
+                          সংক্ষিপ্ত শিক্ষাগত যোগ্যতা
+                        </label>
+                        <input
+                          type="text"
+                          placeholder="যেমন: বিএ (অনার্স), এমএ (ডাবল), বিএমএড & এলএলবি"
+                          value={mShortQualifications}
+                          onChange={(e) => setMShortQualifications(e.target.value)}
+                          className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-emerald-500 font-semibold"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-bold text-slate-700 mb-1">
+                          মোবাইল নম্বর
+                        </label>
+                        <input
+                          type="tel"
+                          placeholder="যেমন: +880 1712-000000"
+                          value={mPhone}
+                          onChange={(e) => setMPhone(e.target.value)}
+                          className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-emerald-500"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Photo Upload & Preview */}
+                    <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-3">
+                      <label className="block text-xs font-bold text-slate-800">
+                        প্রার্থীর ছবি (ফাইল আপলোড বা ইমেজ লিংক)
+                      </label>
+                      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                        <img
+                          src={mPhotoUrl || '/member-afsar.png'}
+                          alt="প্রাকদর্শন"
+                          className="w-16 h-20 object-cover rounded-xl border border-emerald-500 bg-white shrink-0 shadow-2xs"
+                          onError={(e) => {
+                            (e.target as HTMLImageElement).src = '/candidate-latif.jpg';
+                          }}
+                        />
+                        <div className="flex-1 space-y-2 w-full">
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={handleMemberPhotoUpload}
+                            className="block w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-emerald-100 file:text-emerald-800 hover:file:bg-emerald-200 cursor-pointer"
+                          />
+                          <div className="flex items-center gap-2">
+                            <input
+                              type="text"
+                              placeholder="অথবা ফটো URL লিখুন: /member-afsar.png"
+                              value={mPhotoUrl}
+                              onChange={(e) => setMPhotoUrl(e.target.value)}
+                              className="flex-1 px-3 py-1.5 bg-white border border-slate-200 rounded-xl text-xs outline-none"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => setMPhotoUrl('/member-afsar.png')}
+                              className="px-2.5 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-xl text-xs font-bold shrink-0"
+                            >
+                              আফছার আলীর ছবি
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Bio & Manifesto Pledge */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <div>
+                        <label className="block text-xs font-bold text-slate-700 mb-1">
+                          পরিচিতি ও ভোটারদের প্রতি আবেদন (Bio)
+                        </label>
+                        <textarea
+                          rows={3}
+                          placeholder="ওয়ার্ডবাসীর সেবা ও ইনসাফ কায়েমে প্রার্থীর বক্তব্য..."
+                          value={mBio}
+                          onChange={(e) => setMBio(e.target.value)}
+                          className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-emerald-500"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-bold text-slate-700 mb-1">
+                          নির্বাচনী অঙ্গীকার (Pledge)
+                        </label>
+                        <textarea
+                          rows={3}
+                          placeholder="রাস্তাঘাট সংস্কার, পানি নিষ্কাশন ও অন্যান্য মূল অঙ্গীকার..."
+                          value={mPledge}
+                          onChange={(e) => setMPledge(e.target.value)}
+                          className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-emerald-500"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Active Visibility Toggle */}
+                    <div className="flex items-center gap-2 p-3 bg-emerald-50/60 rounded-xl border border-emerald-200/80">
+                      <input
+                        type="checkbox"
+                        id="mActive"
+                        checked={mIsActive}
+                        onChange={(e) => setMIsActive(e.target.checked)}
+                        className="w-4 h-4 accent-emerald-600 rounded cursor-pointer"
+                      />
+                      <label htmlFor="mActive" className="text-xs font-bold text-emerald-950 cursor-pointer">
+                        ওয়েবসাইটে এই প্রার্থীর তথ্য প্রদর্শন করুন (সক্রিয় রাখুন)
+                      </label>
+                    </div>
+
+                    {/* Detailed Education Milestones Builder */}
+                    <div className="space-y-3 pt-2 border-t border-slate-100">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <h4 className="text-sm font-black text-slate-900 flex items-center gap-1.5">
+                            <GraduationCap className="w-4 h-4 text-emerald-600" />
+                            <span>সম্পূর্ণ শিক্ষাগত যোগ্যতার ডিগ্রি তালিকা</span>
+                          </h4>
+                          <p className="text-[11px] text-slate-500">
+                            দাখিল, আলিম, ফাজিল, কামিল, অনার্স, এমএ, এলএলবি সহ সকল ডিগ্রি ও ফলাফল
+                          </p>
+                        </div>
+
+                        <button
+                          type="button"
+                          onClick={addEducationRow}
+                          className="px-3 py-1.5 bg-emerald-100 hover:bg-emerald-200 text-emerald-900 font-bold text-xs rounded-xl flex items-center gap-1 transition cursor-pointer"
+                        >
+                          <Plus className="w-3.5 h-3.5" />
+                          <span>আরেকটি ডিগ্রি যোগ করুন</span>
+                        </button>
+                      </div>
+
+                      <div className="space-y-2">
+                        {mEducation.map((edu, idx) => (
+                          <div
+                            key={idx}
+                            className="bg-slate-50 p-3 rounded-2xl border border-slate-200 grid grid-cols-12 gap-2 items-center"
+                          >
+                            <div className="col-span-12 sm:col-span-3">
+                              <label className="block text-[10px] font-bold text-slate-500 mb-0.5">
+                                ডিগ্রি / পরীক্ষার নাম
+                              </label>
+                              <input
+                                type="text"
+                                placeholder="যেমন: ফাজিল (বিএ)"
+                                value={edu.degree}
+                                onChange={(e) => updateEducationField(idx, 'degree', e.target.value)}
+                                className="w-full px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg text-xs font-bold"
+                              />
+                            </div>
+
+                            <div className="col-span-12 sm:col-span-2">
+                              <label className="block text-[10px] font-bold text-slate-500 mb-0.5">
+                                পাসের সন
+                              </label>
+                              <input
+                                type="text"
+                                placeholder="যেমন: ২০০৭"
+                                value={edu.year || ''}
+                                onChange={(e) => updateEducationField(idx, 'year', e.target.value)}
+                                className="w-full px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg text-xs font-semibold"
+                              />
+                            </div>
+
+                            <div className="col-span-12 sm:col-span-4">
+                              <label className="block text-[10px] font-bold text-slate-500 mb-0.5">
+                                শিক্ষা প্রতিষ্ঠান / বিশ্ববিদ্যালয়
+                              </label>
+                              <input
+                                type="text"
+                                placeholder="যেমন: কলারোয়া আলিয়া মাদ্রাসা (ইবি)"
+                                value={edu.institution || ''}
+                                onChange={(e) => updateEducationField(idx, 'institution', e.target.value)}
+                                className="w-full px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg text-xs"
+                              />
+                            </div>
+
+                            <div className="col-span-10 sm:col-span-2">
+                              <label className="block text-[10px] font-bold text-slate-500 mb-0.5">
+                                ফলাফল / বিভাগ
+                              </label>
+                              <input
+                                type="text"
+                                placeholder="যেমন: প্রথম বিভাগ"
+                                value={edu.result || ''}
+                                onChange={(e) => updateEducationField(idx, 'result', e.target.value)}
+                                className="w-full px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg text-xs font-bold text-emerald-800"
+                              />
+                            </div>
+
+                            <div className="col-span-2 sm:col-span-1 flex justify-center pt-3 sm:pt-0">
+                              <button
+                                type="button"
+                                onClick={() => removeEducationRow(idx)}
+                                className="p-2 text-rose-500 hover:bg-rose-100 rounded-lg transition"
+                                title="এই ডিগ্রি মুছুন"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Modal Footer */}
+                    <div className="flex justify-end gap-3 pt-4 border-t border-slate-100">
+                      <button
+                        type="button"
+                        onClick={() => setShowMemberModal(false)}
+                        className="px-4 py-2.5 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-xl transition cursor-pointer"
+                      >
+                        বাতিল
+                      </button>
+                      <button
+                        type="submit"
+                        className="px-6 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs rounded-xl transition shadow-md cursor-pointer flex items-center gap-1.5 active:scale-95"
+                      >
+                        <Save className="w-4 h-4" />
+                        <span>{editingMemberId ? 'পরিবর্তন সংরক্ষণ করুন' : 'প্রার্থী যোগ সম্পন্ন করুন'}</span>
                       </button>
                     </div>
                   </form>
