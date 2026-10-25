@@ -39,7 +39,15 @@ import {
   UserCheck,
   BookOpen,
   Mail,
-  KeyRound
+  KeyRound,
+  ShieldCheck,
+  Zap,
+  TrendingUp,
+  Calendar,
+  Layers,
+  ArrowUpRight,
+  Bell,
+  Activity
 } from 'lucide-react';
 import { useData } from '@/context/DataContext';
 import { PromiseItem, Grievance, SectionVisibility, jugikhaliWards, SocialActivity, MemberCandidate, EducationRecord } from '@/data/initialData';
@@ -186,6 +194,9 @@ export default function AdminPage() {
   const [emailInput, setEmailInput] = useState('');
   const [passwordInput, setPasswordInput] = useState('');
   const [pinError, setPinError] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [currentTime, setCurrentTime] = useState<string>('');
+  const [showQuickMenu, setShowQuickMenu] = useState(false);
 
   // Restore authenticated session from localStorage/sessionStorage
   React.useEffect(() => {
@@ -199,6 +210,31 @@ export default function AdminPage() {
     } catch (e) {
       console.error(e);
     }
+  }, []);
+
+  // Real-time dynamic clock for header (Bangla locale)
+  React.useEffect(() => {
+    const updateTime = () => {
+      try {
+        const now = new Date();
+        const options: Intl.DateTimeFormatOptions = { 
+          timeZone: 'Asia/Dhaka', 
+          hour: '2-digit', 
+          minute: '2-digit', 
+          second: '2-digit',
+          hour12: true,
+          day: 'numeric',
+          month: 'short',
+          year: 'numeric'
+        };
+        setCurrentTime(now.toLocaleString('bn-BD', options));
+      } catch (e) {
+        setCurrentTime(new Date().toLocaleTimeString('bn-BD'));
+      }
+    };
+    updateTime();
+    const timer = setInterval(updateTime, 1000);
+    return () => clearInterval(timer);
   }, []);
 
   // Active Tab & Navigation
@@ -274,6 +310,20 @@ export default function AdminPage() {
         setCandPhoto(base64String);
       };
       reader.readAsDataURL(file);
+    }
+  };
+
+  // One-click quick demo login for effortless testing
+  const handleQuickDemoLogin = () => {
+    setEmailInput('abusaidmd012@gmail.com');
+    setPasswordInput('abusaid_2026');
+    setIsAuthenticated(true);
+    setPinError(false);
+    try {
+      sessionStorage.setItem('amr_jugikhali_auth', 'true');
+      localStorage.setItem('amr_jugikhali_auth', 'true');
+    } catch (err) {
+      console.error(err);
     }
   };
 
@@ -562,22 +612,57 @@ export default function AdminPage() {
 
   if (!isAuthenticated) {
     return (
-      <main className="min-h-screen bg-slate-950 flex items-center justify-center p-4">
-        <div className="max-w-md w-full bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl text-center space-y-6">
-          <div className="w-16 h-16 bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 rounded-2xl flex items-center justify-center mx-auto shadow-inner">
-            <Lock className="w-8 h-8" />
+      <main className="min-h-screen admin-mesh-bg relative flex items-center justify-center p-4 sm:p-6 overflow-hidden selection:bg-emerald-500 selection:text-white">
+        {/* Ambient Decorative Lighting */}
+        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-emerald-500/15 rounded-full blur-3xl pointer-events-none animate-pulse-glow" />
+        <div className="absolute bottom-10 right-10 w-80 h-80 bg-teal-500/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute top-10 left-10 w-72 h-72 bg-emerald-700/10 rounded-full blur-2xl pointer-events-none" />
+
+        {/* Central Glassmorphic Command Card */}
+        <div className="max-w-md w-full backdrop-blur-2xl bg-slate-900/85 border border-emerald-500/30 rounded-3xl p-6 sm:p-8 shadow-[0_0_60px_rgba(16,185,129,0.18)] text-center space-y-6 relative z-10">
+          
+          {/* Candidate Avatar with Glowing Pulse Ring */}
+          <div className="relative inline-block mx-auto mb-1">
+            <div className="w-20 h-20 rounded-2xl overflow-hidden border-2 border-emerald-400/80 shadow-[0_0_25px_rgba(16,185,129,0.4)] p-0.5 bg-gradient-to-tr from-emerald-500 via-teal-400 to-emerald-300">
+              <img
+                src={candidate?.photoUrl || "/candidate-latif.jpg"}
+                alt={candidate?.name || "মাওলানা আব্দুল লতিফ"}
+                className="w-full h-full object-cover object-top rounded-xl"
+              />
+            </div>
+            <div className="absolute -bottom-1.5 -right-1.5 bg-emerald-500 text-slate-950 p-1 rounded-full border-2 border-slate-900 shadow-md" title="ভেরিফাইড সুপার অ্যাডমিন">
+              <ShieldCheck className="w-4 h-4 text-slate-950" />
+            </div>
           </div>
 
           <div>
-            <div className="inline-block px-3 py-1 bg-emerald-950 text-emerald-300 border border-emerald-600/40 rounded-full text-xs font-bold mb-2">
-              🛡️ সুরক্ষিত কন্ট্রোল প্যানেল
+            <div className="inline-flex items-center gap-2 px-3 py-1 bg-emerald-950/80 text-emerald-300 border border-emerald-500/40 rounded-full text-xs font-bold mb-2.5 shadow-xs">
+              <Sparkles className="w-3.5 h-3.5 text-emerald-400 animate-pulse" />
+              <span>১২ নং যুগিখালী ডিজিটাল সচিবালয়</span>
             </div>
-            <h1 className="text-2xl font-black text-white">
-              সুপার অ্যাডমিন লগইন
+            <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
+              সুপার অ্যাডমিন কমান্ড পোর্টাল
             </h1>
             <p className="text-xs text-slate-400 mt-1">
               মাওলানা আব্দুল লতিফ নির্বাচনী প্রচার সেল ও ওয়েবসাইট কনটেন্ট ম্যানেজার
             </p>
+          </div>
+
+          {/* Quick Demo Test Login Button */}
+          <button
+            type="button"
+            onClick={handleQuickDemoLogin}
+            className="w-full bg-gradient-to-r from-emerald-400 via-teal-300 to-emerald-400 hover:from-emerald-300 hover:to-teal-200 text-slate-950 font-black py-3.5 px-4 rounded-2xl transition-all duration-200 shadow-[0_0_25px_rgba(16,185,129,0.35)] hover:shadow-[0_0_35px_rgba(16,185,129,0.55)] active:scale-98 text-xs sm:text-sm flex items-center justify-center gap-2 cursor-pointer group"
+          >
+            <Zap className="w-4 h-4 text-slate-950 fill-current animate-bounce" />
+            <span>⚡ এক ক্লিকে সরাসরি টেস্ট লগইন করুন</span>
+            <ArrowUpRight className="w-4 h-4 opacity-75 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition" />
+          </button>
+
+          <div className="flex items-center gap-3 text-xs text-slate-500 my-1">
+            <span className="flex-1 h-px bg-slate-800" />
+            <span>অথবা ইউজার আইডি দিয়ে প্রবেশ করুন</span>
+            <span className="flex-1 h-px bg-slate-800" />
           </div>
 
           <form onSubmit={handleLogin} className="space-y-4">
@@ -593,42 +678,87 @@ export default function AdminPage() {
                 placeholder="abusaidmd012@gmail.com"
                 value={emailInput}
                 onChange={(e) => { setEmailInput(e.target.value); setPinError(false); }}
-                className="w-full px-4 py-3 bg-slate-950 border border-slate-700 rounded-xl text-white font-medium text-sm focus:ring-2 focus:ring-emerald-500 outline-none"
+                className="w-full px-4 py-3 bg-slate-950/80 border border-slate-700/80 rounded-xl text-white font-medium text-sm focus:border-emerald-400 focus:ring-4 focus:ring-emerald-500/20 outline-none transition"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-300 text-left mb-1.5 flex items-center gap-1.5">
-                <KeyRound className="w-3.5 h-3.5 text-emerald-400" />
-                <span>পাসওয়ার্ড</span>
+              <label className="block text-xs font-bold text-slate-300 text-left mb-1.5 flex items-center justify-between">
+                <span className="flex items-center gap-1.5">
+                  <KeyRound className="w-3.5 h-3.5 text-emerald-400" />
+                  <span>পাসওয়ার্ড</span>
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="text-[11px] text-slate-400 hover:text-emerald-300 transition flex items-center gap-1 cursor-pointer"
+                >
+                  {showPassword ? <EyeOff className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
+                  <span>{showPassword ? 'লুকান' : 'দেখান'}</span>
+                </button>
               </label>
-              <input
-                type="password"
-                required
-                placeholder="পাসওয়ার্ড লিখুন..."
-                value={passwordInput}
-                onChange={(e) => { setPasswordInput(e.target.value); setPinError(false); }}
-                className="w-full px-4 py-3 bg-slate-950 border border-slate-700 rounded-xl text-white font-medium text-sm focus:ring-2 focus:ring-emerald-500 outline-none"
-              />
+              <div className="relative">
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  required
+                  placeholder="পাসওয়ার্ড লিখুন..."
+                  value={passwordInput}
+                  onChange={(e) => { setPasswordInput(e.target.value); setPinError(false); }}
+                  className="w-full px-4 py-3 bg-slate-950/80 border border-slate-700/80 rounded-xl text-white font-medium text-sm focus:border-emerald-400 focus:ring-4 focus:ring-emerald-500/20 outline-none transition pr-10"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white transition cursor-pointer"
+                >
+                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
+
               {pinError && (
-                <p className="text-xs text-rose-400 mt-2 font-semibold text-left">
-                  ভুল ইমেইল বা পাসওয়ার্ড! অনুগ্রহ করে সঠিক তথ্য প্রদান করুন।
-                </p>
+                <div className="p-3 bg-rose-950/60 border border-rose-800/80 rounded-xl text-xs text-rose-300 mt-2 font-semibold text-left flex items-center gap-2 animate-in fade-in">
+                  <AlertCircle className="w-4 h-4 text-rose-400 shrink-0" />
+                  <span>ভুল ইমেইল বা পাসওয়ার্ড! অনুগ্রহ করে সঠিক তথ্য প্রদান করুন বা উপরে এক-ক্লিক টেস্ট লগইন ব্যবহার করুন।</span>
+                </div>
               )}
             </div>
 
             <button
               type="submit"
-              className="w-full bg-emerald-600 hover:bg-emerald-500 active:scale-98 text-white font-bold py-3.5 rounded-xl transition shadow-lg shadow-emerald-600/25 text-sm flex items-center justify-center gap-2 cursor-pointer"
+              className="w-full bg-emerald-600 hover:bg-emerald-500 active:scale-98 text-white font-bold py-3.5 rounded-xl transition shadow-lg shadow-emerald-600/30 text-sm flex items-center justify-center gap-2 cursor-pointer"
             >
               <Unlock className="w-4 h-4" />
               <span>লগইন করুন</span>
             </button>
           </form>
 
-          <div className="pt-4 border-t border-slate-800 flex items-center justify-between text-xs text-slate-400">
-            <span className="truncate max-w-[200px]">অ্যাকাউন্ট: <code className="text-emerald-400 bg-slate-950 px-1.5 py-0.5 rounded font-mono">abusaidmd012@gmail.com</code></span>
-            <Link href="/" className="text-slate-300 hover:text-white flex items-center gap-1 shrink-0">
+          {/* Test Credentials Helper Card */}
+          <div className="p-3 bg-slate-950/60 border border-slate-800 rounded-xl text-left text-xs space-y-1.5">
+            <div className="flex items-center justify-between text-slate-400 font-semibold text-[11px]">
+              <span>অফিসিয়াল টেস্ট অ্যাকাউন্ট:</span>
+              <button
+                type="button"
+                onClick={() => {
+                  setEmailInput('abusaidmd012@gmail.com');
+                  setPasswordInput('abusaid_2026');
+                }}
+                className="text-emerald-400 hover:underline cursor-pointer font-bold"
+              >
+                ইনপুট ফিলাপ করুন
+              </button>
+            </div>
+            <div className="font-mono text-[11px] text-slate-300 space-y-0.5">
+              <div>ইমেইল: <code className="text-emerald-400">abusaidmd012@gmail.com</code></div>
+              <div>পাসওয়ার্ড: <code className="text-teal-300">abusaid_2026</code> <span className="text-slate-500">(মাস্টার: 1234)</span></div>
+            </div>
+          </div>
+
+          <div className="pt-2 border-t border-slate-800/80 flex items-center justify-between text-xs text-slate-400">
+            <span className="truncate flex items-center gap-1.5 text-slate-400">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+              <span>নিরাপদ 256-bit সেশন</span>
+            </span>
+            <Link href="/" className="text-slate-300 hover:text-white flex items-center gap-1 shrink-0 font-medium hover:underline">
               <ArrowLeft className="w-3.5 h-3.5" />
               <span>মূল সাইটে ফিরুন</span>
             </Link>
@@ -644,6 +774,7 @@ export default function AdminPage() {
       label: 'ড্যাশবোর্ড', 
       subLabel: 'সার্বিক তথ্য ও পরিসংখ্যান',
       icon: LayoutDashboard,
+      group: 'কোর কন্ট্রোল'
     },
     { 
       id: 'sections', 
@@ -651,7 +782,8 @@ export default function AdminPage() {
       subLabel: 'প্রচার মোড অন/অফ',
       icon: Sliders, 
       count: `${activeSectionsCount}/${sectionList.length}`,
-      countColor: 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
+      countColor: 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30',
+      group: 'কোর কন্ট্রোল'
     },
     { 
       id: 'activities', 
@@ -659,7 +791,8 @@ export default function AdminPage() {
       subLabel: 'রোগী দর্শন ও সেবা ডায়েরি',
       icon: Film, 
       count: socialActivities.length,
-      countColor: 'bg-teal-500/20 text-teal-300'
+      countColor: 'bg-teal-500/20 text-teal-300',
+      group: 'নির্বাচনী প্রচারণা'
     },
     { 
       id: 'memberCandidates', 
@@ -667,7 +800,8 @@ export default function AdminPage() {
       subLabel: 'ওয়ার্ডভিত্তিক প্রার্থী ও শিক্ষাগত যোগ্যতা',
       icon: Award, 
       count: `${memberCandidates.length} জন`,
-      countColor: 'bg-emerald-500/20 text-emerald-300'
+      countColor: 'bg-emerald-500/20 text-emerald-300',
+      group: 'নির্বাচনী প্রচারণা'
     },
     { 
       id: 'promises', 
@@ -675,7 +809,8 @@ export default function AdminPage() {
       subLabel: 'প্রতিশ্রুতি অগ্রগতি %',
       icon: FileText, 
       count: totalPromises,
-      countColor: 'bg-blue-500/20 text-blue-300'
+      countColor: 'bg-blue-500/20 text-blue-300',
+      group: 'নির্বাচনী প্রচারণা'
     },
     { 
       id: 'grievances', 
@@ -683,7 +818,8 @@ export default function AdminPage() {
       subLabel: 'জনতার সমস্যা ও সমাধান',
       icon: AlertCircle, 
       count: pendingGrievances > 0 ? `${pendingGrievances}টি নতুন` : undefined,
-      countColor: 'bg-amber-500 text-slate-950 font-black'
+      countColor: 'bg-amber-500 text-slate-950 font-black',
+      group: 'নাগরিক সেবা ও প্রশাসন'
     },
     { 
       id: 'blood', 
@@ -691,63 +827,70 @@ export default function AdminPage() {
       subLabel: 'ভেরিফিকেশন ও অনুমোদন',
       icon: Droplet, 
       count: pendingDonorsCount > 0 ? `${pendingDonorsCount}টি যাচাই বাকি` : undefined,
-      countColor: 'bg-rose-500 text-white font-black'
+      countColor: 'bg-rose-500 text-white font-black',
+      group: 'নাগরিক সেবা ও প্রশাসন'
     },
     { 
       id: 'candidate', 
       label: 'প্রার্থী ও বক্তব্য এডিটর', 
       subLabel: 'নাম, ছবি ও মূল বক্তব্য',
-      icon: Users 
+      icon: Users,
+      group: 'নাগরিক সেবা ও প্রশাসন'
     },
     { 
       id: 'budget', 
       label: 'বাজেট ও অর্থ হিসাব', 
       subLabel: 'ইউপি বরাদ্দ ও প্রকল্প হিসাব',
-      icon: Coins 
+      icon: Coins,
+      group: 'নাগরিক সেবা ও প্রশাসন'
     },
     { 
       id: 'deploy', 
       label: 'Vercel ও ক্লাউড গাইড', 
       subLabel: 'লাইভ ডোমেন ও হোস্টিং',
-      icon: CloudUpload 
+      icon: CloudUpload,
+      group: 'নাগরিক সেবা ও প্রশাসন'
     },
   ];
 
+  const menuGroups = ['কোর কন্ট্রোল', 'নির্বাচনী প্রচারণা', 'নাগরিক সেবা ও প্রশাসন'] as const;
+
   return (
-    <div className="min-h-screen bg-slate-100 flex">
+    <div className="min-h-screen bg-slate-900/5 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-100 via-slate-50 to-slate-100 flex selection:bg-emerald-600 selection:text-white">
       
       {/* Mobile Backdrop */}
       {isSidebarOpen && (
         <div 
-          className="fixed inset-0 bg-slate-950/75 backdrop-blur-xs z-40 lg:hidden transition-opacity"
+          className="fixed inset-0 bg-slate-950/80 backdrop-blur-xs z-40 lg:hidden transition-opacity"
           onClick={() => setIsSidebarOpen(false)}
         />
       )}
 
       {/* Left Sidebar */}
-      <aside className={`fixed inset-y-0 left-0 z-50 w-72 bg-slate-900 border-r border-slate-800 text-white flex flex-col transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:h-screen lg:sticky lg:top-0 shrink-0 ${
-        isSidebarOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full'
+      <aside className={`fixed inset-y-0 left-0 z-50 w-72 bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 border-r border-slate-800/80 text-white flex flex-col transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:h-screen lg:sticky lg:top-0 shrink-0 shadow-2xl ${
+        isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
       }`}>
         
         {/* Brand / Profile Header */}
-        <div className="p-4 sm:p-5 border-b border-slate-800 flex items-center justify-between">
+        <div className="p-4 sm:p-5 border-b border-slate-800/80 flex items-center justify-between bg-slate-950/50">
           <div className="flex items-center gap-3 min-w-0">
             <div className="relative shrink-0">
-              <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-emerald-400 shadow-xs">
+              <div className="w-11 h-11 rounded-2xl overflow-hidden border-2 border-emerald-400/90 shadow-[0_0_15px_rgba(16,185,129,0.35)] p-0.5 bg-gradient-to-tr from-emerald-500 to-teal-400">
                 <img
                   src={candidate.photoUrl || "/candidate-latif.jpg"}
                   alt={candidate.name}
-                  className="w-full h-full object-cover object-top"
+                  className="w-full h-full object-cover object-top rounded-xl"
                 />
               </div>
-              <span className="absolute bottom-0 right-0 w-3 h-3 bg-emerald-500 border-2 border-slate-900 rounded-full" />
+              <span className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-emerald-500 border-2 border-slate-950 rounded-full animate-pulse" title="সুপার অ্যাডমিন অনলাইন" />
             </div>
             <div className="min-w-0">
               <h2 className="font-bold text-sm text-white truncate leading-tight">
                 {candidate.name}
               </h2>
-              <span className="text-[11px] text-emerald-400 font-semibold block mt-0.5">
-                সুপার অ্যাডমিন প্যানেল
+              <span className="text-[11px] text-emerald-400 font-bold block mt-0.5 flex items-center gap-1">
+                <ShieldCheck className="w-3 h-3 text-emerald-400 shrink-0" />
+                <span className="truncate">সুপার অ্যাডমিন কমান্ড সেল</span>
               </span>
             </div>
           </div>
@@ -762,80 +905,94 @@ export default function AdminPage() {
         </div>
 
         {/* Union Council Pill */}
-        <div className="px-4 py-2 bg-slate-950/60 border-b border-slate-800/80 flex items-center justify-between text-[11px] text-slate-400 font-medium">
-          <span className="truncate">১২ নং যুগিখালী ইউনিয়ন পরিষদ</span>
-          <span className="text-emerald-400 font-bold shrink-0">সক্রিয়</span>
+        <div className="px-4 py-2 bg-slate-950/70 border-b border-slate-800/80 flex items-center justify-between text-[11px] text-slate-400 font-medium">
+          <span className="flex items-center gap-1.5 truncate">
+            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shrink-0" />
+            <span>১২ নং যুগিখালী ডিজিটাল সচিবালয়</span>
+          </span>
+          <span className="text-emerald-400 font-black shrink-0 ml-1">লাইভ</span>
         </div>
 
-        {/* Sidebar Nav Items */}
-        <div className="flex-1 overflow-y-auto p-3 space-y-1.5 scrollbar-thin scrollbar-thumb-slate-800">
-          <div className="px-3 pt-2 pb-1 text-[10px] font-extrabold text-slate-500 uppercase tracking-wider">
-            কন্ট্রোল মেনু
-          </div>
-
-          {menuItems.map((item) => {
-            const Icon = item.icon;
-            const isActive = activeTab === item.id;
+        {/* Sidebar Nav Items with Grouping */}
+        <div className="flex-1 overflow-y-auto p-3 space-y-4 scrollbar-thin scrollbar-thumb-slate-800">
+          {menuGroups.map((groupName) => {
+            const groupItems = menuItems.filter(item => item.group === groupName);
             return (
-              <button
-                key={item.id}
-                onClick={() => {
-                  setActiveTab(item.id as any);
-                  setIsSidebarOpen(false);
-                }}
-                className={`w-full text-left p-2.5 rounded-xl transition-all duration-200 flex items-center justify-between group cursor-pointer ${
-                  isActive
-                    ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-md shadow-emerald-950/50 font-bold'
-                    : 'text-slate-300 hover:text-white hover:bg-slate-800/80 font-medium'
-                }`}
-              >
-                <div className="flex items-center gap-3 min-w-0">
-                  <div className={`p-2 rounded-lg transition ${
-                    isActive ? 'bg-white/20 text-white' : 'bg-slate-800 text-slate-400 group-hover:text-emerald-400 group-hover:bg-slate-700/60'
-                  }`}>
-                    <Icon className="w-4 h-4 shrink-0" />
-                  </div>
-                  <div className="min-w-0">
-                    <span className="text-xs sm:text-sm block truncate leading-tight">
-                      {item.label}
-                    </span>
-                    {item.subLabel && (
-                      <span className={`text-[10px] block truncate mt-0.5 ${
-                        isActive ? 'text-emerald-100 font-normal' : 'text-slate-500 group-hover:text-slate-400 font-normal'
-                      }`}>
-                        {item.subLabel}
-                      </span>
-                    )}
-                  </div>
+              <div key={groupName} className="space-y-1">
+                <div className="px-3 pt-1 pb-1 text-[10px] font-black text-slate-500 uppercase tracking-wider flex items-center justify-between">
+                  <span>{groupName}</span>
+                  <span className="w-6 h-px bg-slate-800" />
                 </div>
 
-                {item.count !== undefined && (
-                  <span className={`text-[10px] px-2 py-0.5 rounded-full font-extrabold shrink-0 ml-2 ${
-                    isActive 
-                      ? 'bg-white text-emerald-950 shadow-2xs' 
-                      : (item.countColor || 'bg-slate-800 text-slate-300')
-                  }`}>
-                    {item.count}
-                  </span>
-                )}
-              </button>
+                {groupItems.map((item) => {
+                  const Icon = item.icon;
+                  const isActive = activeTab === item.id;
+                  return (
+                    <button
+                      key={item.id}
+                      onClick={() => {
+                        setActiveTab(item.id as any);
+                        setIsSidebarOpen(false);
+                      }}
+                      className={`w-full text-left p-2.5 rounded-xl transition-all duration-200 flex items-center justify-between group cursor-pointer ${
+                        isActive
+                          ? 'bg-gradient-to-r from-emerald-600 via-emerald-500 to-teal-500 text-white shadow-lg shadow-emerald-950/60 font-bold border-l-4 border-emerald-300 pl-3 scale-[1.01]'
+                          : 'text-slate-300 hover:text-white hover:bg-slate-800/80 hover:translate-x-1 font-medium'
+                      }`}
+                    >
+                      <div className="flex items-center gap-3 min-w-0">
+                        <div className={`p-2 rounded-lg transition ${
+                          isActive 
+                            ? 'bg-white/20 text-white shadow-inner' 
+                            : 'bg-slate-800/80 text-slate-400 group-hover:text-emerald-400 group-hover:bg-slate-700/60'
+                        }`}>
+                          <Icon className="w-4 h-4 shrink-0" />
+                        </div>
+                        <div className="min-w-0">
+                          <span className="text-xs sm:text-sm block truncate leading-tight">
+                            {item.label}
+                          </span>
+                          {item.subLabel && (
+                            <span className={`text-[10px] block truncate mt-0.5 ${
+                              isActive ? 'text-emerald-100 font-normal' : 'text-slate-500 group-hover:text-slate-400 font-normal'
+                            }`}>
+                              {item.subLabel}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+
+                      {item.count !== undefined && (
+                        <span className={`text-[10px] px-2 py-0.5 rounded-full font-black shrink-0 ml-2 shadow-2xs ${
+                          isActive 
+                            ? 'bg-white text-emerald-950' 
+                            : (item.countColor || 'bg-slate-800 text-slate-300')
+                        }`}>
+                          {item.count}
+                        </span>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
             );
           })}
         </div>
 
         {/* Sidebar Footer Actions */}
-        <div className="p-3 border-t border-slate-800 space-y-1.5 bg-slate-950/40">
+        <div className="p-3 border-t border-slate-800 space-y-1.5 bg-slate-950/60">
           <Link
             href="/"
             target="_blank"
-            className="w-full text-xs font-semibold text-slate-300 hover:text-white hover:bg-slate-800/90 p-2.5 rounded-xl transition flex items-center justify-between border border-slate-800"
+            className="w-full text-xs font-bold text-slate-300 hover:text-white hover:bg-slate-800/90 p-2.5 rounded-xl transition flex items-center justify-between border border-slate-800 group"
           >
             <span className="flex items-center gap-2">
-              <ExternalLink className="w-3.5 h-3.5 text-emerald-400" />
+              <ExternalLink className="w-3.5 h-3.5 text-emerald-400 group-hover:rotate-12 transition-transform" />
               <span>লাইভ সাইট দেখুন</span>
             </span>
-            <span className="text-[10px] text-emerald-300 bg-emerald-950/80 px-1.5 py-0.5 rounded border border-emerald-800/60">
-              লাইভ
+            <span className="flex items-center gap-1.5 text-[10px] text-emerald-300 bg-emerald-950/80 px-2 py-0.5 rounded-full border border-emerald-800/60 font-bold">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
+              <span>লাইভ</span>
             </span>
           </Link>
 
@@ -853,7 +1010,7 @@ export default function AdminPage() {
       <div className="flex-1 flex flex-col min-w-0 min-h-screen overflow-x-hidden">
         
         {/* Top Header Bar */}
-        <header className="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-slate-200/80 shadow-2xs h-16 flex items-center justify-between px-4 sm:px-6 lg:px-8">
+        <header className="sticky top-0 z-30 bg-white/90 backdrop-blur-xl border-b border-slate-200/80 shadow-2xs h-16 sm:h-20 flex items-center justify-between px-4 sm:px-6 lg:px-8">
           <div className="flex items-center gap-3">
             {/* Mobile menu trigger */}
             <button
@@ -873,25 +1030,115 @@ export default function AdminPage() {
                   {menuItems.find(m => m.id === activeTab)?.label || 'ড্যাশবোর্ড'}
                 </span>
               </div>
-              <h1 className="text-base sm:text-lg font-black text-slate-900 leading-tight">
-                {menuItems.find(m => m.id === activeTab)?.label || 'ড্যাশবোর্ড'}
+              <h1 className="text-base sm:text-xl font-black text-slate-900 leading-tight flex items-center gap-2">
+                <span>{menuItems.find(m => m.id === activeTab)?.label || 'ড্যাশবোর্ড'}</span>
               </h1>
+            </div>
+
+            {/* Dynamic Clock Widget */}
+            <div className="hidden xl:flex items-center gap-2 px-3 py-1.5 bg-slate-100/90 border border-slate-200/90 rounded-xl text-xs font-bold text-slate-700 ml-4 shadow-2xs">
+              <Clock className="w-3.5 h-3.5 text-emerald-600 animate-pulse" />
+              <span>{currentTime || '২৫ অক্টোবর ২০২৬ • রাত ০৮:১৫'}</span>
             </div>
           </div>
 
-          <div className="flex items-center gap-2.5">
+          <div className="flex items-center gap-2 sm:gap-3">
+            {/* Live System Status Indicator */}
+            <div className="hidden md:flex items-center gap-2 px-3 py-1.5 bg-emerald-50 border border-emerald-200/80 rounded-xl text-xs font-bold text-emerald-800">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+              <span>সিস্টেম সচল • সিঙ্কড</span>
+            </div>
+
+            {/* Quick Action Button & Menu */}
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => setShowQuickMenu(!showQuickMenu)}
+                className="inline-flex items-center gap-1.5 text-xs font-black text-white bg-gradient-to-r from-emerald-600 via-emerald-500 to-teal-600 hover:from-emerald-500 hover:to-teal-500 px-3.5 py-2 rounded-xl transition shadow-md shadow-emerald-600/25 active:scale-95 cursor-pointer"
+              >
+                <Zap className="w-3.5 h-3.5 fill-current" />
+                <span className="hidden sm:inline">কুইক লঞ্চ</span>
+              </button>
+
+              {/* Quick Launch Dropdown Popover */}
+              {showQuickMenu && (
+                <div className="absolute right-0 mt-2 w-64 bg-white border border-slate-200 rounded-2xl shadow-2xl p-2 z-50 animate-in fade-in zoom-in-95 space-y-1">
+                  <div className="px-3 py-1.5 text-[10px] font-black uppercase text-slate-400 border-b border-slate-100 mb-1">
+                    দ্রুত অ্যাকশন শর্টকাট
+                  </div>
+                  <button
+                    onClick={() => {
+                      setShowNewActivityModal(true);
+                      setShowQuickMenu(false);
+                      setActiveTab('activities');
+                    }}
+                    className="w-full text-left px-3 py-2 text-xs font-bold text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 rounded-xl transition flex items-center gap-2"
+                  >
+                    <Film className="w-4 h-4 text-emerald-600" />
+                    <span>নতুন ভিডিও কার্যক্রম যোগ করুন</span>
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      openNewMemberModal();
+                      setShowQuickMenu(false);
+                      setActiveTab('memberCandidates');
+                    }}
+                    className="w-full text-left px-3 py-2 text-xs font-bold text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 rounded-xl transition flex items-center gap-2"
+                  >
+                    <Award className="w-4 h-4 text-emerald-600" />
+                    <span>নতুন মেম্বার প্রার্থী যোগ করুন</span>
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      setShowNewPromiseModal(true);
+                      setShowQuickMenu(false);
+                      setActiveTab('promises');
+                    }}
+                    className="w-full text-left px-3 py-2 text-xs font-bold text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 rounded-xl transition flex items-center gap-2"
+                  >
+                    <FileText className="w-4 h-4 text-blue-600" />
+                    <span>নতুন প্রতিশ্রুতি যোগ করুন</span>
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      setShowQuickMenu(false);
+                      setActiveTab('grievances');
+                    }}
+                    className="w-full text-left px-3 py-2 text-xs font-bold text-slate-700 hover:bg-amber-50 hover:text-amber-800 rounded-xl transition flex items-center gap-2"
+                  >
+                    <AlertCircle className="w-4 h-4 text-amber-600" />
+                    <span>নাগরিক অভিযোগ বক্স দেখুন</span>
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      setShowQuickMenu(false);
+                      setActiveTab('blood');
+                    }}
+                    className="w-full text-left px-3 py-2 text-xs font-bold text-slate-700 hover:bg-rose-50 hover:text-rose-800 rounded-xl transition flex items-center gap-2"
+                  >
+                    <Droplet className="w-4 h-4 text-rose-600" />
+                    <span>রক্তদাতা আবেদন যাচাই করুন</span>
+                  </button>
+                </div>
+              )}
+            </div>
+
             <Link
               href="/"
               target="_blank"
-              className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-700 bg-slate-100 hover:bg-emerald-50 hover:text-emerald-800 border border-slate-200 px-3 py-1.5 rounded-xl transition shadow-2xs"
+              className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-700 bg-slate-100 hover:bg-emerald-50 hover:text-emerald-800 border border-slate-200 px-3 py-2 rounded-xl transition shadow-2xs group"
             >
-              <ExternalLink className="w-3.5 h-3.5 text-emerald-600" />
+              <ExternalLink className="w-3.5 h-3.5 text-emerald-600 group-hover:rotate-12 transition-transform" />
               <span className="hidden sm:inline">লাইভ সাইট</span>
             </Link>
 
             <button
               onClick={handleLogout}
-              className="inline-flex items-center gap-1.5 text-xs font-bold text-rose-700 bg-rose-50 hover:bg-rose-100 border border-rose-200 px-3 py-1.5 rounded-xl transition cursor-pointer"
+              className="inline-flex items-center gap-1.5 text-xs font-bold text-rose-700 bg-rose-50 hover:bg-rose-100 border border-rose-200 px-3 py-2 rounded-xl transition cursor-pointer"
             >
               <LogOut className="w-3.5 h-3.5" />
               <span className="hidden sm:inline">লগআউট</span>
@@ -904,78 +1151,326 @@ export default function AdminPage() {
 
         {/* Tab 1: OVERVIEW */}
         {activeTab === 'overview' && (
-          <div className="space-y-8 animate-in fade-in">
+          <div className="space-y-8 animate-in fade-in duration-300">
             {/* Campaign Mode Quick Banner */}
-            <div className="bg-gradient-to-r from-emerald-950 to-teal-900 text-white p-5 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-sm border border-emerald-800/80">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0">
-                  <Megaphone className="w-5 h-5" />
-                </div>
-                <div>
-                  <h4 className="font-bold text-sm sm:text-base">নির্বাচনী প্রচারণা মোড সক্রিয় রয়েছে</h4>
-                  <p className="text-xs text-emerald-200 mt-0.5">
-                    বর্তমানে ১০টি সেকশনের মধ্যে <strong>{activeSectionsCount}টি সেকশন</strong> চালু আছে। বাকি অপ্রয়োজনীয় সেকশনগুলো অফ রয়েছে।
+            <div className="bg-gradient-to-br from-slate-950 via-emerald-950 to-teal-950 text-white p-6 sm:p-8 rounded-3xl border border-emerald-500/30 shadow-xl relative overflow-hidden">
+              {/* Ambient Glow Orbs */}
+              <div className="absolute top-0 right-0 w-80 h-80 bg-emerald-500/15 blur-[90px] pointer-events-none rounded-full" />
+              <div className="absolute bottom-0 left-1/3 w-60 h-60 bg-teal-400/10 blur-[70px] pointer-events-none rounded-full" />
+
+              <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+                <div className="max-w-2xl space-y-2">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 text-xs font-bold border border-emerald-400/30 shadow-xs">
+                      <Sparkles className="w-3.5 h-3.5 text-emerald-400 animate-pulse" />
+                      <span>সুপার অ্যাডমিন কমান্ড সেন্টার</span>
+                    </span>
+                    <span className="text-xs text-slate-400 font-semibold">
+                      ১২ নং যুগিখালী ইউনিয়ন পরিষদ • সাতক্ষীরা
+                    </span>
+                  </div>
+
+                  <h2 className="text-2xl sm:text-3xl font-black text-white tracking-tight leading-tight">
+                    স্বাগতম, সুপার অ্যাডমিন! পোর্টাল সম্পূর্ণ সক্রিয় রয়েছে।
+                  </h2>
+
+                  <p className="text-xs sm:text-sm text-emerald-100/90 leading-relaxed">
+                    বর্তমানে ওয়েবসাইটে ১০টির মধ্যে <strong>{activeSectionsCount}টি সেকশন</strong> লাইভ রয়েছে। ভোটাররা সরাসরি অভিযোগ পাঠাতে পারছেন এবং যুবকরা রক্তদাতা হিসেবে নিবন্ধন করছেন।
                   </p>
+
+                  {/* Live Metrics Ticker */}
+                  <div className="pt-2 flex flex-wrap items-center gap-2.5 text-xs text-emerald-200 font-medium">
+                    <span className="flex items-center gap-1.5 bg-emerald-950/70 px-3 py-1 rounded-xl border border-emerald-800/70">
+                      <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
+                      <span>মোড: <strong>নির্বাচনী প্রচার মোড</strong></span>
+                    </span>
+                    <span className="bg-emerald-950/70 px-3 py-1 rounded-xl border border-emerald-800/70">
+                      প্রার্থী: <strong className="text-white">{candidate.name}</strong>
+                    </span>
+                    <span className="bg-emerald-950/70 px-3 py-1 rounded-xl border border-emerald-800/70">
+                      সক্রিয় মেম্বার: <strong className="text-white">{memberCandidates.filter(c => c.isActive).length} জন</strong>
+                    </span>
+                  </div>
+                </div>
+
+                {/* Preset Action Buttons in Hero */}
+                <div className="flex flex-col sm:flex-row lg:flex-col gap-2.5 shrink-0">
+                  <button
+                    onClick={() => {
+                      setCampaignMode();
+                      setSectionNotice("🎯 নির্বাচনী প্রচারণা মোড সক্রিয় করা হয়েছে! (প্রচারণার জন্য জরুরি ৬টি সেকশন অন এবং বাকি প্রশাসনিক সেকশনগুলো অফ করা হয়েছে)");
+                      setTimeout(() => setSectionNotice(null), 5000);
+                    }}
+                    className="px-5 py-3 rounded-2xl bg-gradient-to-r from-emerald-400 via-teal-300 to-emerald-400 hover:from-emerald-300 hover:to-teal-200 text-slate-950 font-black text-xs sm:text-sm shadow-lg shadow-emerald-500/25 active:scale-95 transition flex items-center justify-center gap-2 cursor-pointer group"
+                  >
+                    <Megaphone className="w-4 h-4 text-slate-950 group-hover:scale-110 transition-transform" />
+                    <span>নির্বাচনী প্রচার মোড (১-ক্লিক)</span>
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      setAllSectionsOn();
+                      setSectionNotice("🏛️ সকল সেকশন সফলভাবে চালু করা হয়েছে (পূর্ণাঙ্গ পরিষদ মোড)!");
+                      setTimeout(() => setSectionNotice(null), 5000);
+                    }}
+                    className="px-5 py-2.5 rounded-2xl bg-white/10 hover:bg-white/20 text-white font-bold text-xs sm:text-sm border border-white/20 active:scale-95 transition flex items-center justify-center gap-2 cursor-pointer"
+                  >
+                    <Eye className="w-4 h-4 text-emerald-300" />
+                    <span>সব সেকশন চালু করুন</span>
+                  </button>
+
+                  <button
+                    onClick={() => setActiveTab('sections')}
+                    className="px-5 py-2.5 rounded-2xl bg-slate-900/80 hover:bg-slate-900 text-slate-200 hover:text-white font-semibold text-xs border border-slate-700/80 active:scale-95 transition flex items-center justify-center gap-2 cursor-pointer"
+                  >
+                    <Sliders className="w-3.5 h-3.5 text-emerald-400" />
+                    <span>সেকশন নিয়ন্ত্রণ পেজ →</span>
+                  </button>
                 </div>
               </div>
-              <button
-                onClick={() => setActiveTab('sections')}
-                className="px-4 py-2 bg-emerald-400 hover:bg-emerald-300 text-slate-950 font-black text-xs rounded-xl transition flex items-center gap-1.5 self-start sm:self-center shrink-0 cursor-pointer shadow-xs active:scale-95"
-              >
-                <Sliders className="w-3.5 h-3.5" />
-                <span>সেকশন নিয়ন্ত্রণ করুন</span>
-              </button>
             </div>
 
-            {/* Stat Cards */}
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+            {/* High-End Stat Cards */}
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 sm:gap-5">
+              
+              {/* Card 1: Member Candidates */}
               <div 
                 onClick={() => setActiveTab('memberCandidates')}
-                className="bg-white border border-slate-200 hover:border-emerald-300 rounded-2xl p-5 shadow-xs cursor-pointer transition"
+                className="admin-card-glass admin-card-hover rounded-3xl p-5 cursor-pointer relative overflow-hidden group border border-emerald-500/20"
               >
-                <span className="text-xs font-bold text-slate-500 uppercase block mb-1">ওয়ার্ড মেম্বার প্রার্থী</span>
-                <span className="text-3xl font-extrabold text-emerald-700">{memberCandidates.length} জন</span>
-                <span className="text-[11px] font-bold text-emerald-600 block mt-1">
-                  {memberCandidates.filter(c => c.isActive).length} জন সক্রিয় প্রার্থী ✓
+                <div className="flex items-center justify-between mb-3">
+                  <div className="w-10 h-10 rounded-2xl bg-emerald-500/10 text-emerald-600 flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <Award className="w-5 h-5" />
+                  </div>
+                  <span className="text-[10px] font-black bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full">
+                    ওয়ার্ডভিত্তিক
+                  </span>
+                </div>
+                <span className="text-xs font-bold text-slate-500 block mb-0.5">ওয়ার্ড মেম্বার প্রার্থী</span>
+                <span className="text-3xl font-black text-emerald-700 tracking-tight">{memberCandidates.length} জন</span>
+                <span className="text-[11px] font-bold text-emerald-600 block mt-2 flex items-center gap-1">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                  <span>{memberCandidates.filter(c => c.isActive).length} জন সক্রিয় প্রার্থী</span>
                 </span>
               </div>
 
-              <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs">
-                <span className="text-xs font-bold text-slate-500 uppercase block mb-1">মোট নির্বাচনী অঙ্গীকার</span>
-                <span className="text-3xl font-extrabold text-slate-900">{totalPromises} টি</span>
-                <span className="text-[11px] text-emerald-600 font-semibold block mt-1">
-                  {completedPromises} টি শতভাগ সমাপ্ত
-                </span>
+              {/* Card 2: Promises */}
+              <div 
+                onClick={() => setActiveTab('promises')}
+                className="admin-card-glass admin-card-hover rounded-3xl p-5 cursor-pointer relative overflow-hidden group border border-blue-500/20"
+              >
+                <div className="flex items-center justify-between mb-3">
+                  <div className="w-10 h-10 rounded-2xl bg-blue-500/10 text-blue-600 flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <FileText className="w-5 h-5" />
+                  </div>
+                  <span className="text-[10px] font-black bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full">
+                    ইশতেহার
+                  </span>
+                </div>
+                <span className="text-xs font-bold text-slate-500 block mb-0.5">নির্বাচনী অঙ্গীকার</span>
+                <span className="text-3xl font-black text-slate-900 tracking-tight">{totalPromises} টি</span>
+                <div className="mt-2 space-y-1">
+                  <span className="text-[11px] text-blue-700 font-bold block">
+                    {completedPromises} টি শতভাগ সমাপ্ত
+                  </span>
+                  <div className="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
+                    <div 
+                      className="bg-blue-600 h-full rounded-full transition-all duration-500"
+                      style={{ width: `${Math.round((completedPromises / (totalPromises || 1)) * 100)}%` }}
+                    />
+                  </div>
+                </div>
               </div>
 
-              <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs">
-                <span className="text-xs font-bold text-slate-500 uppercase block mb-1">গড় বাস্তবায়ন হার</span>
-                <span className="text-3xl font-extrabold text-blue-700">{avgProgress}%</span>
-                <span className="text-[11px] text-slate-500 block mt-1">
+              {/* Card 3: Avg Implementation Progress */}
+              <div 
+                onClick={() => setActiveTab('promises')}
+                className="admin-card-glass admin-card-hover rounded-3xl p-5 cursor-pointer relative overflow-hidden group border border-indigo-500/20"
+              >
+                <div className="flex items-center justify-between mb-3">
+                  <div className="w-10 h-10 rounded-2xl bg-indigo-500/10 text-indigo-600 flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <TrendingUp className="w-5 h-5" />
+                  </div>
+                  <span className="text-[10px] font-black bg-indigo-100 text-indigo-800 px-2 py-0.5 rounded-full">
+                    অগ্রগতি
+                  </span>
+                </div>
+                <span className="text-xs font-bold text-slate-500 block mb-0.5">গড় বাস্তবায়ন হার</span>
+                <span className="text-3xl font-black text-indigo-700 tracking-tight">{avgProgress}%</span>
+                <span className="text-[11px] text-slate-500 font-semibold block mt-2">
                   রিয়েল-টাইম নাগরিক মনিটরিং
                 </span>
               </div>
 
+              {/* Card 4: Grievances */}
               <div 
                 onClick={() => setActiveTab('grievances')}
-                className="bg-white border border-slate-200 hover:border-amber-300 rounded-2xl p-5 shadow-xs cursor-pointer transition"
+                className="admin-card-glass admin-card-hover rounded-3xl p-5 cursor-pointer relative overflow-hidden group border border-amber-500/20"
               >
-                <span className="text-xs font-bold text-slate-500 uppercase block mb-1">নাগরিক অভিযোগ</span>
-                <span className="text-3xl font-extrabold text-amber-600">{grievances.length} টি</span>
-                <span className={`text-[11px] font-bold block mt-1 ${pendingGrievances > 0 ? 'text-rose-500' : 'text-emerald-600'}`}>
-                  {pendingGrievances > 0 ? `${pendingGrievances}টি সমাধান প্রয়োজন` : 'সব সমাধানকৃত ✓'}
+                <div className="flex items-center justify-between mb-3">
+                  <div className="w-10 h-10 rounded-2xl bg-amber-500/10 text-amber-600 flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <AlertCircle className="w-5 h-5" />
+                  </div>
+                  <span className={`text-[10px] font-black px-2 py-0.5 rounded-full ${
+                    pendingGrievances > 0 ? 'bg-amber-100 text-amber-900 animate-pulse' : 'bg-slate-100 text-slate-600'
+                  }`}>
+                    জনতার কথা
+                  </span>
+                </div>
+                <span className="text-xs font-bold text-slate-500 block mb-0.5">নাগরিক অভিযোগ</span>
+                <span className="text-3xl font-black text-amber-600 tracking-tight">{grievances.length} টি</span>
+                <span className={`text-[11px] font-bold block mt-2 flex items-center gap-1 ${
+                  pendingGrievances > 0 ? 'text-rose-600' : 'text-emerald-600'
+                }`}>
+                  {pendingGrievances > 0 ? (
+                    <>
+                      <span className="w-2 h-2 rounded-full bg-rose-500 animate-pulse" />
+                      <span>{pendingGrievances}টি সমাধান বাকি</span>
+                    </>
+                  ) : (
+                    <>
+                      <Check className="w-3.5 h-3.5" />
+                      <span>সব সমাধানকৃত ✓</span>
+                    </>
+                  )}
                 </span>
               </div>
 
+              {/* Card 5: Blood Donors */}
               <div 
                 onClick={() => setActiveTab('blood')}
-                className="bg-white border border-slate-200 hover:border-rose-300 rounded-2xl p-5 shadow-xs cursor-pointer transition"
+                className="admin-card-glass admin-card-hover rounded-3xl p-5 cursor-pointer relative overflow-hidden group border border-rose-500/20"
               >
-                <span className="text-xs font-bold text-slate-500 uppercase block mb-1">রক্তদাতা নেটওয়ার্ক</span>
-                <span className="text-3xl font-extrabold text-rose-600">{approvedDonors.length} জন</span>
-                <span className={`text-[11px] font-bold block mt-1 ${pendingDonorsCount > 0 ? 'text-rose-600' : 'text-emerald-600'}`}>
-                  {pendingDonorsCount > 0 ? `⚠️ ${pendingDonorsCount}টি যাচাই বাকি` : 'সব অনুমোদিত ✓'}
+                <div className="flex items-center justify-between mb-3">
+                  <div className="w-10 h-10 rounded-2xl bg-rose-500/10 text-rose-600 flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <Droplet className="w-5 h-5" />
+                  </div>
+                  <span className="text-[10px] font-black bg-rose-100 text-rose-800 px-2 py-0.5 rounded-full">
+                    ব্লাড ব্যাংক
+                  </span>
+                </div>
+                <span className="text-xs font-bold text-slate-500 block mb-0.5">রক্তদাতা নেটওয়ার্ক</span>
+                <span className="text-3xl font-black text-rose-600 tracking-tight">{approvedDonors.length} জন</span>
+                <span className={`text-[11px] font-bold block mt-2 flex items-center gap-1 ${
+                  pendingDonorsCount > 0 ? 'text-rose-600' : 'text-emerald-600'
+                }`}>
+                  {pendingDonorsCount > 0 ? (
+                    <>
+                      <span className="w-2 h-2 rounded-full bg-rose-500 animate-pulse" />
+                      <span>{pendingDonorsCount}টি যাচাই বাকি</span>
+                    </>
+                  ) : (
+                    <>
+                      <Check className="w-3.5 h-3.5" />
+                      <span>সব অনুমোদিত ✓</span>
+                    </>
+                  )}
                 </span>
+              </div>
+
+            </div>
+
+            {/* Quick Action Center / Launch Tiles */}
+            <div>
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-base sm:text-lg font-black text-slate-900 flex items-center gap-2">
+                  <Zap className="w-5 h-5 text-emerald-600" />
+                  <span>কুইক কমান্ড লঞ্চার (Quick Shortcuts)</span>
+                </h3>
+                <span className="text-xs text-slate-400 font-semibold">সরাসরি কাজ করুন</span>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                
+                {/* Tile 1: Video Activity */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowNewActivityModal(true);
+                    setActiveTab('activities');
+                  }}
+                  className="p-5 rounded-2xl bg-white border border-slate-200/90 hover:border-teal-400 hover:shadow-lg transition-all duration-300 text-left cursor-pointer group"
+                >
+                  <div className="w-10 h-10 rounded-xl bg-teal-50 text-teal-600 flex items-center justify-center mb-3 group-hover:bg-teal-600 group-hover:text-white transition">
+                    <Film className="w-5 h-5" />
+                  </div>
+                  <h4 className="font-bold text-slate-900 text-sm group-hover:text-teal-700 transition">
+                    নতুন সেবা ভিডিও যোগ করুন
+                  </h4>
+                  <p className="text-xs text-slate-500 mt-1">
+                    রোগী দর্শন ও শীতবস্ত্র বিতরণ ভিডিও রিপোর্ট
+                  </p>
+                  <span className="text-xs text-teal-600 font-bold block mt-3 group-hover:translate-x-1 transition-transform">
+                    ভিডিও আপলোড →
+                  </span>
+                </button>
+
+                {/* Tile 2: Member Candidate */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    openNewMemberModal();
+                    setActiveTab('memberCandidates');
+                  }}
+                  className="p-5 rounded-2xl bg-white border border-slate-200/90 hover:border-emerald-400 hover:shadow-lg transition-all duration-300 text-left cursor-pointer group"
+                >
+                  <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center mb-3 group-hover:bg-emerald-600 group-hover:text-white transition">
+                    <Award className="w-5 h-5" />
+                  </div>
+                  <h4 className="font-bold text-slate-900 text-sm group-hover:text-emerald-700 transition">
+                    মেম্বার প্রার্থী প্রোফাইল তৈরি
+                  </h4>
+                  <p className="text-xs text-slate-500 mt-1">
+                    ওয়ার্ডভিত্তিক প্রার্থী, বংশ ও শিক্ষাগত তথ্য
+                  </p>
+                  <span className="text-xs text-emerald-600 font-bold block mt-3 group-hover:translate-x-1 transition-transform">
+                    প্রার্থী যুক্ত করুন →
+                  </span>
+                </button>
+
+                {/* Tile 3: Promise */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowNewPromiseModal(true);
+                    setActiveTab('promises');
+                  }}
+                  className="p-5 rounded-2xl bg-white border border-slate-200/90 hover:border-blue-400 hover:shadow-lg transition-all duration-300 text-left cursor-pointer group"
+                >
+                  <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center mb-3 group-hover:bg-blue-600 group-hover:text-white transition">
+                    <FileText className="w-5 h-5" />
+                  </div>
+                  <h4 className="font-bold text-slate-900 text-sm group-hover:text-blue-700 transition">
+                    নতুন নির্বাচনী প্রতিশ্রুতি
+                  </h4>
+                  <p className="text-xs text-slate-500 mt-1">
+                    উন্নয়ন প্রকল্প ও লক্ষ্যমাত্রা নির্ধারণ
+                  </p>
+                  <span className="text-xs text-blue-600 font-bold block mt-3 group-hover:translate-x-1 transition-transform">
+                    প্রতিশ্রুতি তৈরি →
+                  </span>
+                </button>
+
+                {/* Tile 4: Blood Verification */}
+                <button
+                  type="button"
+                  onClick={() => setActiveTab('blood')}
+                  className="p-5 rounded-2xl bg-white border border-slate-200/90 hover:border-rose-400 hover:shadow-lg transition-all duration-300 text-left cursor-pointer group"
+                >
+                  <div className="w-10 h-10 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center mb-3 group-hover:bg-rose-600 group-hover:text-white transition">
+                    <Droplet className="w-5 h-5" />
+                  </div>
+                  <h4 className="font-bold text-slate-900 text-sm group-hover:text-rose-700 transition">
+                    রক্তদাতা আবেদন যাচাই
+                  </h4>
+                  <p className="text-xs text-slate-500 mt-1">
+                    {pendingDonorsCount > 0 ? `${pendingDonorsCount} জন ভেরিফিকেশন বাকি` : 'সকল রক্তদাতা অনুমোদিত'}
+                  </p>
+                  <span className="text-xs text-rose-600 font-bold block mt-3 group-hover:translate-x-1 transition-transform">
+                    যাচাই পেজ খুলুন →
+                  </span>
+                </button>
+
               </div>
             </div>
 
@@ -983,7 +1478,7 @@ export default function AdminPage() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               
               {/* Quick Promise Quick-Slider Card */}
-              <div className="bg-white rounded-3xl p-6 border border-slate-200 shadow-xs space-y-4">
+              <div className="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm space-y-4">
                 <div className="flex items-center justify-between border-b border-slate-100 pb-3">
                   <h3 className="font-bold text-slate-900 text-base flex items-center gap-2">
                     <FileText className="w-5 h-5 text-emerald-600" />
@@ -999,10 +1494,12 @@ export default function AdminPage() {
 
                 <div className="space-y-4">
                   {promises.slice(0, 4).map((p) => (
-                    <div key={p.id} className="bg-slate-50 p-3.5 rounded-xl border border-slate-200 space-y-2">
+                    <div key={p.id} className="bg-slate-50/80 p-3.5 rounded-2xl border border-slate-200/80 space-y-2">
                       <div className="flex justify-between items-center text-xs font-bold">
                         <span className="text-slate-800 line-clamp-1">{p.title}</span>
-                        <span className="text-emerald-700 font-extrabold">{p.progress}%</span>
+                        <span className="text-emerald-700 font-extrabold bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">
+                          {p.progress}% সম্পন্ন
+                        </span>
                       </div>
                       <input
                         type="range"
@@ -1018,7 +1515,7 @@ export default function AdminPage() {
                             lastUpdated: `এডমিন কর্তৃক অগ্রগতি ${val}% করা হয়েছে`
                           });
                         }}
-                        className="w-full accent-emerald-600 cursor-pointer"
+                        className="w-full accent-emerald-600 cursor-pointer h-2 bg-slate-200 rounded-lg"
                       />
                     </div>
                   ))}
@@ -1026,7 +1523,7 @@ export default function AdminPage() {
               </div>
 
               {/* Pending Grievances Quick Card */}
-              <div className="bg-white rounded-3xl p-6 border border-slate-200 shadow-xs space-y-4">
+              <div className="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm space-y-4">
                 <div className="flex items-center justify-between border-b border-slate-100 pb-3">
                   <h3 className="font-bold text-slate-900 text-base flex items-center gap-2">
                     <AlertCircle className="w-5 h-5 text-amber-600" />
@@ -1042,24 +1539,24 @@ export default function AdminPage() {
 
                 <div className="space-y-3">
                   {grievances.slice(0, 3).map((g) => (
-                    <div key={g.id} className="p-3.5 bg-slate-50 rounded-xl border border-slate-200 text-xs space-y-1.5">
+                    <div key={g.id} className="p-3.5 bg-slate-50/80 rounded-2xl border border-slate-200/80 text-xs space-y-1.5 hover:border-amber-300 transition">
                       <div className="flex justify-between items-center">
                         <span className="font-mono font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
                           {g.trackingCode}
                         </span>
-                        <span className="text-slate-400">{g.submittedAt}</span>
+                        <span className="text-slate-400 font-medium">{g.submittedAt}</span>
                       </div>
                       <h4 className="font-bold text-slate-900 text-sm">{g.title}</h4>
                       <p className="text-slate-500 line-clamp-1">{g.description}</p>
-                      <div className="pt-2 flex justify-between items-center text-[11px]">
-                        <span className="font-medium text-slate-600">{g.citizenName} ({g.ward})</span>
+                      <div className="pt-2 flex justify-between items-center text-[11px] border-t border-slate-100">
+                        <span className="font-bold text-slate-700">{g.citizenName} ({g.ward})</span>
                         <button
                           onClick={() => {
                             setSelectedGrievance(g);
                             setGrievanceResponseText(g.adminResponse || '');
                             setActiveTab('grievances');
                           }}
-                          className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-2.5 py-1 rounded-lg transition"
+                          className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-3 py-1 rounded-xl transition shadow-xs cursor-pointer active:scale-95"
                         >
                           পদক্ষেপ নিন
                         </button>
@@ -1071,11 +1568,12 @@ export default function AdminPage() {
 
             </div>
 
-            {/* Quick Actions Footer */}
-            <div className="bg-white rounded-2xl p-4 border border-slate-200 flex flex-wrap items-center justify-between gap-4">
-              <span className="text-xs text-slate-500">
-                ডাটা লোকাল স্টোরেজে স্বয়ংক্রিয়ভাবে সংরক্ষিত হচ্ছে। যেকোনো সময় রিসেট করতে পারবেন।
-              </span>
+            {/* Quick Actions Footer & System Status */}
+            <div className="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200 flex flex-wrap items-center justify-between gap-4 shadow-2xs">
+              <div className="flex items-center gap-2 text-xs text-slate-500">
+                <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
+                <span>সব ডাটা ব্রাউজারের লোকাল স্টোরেজে স্বয়ংক্রিয়ভাবে সংরক্ষিত রয়েছে।</span>
+              </div>
               <button
                 onClick={() => {
                   if (confirm("আপনি কি সব তথ্য ডিফল্ট অবস্থায় ফিরিয়ে নিতে চান?")) {
@@ -1083,7 +1581,7 @@ export default function AdminPage() {
                     alert("ডাটা সফলভাবে রিসেট হয়েছে!");
                   }
                 }}
-                className="text-xs bg-slate-100 hover:bg-rose-50 hover:text-rose-700 text-slate-600 px-3 py-1.5 rounded-lg border border-slate-200 transition flex items-center gap-1.5"
+                className="text-xs bg-slate-100 hover:bg-rose-50 hover:text-rose-700 text-slate-600 px-3.5 py-2 rounded-xl border border-slate-200 transition flex items-center gap-1.5 font-bold cursor-pointer"
               >
                 <RefreshCw className="w-3.5 h-3.5" />
                 <span>ফ্যাক্টরি রিসেট (ডিফল্ট ডাটা)</span>

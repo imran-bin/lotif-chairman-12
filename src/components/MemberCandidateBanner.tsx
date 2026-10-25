@@ -58,6 +58,8 @@ export const MemberCandidateBanner: React.FC = () => {
 
   // Helper icons for manifesto points
   const getManifestoIcon = (idx: number, iconName?: string) => {
+    if (iconName === 'seedling' || iconName === 'sprout') return <Sparkles className="w-5 h-5 text-emerald-400" />;
+    if (iconName === 'briefcase') return <Award className="w-5 h-5 text-amber-400" />;
     if (iconName === 'droplet' || idx === 1) return <Droplet className="w-5 h-5 text-teal-400" />;
     if (iconName === 'shield' || idx === 2) return <ShieldCheck className="w-5 h-5 text-amber-400" />;
     if (iconName === 'graduation' || idx === 3) return <GraduationCap className="w-5 h-5 text-emerald-400" />;
@@ -186,24 +188,32 @@ export const MemberCandidateBanner: React.FC = () => {
                   <div className="p-3.5 rounded-xl bg-emerald-950/80 border border-emerald-700/60 space-y-1">
                     <div className="flex items-center gap-2 text-xs font-bold text-amber-300">
                       <GraduationCap className="w-4 h-4 text-emerald-400" />
-                      <span>শিক্ষাগত যোগ্যতা সারসংক্ষেপ:</span>
+                      <span>যোগ্যতা ও পরিচিতি সারসংক্ষেপ:</span>
                     </div>
                     <p className="text-sm sm:text-base font-extrabold text-white">
                       {currentCandidate.shortQualifications}
                     </p>
                     <p className="text-[11px] text-emerald-300">
-                      দাখিল, আলিম, ফাজিল (বিএ), কামিল (এমএ), বিএ অনার্স, এমএ, এলএলবি ও বিএমএড সহ মোট ৮টি ডিগ্রি সম্পন্ন।
+                      {currentCandidate.education && currentCandidate.education.length > 1
+                        ? `মোট ${currentCandidate.education.length}টি সনদ ও শিক্ষাগত ডিগ্রির বিবরণ।`
+                        : `${currentCandidate.wardName} (${currentCandidate.village}) এর উন্নয়ন ও গণমানুষের সেবায় নিবেদিতপ্রাণ।`}
                     </p>
                   </div>
 
-                  {/* View Full 8 Degrees Button */}
-                  <button
-                    onClick={() => setShowEducationModal(true)}
-                    className="w-full py-2.5 px-4 rounded-xl bg-slate-900 hover:bg-slate-800 text-emerald-300 hover:text-white border border-emerald-700/60 font-bold text-xs transition flex items-center justify-center gap-2 cursor-pointer shadow-sm active:scale-98"
-                  >
-                    <BookOpen className="w-4 h-4 text-emerald-400" />
-                    <span>সম্পূর্ণ ৮টি সনদের বিস্তারিত খতিয়ান দেখুন ➔</span>
-                  </button>
+                  {/* View Full Degrees Button */}
+                  {currentCandidate.education && currentCandidate.education.length > 0 && (
+                    <button
+                      onClick={() => setShowEducationModal(true)}
+                      className="w-full py-2.5 px-4 rounded-xl bg-slate-900 hover:bg-slate-800 text-emerald-300 hover:text-white border border-emerald-700/60 font-bold text-xs transition flex items-center justify-center gap-2 cursor-pointer shadow-sm active:scale-98"
+                    >
+                      <BookOpen className="w-4 h-4 text-emerald-400" />
+                      <span>
+                        {currentCandidate.education.length > 1
+                          ? `সম্পূর্ণ ${currentCandidate.education.length}টি সনদের বিস্তারিত খতিয়ান দেখুন ➔`
+                          : 'শিক্ষাগত সনদের বিস্তারিত খতিয়ান দেখুন ➔'}
+                      </span>
+                    </button>
+                  )}
                 </div>
 
                 {/* Candidate Bio & Call to Action */}
@@ -343,12 +353,17 @@ export const MemberCandidateBanner: React.FC = () => {
             <p className="text-xs text-slate-400 max-w-md mx-auto">
               সুপার অ্যাডমিন ড্যাশবোর্ড থেকে খুব শীঘ্রই এই ওয়ার্ডের ইউপি সদস্য পদপ্রার্থীর পরিচিতি ও ইশতেহার সংযোজন করা হবে।
             </p>
-            <button
-              onClick={() => setSelectedWardNumber(3)}
-              className="mt-2 px-4 py-2 bg-emerald-700 hover:bg-emerald-600 text-white font-bold text-xs rounded-xl"
-            >
-              ৩ নং ওয়ার্ডের মো: আফছার আলীর ইশতেহার দেখুন
-            </button>
+            <div className="flex flex-wrap justify-center gap-2 mt-2">
+              {activeCandidates.map(c => (
+                <button
+                  key={c.id}
+                  onClick={() => setSelectedWardNumber(c.wardNumber)}
+                  className="px-4 py-2 bg-emerald-700 hover:bg-emerald-600 text-white font-bold text-xs rounded-xl transition"
+                >
+                  {c.wardNumber} নং ওয়ার্ড: {c.name}
+                </button>
+              ))}
+            </div>
           </div>
         )}
 
@@ -393,9 +408,17 @@ export const MemberCandidateBanner: React.FC = () => {
                 <p className="text-xs font-bold text-emerald-800">
                   {currentCandidate.designation} • {currentCandidate.wardName} ({currentCandidate.village})
                 </p>
-                <p className="text-xs text-slate-500">
-                  পিতা: {currentCandidate.fatherName} • মাতা: {currentCandidate.motherName}
-                </p>
+                {(currentCandidate.fatherName || currentCandidate.motherName) ? (
+                  <p className="text-xs text-slate-500">
+                    {currentCandidate.fatherName && <span>পিতা: {currentCandidate.fatherName}</span>}
+                    {currentCandidate.fatherName && currentCandidate.motherName && <span> • </span>}
+                    {currentCandidate.motherName && <span>মাতা: {currentCandidate.motherName}</span>}
+                  </p>
+                ) : (
+                  <p className="text-xs text-slate-500">
+                    {currentCandidate.shortQualifications}
+                  </p>
+                )}
               </div>
             </div>
 
@@ -404,7 +427,11 @@ export const MemberCandidateBanner: React.FC = () => {
               <div className="flex items-center justify-between">
                 <h4 className="text-sm font-black text-slate-900 flex items-center gap-2">
                   <BookOpen className="w-4 h-4 text-emerald-700" />
-                  <span>সম্পূর্ণ ৮টি শিক্ষাগত সনদ ও ফলাফলের অনুমোদিত খতিয়ান</span>
+                  <span>
+                    {currentCandidate.education.length > 1
+                      ? `সম্পূর্ণ ${currentCandidate.education.length}টি শিক্ষাগত সনদ ও ফলাফলের অনুমোদিত খতিয়ান`
+                      : 'শিক্ষাগত সনদ ও পরীক্ষার ফলাফলের অনুমোদিত খতিয়ান'}
+                  </span>
                 </h4>
                 <span className="text-xs font-bold text-emerald-800 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
                   উচ্চশিক্ষিত নেতৃত্ব

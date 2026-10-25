@@ -109,3 +109,39 @@ html {
   background-size: 200% 100%;
   animation: shimmerSweep 3.5s infinite;
 }
+
+/* ================= ADMIN DASHBOARD FANCY STYLES ================= */
+.admin-mesh-bg {
+  background-color: #090d16;
+  background-image: 
+    radial-gradient(at 0% 0%, rgba(5, 150, 105, 0.18) 0px, transparent 50%),
+    radial-gradient(at 100% 0%, rgba(13, 148, 136, 0.15) 0px, transparent 50%),
+    radial-gradient(at 50% 100%, rgba(2, 44, 34, 0.25) 0px, transparent 60%);
+}
+
+.admin-login-glow {
+  background: radial-gradient(circle at 50% 0%, rgba(16, 185, 129, 0.22) 0%, rgba(6, 78, 59, 0.1) 40%, transparent 70%);
+}
+
+.admin-card-glass {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(226, 232, 240, 0.8);
+}
+
+.admin-card-dark {
+  background: rgba(15, 23, 42, 0.75);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(51, 65, 85, 0.6);
+}
+
+.admin-card-hover {
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.admin-card-hover:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 16px 32px -8px rgba(0, 0, 0, 0.08), 0 4px 12px -2px rgba(5, 150, 105, 0.12);
+}
+

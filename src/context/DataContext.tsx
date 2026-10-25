@@ -150,7 +150,14 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
         try {
           const parsed = JSON.parse(savedCandidates);
           if (Array.isArray(parsed) && parsed.length > 0) {
-            setMemberCandidates(parsed);
+            const existingIds = new Set(parsed.map((c: MemberCandidate) => c.id));
+            const merged = [...parsed];
+            for (const initC of initialMemberCandidates) {
+              if (!existingIds.has(initC.id)) {
+                merged.push(initC);
+              }
+            }
+            setMemberCandidates(merged);
           } else {
             setMemberCandidates(initialMemberCandidates);
           }
