@@ -23,7 +23,10 @@ import {
   initialAgriculture,
   initialSocialActivities,
   initialSectionVisibility,
-  initialMemberCandidates
+  initialMemberCandidates,
+  CampaignTemplateId,
+  CampaignTemplateConfig,
+  templateOptions
 } from '@/data/initialData';
 
 interface DataContextType {
@@ -78,6 +81,11 @@ interface DataContextType {
   toggleTheme: () => void;
   setTheme: (theme: 'light' | 'dark') => void;
 
+  // Campaign Template System (3 Distinct Designs)
+  activeTemplate: CampaignTemplateId;
+  setActiveTemplate: (template: CampaignTemplateId) => void;
+  templateOptions: CampaignTemplateConfig[];
+
   resetAllData: () => void;
   isLoaded: boolean;
 }
@@ -101,6 +109,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isGrievanceModalOpen, setIsGrievanceModalOpen] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
   const [theme, setThemeState] = useState<'light' | 'dark'>('light');
+  const [activeTemplate, setActiveTemplateState] = useState<CampaignTemplateId>('islamic-emerald');
 
   const openGrievanceModal = () => setIsGrievanceModalOpen(true);
   const closeGrievanceModal = () => setIsGrievanceModalOpen(false);
@@ -120,6 +129,40 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setThemeState('dark');
         document.documentElement.classList.add('dark');
       }
+
+      // Initialize Campaign Template
+      const savedTemplate = localStorage.getItem(`${STORAGE_KEY_PREFIX}active_template`) as CampaignTemplateId | null;
+      if (savedTemplate === 'islamic-emerald' || savedTemplate === 'smart-digital' || savedTemplate === 'rally-energy') {
+        setActiveTemplateState(savedTemplate);
+        document.documentElement.setAttribute('data-template', savedTemplate);
+        if (typeof document !== 'undefined' && document.body) {
+          document.body.setAttribute('data-template', savedTemplate);
+        }
+      } else {
+        document.documentElement.setAttribute('data-template', 'islamic-emerald');
+        if (typeof document !== 'undefined' && document.body) {
+          document.body.setAttribute('data-template', 'islamic-emerald');
+        }
+      }
+
+      // Live sync listener across tabs or components
+      const handleStorageOrTemplate = () => {
+        try {
+          const currentTpl = localStorage.getItem(`${STORAGE_KEY_PREFIX}active_template`) as CampaignTemplateId | null;
+          if (currentTpl && (currentTpl === 'islamic-emerald' || currentTpl === 'smart-digital' || currentTpl === 'rally-energy')) {
+            setActiveTemplateState(currentTpl);
+            document.documentElement.setAttribute('data-template', currentTpl);
+            if (document.body) document.body.setAttribute('data-template', currentTpl);
+          }
+        } catch (e) {}
+      };
+      window.addEventListener('storage', handleStorageOrTemplate);
+      window.addEventListener('templateChange', handleStorageOrTemplate);
+
+      return () => {
+        window.removeEventListener('storage', handleStorageOrTemplate);
+        window.removeEventListener('templateChange', handleStorageOrTemplate);
+      };
     } catch (e) {
       console.error(e);
     }
@@ -149,6 +192,21 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
       document.documentElement.classList.add('dark');
     } else {
       document.documentElement.classList.remove('dark');
+    }
+  };
+
+  const setActiveTemplate = (template: CampaignTemplateId) => {
+    setActiveTemplateState(template);
+    try {
+      localStorage.setItem(`${STORAGE_KEY_PREFIX}active_template`, template);
+      document.documentElement.setAttribute('data-template', template);
+      if (typeof document !== 'undefined' && document.body) {
+        document.body.setAttribute('data-template', template);
+      }
+      window.dispatchEvent(new Event('storage'));
+      window.dispatchEvent(new Event('templateChange'));
+    } catch (e) {
+      console.error(e);
     }
   };
 
@@ -494,7 +552,10 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
         isLoaded,
         theme,
         toggleTheme,
-        setTheme
+        setTheme,
+        activeTemplate,
+        setActiveTemplate,
+        templateOptions
       }}
     >
       {children}

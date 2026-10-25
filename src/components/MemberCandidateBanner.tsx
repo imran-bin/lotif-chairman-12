@@ -24,10 +24,13 @@ import { useData } from '@/context/DataContext';
 import { jugikhaliWards, MemberCandidate } from '@/data/initialData';
 
 export const MemberCandidateBanner: React.FC = () => {
-  const { memberCandidates, sectionVisibility, pledgeSupport } = useData();
+  const { memberCandidates, sectionVisibility, pledgeSupport, activeTemplate } = useData();
   const [selectedWardNumber, setSelectedWardNumber] = useState<number>(3);
   const [showEducationModal, setShowEducationModal] = useState<boolean>(false);
   const [hasSupported, setHasSupported] = useState<boolean>(false);
+
+  const isSmart = activeTemplate === 'smart-digital';
+  const isRally = activeTemplate === 'rally-energy';
 
   // If section is turned off in superadmin, hide it
   if (sectionVisibility?.memberCandidates === false) {
@@ -48,7 +51,11 @@ export const MemberCandidateBanner: React.FC = () => {
           particleCount: 90,
           spread: 70,
           origin: { y: 0.6 },
-          colors: ['#059669', '#10b981', '#f59e0b', '#34d399', '#ffffff']
+          colors: isSmart 
+            ? ['#06b6d4', '#14b8a6', '#0ea5e9', '#3b82f6', '#ffffff']
+            : isRally 
+            ? ['#e11d48', '#f43f5e', '#10b981', '#f59e0b', '#ffffff']
+            : ['#059669', '#10b981', '#f59e0b', '#34d399', '#ffffff']
         });
       } catch (e) {
         console.error(e);
@@ -70,12 +77,28 @@ export const MemberCandidateBanner: React.FC = () => {
   return (
     <section 
       id="member-manifesto"
-      className="relative overflow-hidden bg-gradient-to-b from-slate-950 via-emerald-950 to-slate-900 text-white py-14 sm:py-20 border-b border-emerald-900/60"
+      className={`relative overflow-hidden ${
+        isSmart 
+          ? 'bg-gradient-to-b from-slate-950 via-[#071926] to-slate-900 border-cyan-900/60'
+          : isRally
+          ? 'bg-gradient-to-b from-slate-950 via-[#260814] to-slate-900 border-rose-900/60'
+          : 'bg-gradient-to-b from-slate-950 via-emerald-950 to-slate-900 border-emerald-900/60'
+      } text-white py-14 sm:py-20 border-b transition-colors duration-500`}
     >
       {/* Dynamic Ambient Background Glows */}
-      <div className="absolute inset-0 bg-[radial-gradient(#10b981_1px,transparent_1px)] [background-size:28px_28px] opacity-15 pointer-events-none" />
-      <div className="absolute -top-20 left-1/4 w-[500px] h-[500px] bg-emerald-500/15 rounded-full blur-[140px] pointer-events-none" />
-      <div className="absolute -bottom-20 right-1/4 w-[450px] h-[450px] bg-amber-500/10 rounded-full blur-[130px] pointer-events-none" />
+      <div 
+        className="absolute inset-0 opacity-15 pointer-events-none"
+        style={{
+          backgroundImage: `radial-gradient(${isSmart ? '#06b6d4' : isRally ? '#f43f5e' : '#10b981'} 1px, transparent 1px)`,
+          backgroundSize: '28px 28px'
+        }}
+      />
+      <div className={`absolute -top-20 left-1/4 w-[500px] h-[500px] ${
+        isSmart ? 'bg-cyan-500/15' : isRally ? 'bg-rose-500/15' : 'bg-emerald-500/15'
+      } rounded-full blur-[140px] pointer-events-none`} />
+      <div className={`absolute -bottom-20 right-1/4 w-[450px] h-[450px] ${
+        isSmart ? 'bg-teal-500/10' : isRally ? 'bg-amber-500/10' : 'bg-amber-500/10'
+      } rounded-full blur-[130px] pointer-events-none`} />
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
@@ -87,7 +110,15 @@ export const MemberCandidateBanner: React.FC = () => {
           </div>
 
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight leading-tight">
-            ওয়ার্ডের তৃণমূল উন্নয়ন ও <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-teal-300 to-amber-300">ইনসাফভিত্তিক ইশতেহার</span>
+            ওয়ার্ডের তৃণমূল উন্নয়ন ও <span className={`text-transparent bg-clip-text ${
+              isSmart 
+                ? 'bg-gradient-to-r from-cyan-400 via-teal-300 to-blue-300' 
+                : isRally 
+                ? 'bg-gradient-to-r from-rose-400 via-amber-300 to-emerald-400' 
+                : 'bg-gradient-to-r from-emerald-400 via-teal-300 to-amber-300'
+            }`}>
+              {isSmart ? 'ডিজিটাল ইশতেহার' : isRally ? 'জনতার বিজয়ী রূপরেখা' : 'ইনসাফভিত্তিক ইশতেহার'}
+            </span>
           </h2>
 
           <p className="text-slate-300 text-sm sm:text-base lg:text-lg leading-relaxed max-w-3xl mx-auto">

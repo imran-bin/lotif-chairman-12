@@ -55,6 +55,60 @@ export interface SectionVisibility {
   unionWards?: boolean;
 }
 
+export type CampaignTemplateId = 'islamic-emerald' | 'smart-digital' | 'rally-energy';
+
+export interface CampaignTemplateConfig {
+  id: CampaignTemplateId;
+  name: string;
+  tagline: string;
+  badge: string;
+  themeStyle: string;
+  accentColor: string;
+  secondaryColor: string;
+  description: string;
+  features: string[];
+  previewGradient: string;
+}
+
+export const templateOptions: CampaignTemplateConfig[] = [
+  {
+    id: 'islamic-emerald',
+    name: '১. ইনসাফ ও আমানত (ইসলামিক ক্লাসিক)',
+    tagline: 'সততা, ঐতিহ্য ও ইনসাফভিত্তিক মডেল ইউনিয়ন',
+    badge: 'ঐতিহ্যবাহী ও ইসলামিক',
+    themeStyle: 'রয়্যাল ইসলামিক এমারেল্ড, গোল্ডেন ক্যালিগ্রাফি ও আমানতের রূপরেখা',
+    accentColor: '#059669',
+    secondaryColor: '#f59e0b',
+    description: 'মর্যাদাপূর্ণ ইসলামিক ব্যানার, সোনালী ক্যালিগ্রাফি ফ্রেম, কোরআনিক আয়াতের ফিতা ও ইনসাফের অঙ্গীকার সংবলিত ঐতিহ্যবাহী ডিজাইন।',
+    features: ['রয়্যাল এমারেল্ড ও গোল্ডেন লাইটিং', 'ইসলামিক ক্যালিগ্রাফি ও আয়াতের ফোকাস', 'আমানতদারী ও সততার সুদৃঢ় অঙ্গীকার'],
+    previewGradient: 'from-emerald-950 via-emerald-800 to-amber-950'
+  },
+  {
+    id: 'smart-digital',
+    name: '২. স্মার্ট যুগিখালী (মডার্ন সিভিক টেক)',
+    tagline: 'ডিজিটাল স্বচ্ছতা, যুব কর্মসংস্থান ও আধুনিক ভবিষ্যৎ',
+    badge: 'হাই-টেক ও স্মার্ট ২০২৬',
+    themeStyle: 'নিওন সায়ান ও ওবসিডিয়ান ব্ল্যাক, ফিউচারিস্টিক গ্রিড ও সাইবার পোর্টাল',
+    accentColor: '#06b6d4',
+    secondaryColor: '#10b981',
+    description: 'একটি অত্যাধুনিক স্মার্ট ইউনিয়ন পরিষদ পোর্টাল—সাইবার ব্ল্যাক গ্লাস, নিওন সায়ান আভা, রিয়েলটাইম লাইভ মেট্রিক ও ডিজিটাল ইশতেহার।',
+    features: ['নিওন সায়ান ও অ্যাকোয়া গ্লাস ফ্রস্ট', 'লাইভ ডিজিটাল মেট্রিক ও কাউন্টার হুড', 'তারুণ্য ও আইটি কর্মসংস্থানের আধুনিক লুক'],
+    previewGradient: 'from-slate-950 via-cyan-950 to-teal-950'
+  },
+  {
+    id: 'rally-energy',
+    name: '৩. জনতার গণজোয়ার (উদ্যমী নির্বাচনী প্রচার)',
+    tagline: 'গণজাগরণ, ভোট বিপ্লব ও মাঠপর্যায়ের গণসংযোগ',
+    badge: 'উদ্যমী ও নির্বাচনী জোয়ার',
+    themeStyle: 'লাল-সবুজ পতাকা, নির্বাচনী উৎসব ব্যানার ও জনতার ডাক',
+    accentColor: '#e11d48',
+    secondaryColor: '#10b981',
+    description: 'নির্বাচনী প্রচারণার মাঠ কাঁপানো উৎসবমুখর ডিজাইন—উদ্যমী লাল-সবুজ জাতীয় রঙের মিশেল, ব্যালট ও ভোটের ডাক, এবং জনসমুদ্রের বিপ্লবী আবেদন।',
+    features: ['উদ্যমী লাল-সবুজ নির্বাচনী রঙের রোমাঞ্চ', 'ভোট ও ব্যালট বিপ্লবের প্রত্যক্ষ গণআহ্বান', 'নির্বাচনী জনসভার ব্রেকিং এলার্ট ও উৎসব আমেজ'],
+    previewGradient: 'from-rose-950 via-emerald-950 to-slate-950'
+  }
+];
+
 export interface EducationRecord {
   degree: string;
   year?: string;

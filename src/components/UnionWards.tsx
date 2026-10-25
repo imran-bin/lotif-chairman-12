@@ -23,18 +23,25 @@ import { jugikhaliWards, MemberCandidate } from '@/data/initialData';
 import { useData } from '@/context/DataContext';
 
 export const UnionWards: React.FC = () => {
-  const { openGrievanceModal, memberCandidates, sectionVisibility } = useData();
+  const { openGrievanceModal, memberCandidates, sectionVisibility, activeTemplate } = useData();
   const [selectedCandidate, setSelectedCandidate] = useState<MemberCandidate | null>(null);
   const [wardFilter, setWardFilter] = useState<'all' | 'candidatesOnly'>('all');
+
+  const isSmart = activeTemplate === 'smart-digital';
+  const isRally = activeTemplate === 'rally-energy';
 
   const showCandidates = sectionVisibility?.memberCandidates !== false;
   const activeCandidates = showCandidates ? (memberCandidates || []).filter(c => c.isActive) : [];
 
   return (
-    <section id="wards" className="py-20 bg-gradient-to-b from-slate-50 via-white to-slate-50 relative overflow-hidden">
+    <section id="wards" className="py-20 bg-gradient-to-b from-slate-50 via-white to-slate-50 dark:from-[#0b0f19] dark:via-[#0e1526] dark:to-[#0b0f19] relative overflow-hidden transition-colors">
       {/* Background Subtle Ambient Glow */}
-      <div className="absolute top-0 right-1/4 w-96 h-96 bg-emerald-100/40 rounded-full blur-3xl pointer-events-none -z-10" />
-      <div className="absolute bottom-0 left-1/4 w-96 h-96 bg-teal-100/40 rounded-full blur-3xl pointer-events-none -z-10" />
+      <div className={`absolute top-0 right-1/4 w-96 h-96 ${
+        isSmart ? 'bg-cyan-100/40 dark:bg-cyan-900/20' : isRally ? 'bg-rose-100/40 dark:bg-rose-900/20' : 'bg-emerald-100/40 dark:bg-emerald-900/20'
+      } rounded-full blur-3xl pointer-events-none -z-10`} />
+      <div className={`absolute bottom-0 left-1/4 w-96 h-96 ${
+        isSmart ? 'bg-teal-100/40 dark:bg-teal-900/20' : isRally ? 'bg-amber-100/40 dark:bg-amber-900/20' : 'bg-teal-100/40 dark:bg-teal-900/20'
+      } rounded-full blur-3xl pointer-events-none -z-10`} />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
@@ -45,9 +52,15 @@ export const UnionWards: React.FC = () => {
             <span>১২ নং যুগিখালী ইউনিয়ন পরিষদ • ৯টি ওয়ার্ড ও ভৌগোলিক পরিচিতি</span>
           </div>
 
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-900 tracking-tight leading-tight">
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-900 dark:text-white tracking-tight leading-tight">
             ইউনিয়নের ৯টি ওয়ার্ড ও {showCandidates ? (
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-700 to-teal-600">মেম্বার পদপ্রার্থী পরিচিতি</span>
+              <span className={`text-transparent bg-clip-text ${
+                isSmart 
+                  ? 'bg-gradient-to-r from-cyan-600 to-teal-600' 
+                  : isRally 
+                  ? 'bg-gradient-to-r from-rose-600 to-emerald-600' 
+                  : 'bg-gradient-to-r from-emerald-700 to-teal-600'
+              }`}>মেম্বার পদপ্রার্থী পরিচিতি</span>
             ) : (
               <span>আওতাধীন গ্রামসমূহ</span>
             )}

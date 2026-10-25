@@ -2,8 +2,13 @@
 
 import React from 'react';
 import { BookOpen, Scale, Award, ShieldAlert, Sparkles } from 'lucide-react';
+import { useData } from '@/context/DataContext';
 
 export const IslamicGuidance: React.FC = () => {
+  const { activeTemplate } = useData();
+  const isSmart = activeTemplate === 'smart-digital';
+  const isRally = activeTemplate === 'rally-energy';
+
   const verses = [
     {
       title: "আমানত ও ন্যায়পরায়ণতার ঐশী নির্দেশ",
@@ -40,10 +45,24 @@ export const IslamicGuidance: React.FC = () => {
   ];
 
   return (
-    <section className="py-20 bg-gradient-to-b from-emerald-950 via-slate-950 to-emerald-950 text-white relative overflow-hidden">
-      {/* Islamic Pattern Background */}
-      <div className="absolute inset-0 bg-[radial-gradient(#10b981_1px,transparent_1px)] [background-size:28px_28px] opacity-10" />
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-4xl h-96 bg-emerald-600/10 rounded-full blur-3xl pointer-events-none" />
+    <section className={`py-20 ${
+      isSmart 
+        ? 'bg-gradient-to-b from-[#071926] via-slate-950 to-[#071926]' 
+        : isRally 
+        ? 'bg-gradient-to-b from-[#260814] via-slate-950 to-[#260814]' 
+        : 'bg-gradient-to-b from-emerald-950 via-slate-950 to-emerald-950'
+    } text-white relative overflow-hidden transition-colors`}>
+      {/* Pattern Background */}
+      <div 
+        className="absolute inset-0 opacity-10" 
+        style={{
+          backgroundImage: `radial-gradient(${isSmart ? '#06b6d4' : isRally ? '#f43f5e' : '#10b981'} 1px, transparent 1px)`,
+          backgroundSize: '28px 28px'
+        }}
+      />
+      <div className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-4xl h-96 ${
+        isSmart ? 'bg-cyan-600/10' : isRally ? 'bg-rose-600/10' : 'bg-emerald-600/10'
+      } rounded-full blur-3xl pointer-events-none`} />
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         

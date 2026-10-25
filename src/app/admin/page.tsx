@@ -49,8 +49,10 @@ import {
   Bell,
   Activity,
   Sun,
-  Moon
+  Moon,
+  Palette
 } from 'lucide-react';
+import confetti from 'canvas-confetti';
 import { useData } from '@/context/DataContext';
 import { PromiseItem, Grievance, SectionVisibility, jugikhaliWards, SocialActivity, MemberCandidate, EducationRecord } from '@/data/initialData';
 
@@ -190,7 +192,10 @@ export default function AdminPage() {
     deleteBloodDonor,
     resetAllData,
     theme: themeMode,
-    toggleTheme
+    toggleTheme,
+    activeTemplate,
+    setActiveTemplate,
+    templateOptions
   } = useData();
 
   // Authentication State (Credentials: abusaidmd012@gmail.com / abusaid_2026)
@@ -242,8 +247,9 @@ export default function AdminPage() {
   }, []);
 
   // Active Tab & Navigation
-  const [activeTab, setActiveTab] = useState<'overview' | 'sections' | 'activities' | 'memberCandidates' | 'blood' | 'grievances' | 'promises' | 'candidate' | 'budget' | 'deploy'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'templates' | 'sections' | 'activities' | 'memberCandidates' | 'blood' | 'grievances' | 'promises' | 'candidate' | 'budget' | 'deploy'>('overview');
   const [sectionNotice, setSectionNotice] = useState<string | null>(null);
+  const [templateNotice, setTemplateNotice] = useState<string | null>(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   // Blood Donor Moderation State
@@ -781,6 +787,15 @@ export default function AdminPage() {
       group: 'কোর কন্ট্রোল'
     },
     { 
+      id: 'templates', 
+      label: 'নির্বাচনী টেমপ্লেট ডিজাইন', 
+      subLabel: '৩টি চমৎকার প্রচার ডিজাইন',
+      icon: Palette, 
+      count: '৩টি ডিজাইন',
+      countColor: 'bg-amber-500/20 text-amber-300 border border-amber-500/30',
+      group: 'কোর কন্ট্রোল'
+    },
+    { 
       id: 'sections', 
       label: 'সেকশন নিয়ন্ত্রণ', 
       subLabel: 'প্রচার মোড অন/অফ',
@@ -1259,19 +1274,27 @@ export default function AdminPage() {
                     বর্তমানে ওয়েবসাইটে ১০টির মধ্যে <strong>{activeSectionsCount}টি সেকশন</strong> লাইভ রয়েছে। ভোটাররা সরাসরি অভিযোগ পাঠাতে পারছেন এবং যুবকরা রক্তদাতা হিসেবে নিবন্ধন করছেন।
                   </p>
 
-                  {/* Live Metrics Ticker */}
-                  <div className="pt-2 flex flex-wrap items-center gap-2.5 text-xs text-emerald-200 font-medium">
-                    <span className="flex items-center gap-1.5 bg-emerald-950/70 px-3 py-1 rounded-xl border border-emerald-800/70">
-                      <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
-                      <span>মোড: <strong>নির্বাচনী প্রচার মোড</strong></span>
-                    </span>
-                    <span className="bg-emerald-950/70 px-3 py-1 rounded-xl border border-emerald-800/70">
-                      প্রার্থী: <strong className="text-white">{candidate.name}</strong>
-                    </span>
-                    <span className="bg-emerald-950/70 px-3 py-1 rounded-xl border border-emerald-800/70">
-                      সক্রিয় মেম্বার: <strong className="text-white">{memberCandidates.filter(c => c.isActive).length} জন</strong>
-                    </span>
-                  </div>
+                    {/* Live Metrics Ticker */}
+                    <div className="pt-2 flex flex-wrap items-center gap-2.5 text-xs text-emerald-200 font-medium">
+                      <span className="flex items-center gap-1.5 bg-emerald-950/70 px-3 py-1 rounded-xl border border-emerald-800/70">
+                        <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
+                        <span>মোড: <strong>নির্বাচনী প্রচার মোড</strong></span>
+                      </span>
+                      <button
+                        onClick={() => setActiveTab('templates')}
+                        className="bg-amber-950/80 text-amber-200 px-3 py-1 rounded-xl border border-amber-600/60 flex items-center gap-1.5 hover:bg-amber-900/90 transition cursor-pointer"
+                        title="ক্লিক করে টেমপ্লেট পরিবর্তন করুন"
+                      >
+                        <Palette className="w-3.5 h-3.5 text-amber-400" />
+                        <span>ডিজাইন: <strong className="text-white underline">{templateOptions.find(t => t.id === activeTemplate)?.name.split(' (')[0] || 'ইনসাফ ও আমানত'}</strong></span>
+                      </button>
+                      <span className="bg-emerald-950/70 px-3 py-1 rounded-xl border border-emerald-800/70">
+                        প্রার্থী: <strong className="text-white">{candidate.name}</strong>
+                      </span>
+                      <span className="bg-emerald-950/70 px-3 py-1 rounded-xl border border-emerald-800/70">
+                        সক্রিয় মেম্বার: <strong className="text-white">{memberCandidates.filter(c => c.isActive).length} জন</strong>
+                      </span>
+                    </div>
                 </div>
 
                 {/* Preset Action Buttons in Hero */}
@@ -1668,6 +1691,224 @@ export default function AdminPage() {
                 <span>ফ্যাক্টরি রিসেট (ডিফল্ট ডাটা)</span>
               </button>
             </div>
+          </div>
+        )}
+
+        {/* Tab: TEMPLATES & DESIGN ENGINE */}
+        {activeTab === 'templates' && (
+          <div className="space-y-6 animate-in fade-in">
+            {/* Notification alert */}
+            {templateNotice && (
+              <div className="p-4 rounded-2xl bg-gradient-to-r from-emerald-500/20 via-teal-500/20 to-emerald-500/20 border-2 border-emerald-500 text-emerald-800 dark:text-emerald-200 text-sm font-bold flex items-center justify-between shadow-lg animate-in fade-in">
+                <div className="flex items-center gap-3">
+                  <span className="w-8 h-8 rounded-xl bg-emerald-500 text-slate-950 flex items-center justify-center font-black text-base shadow-xs">
+                    ✓
+                  </span>
+                  <span>{templateNotice}</span>
+                </div>
+                <button 
+                  onClick={() => setTemplateNotice(null)} 
+                  className="text-emerald-700 dark:text-emerald-300 hover:text-emerald-900 text-xs font-black px-2.5 py-1 rounded-lg bg-emerald-500/15"
+                >
+                  ✕ বন্ধ করুন
+                </button>
+              </div>
+            )}
+
+            {/* Header Preset Control Card */}
+            <div className="bg-gradient-to-br from-slate-950 via-emerald-950 to-slate-900 text-white p-6 sm:p-8 rounded-3xl shadow-xl relative overflow-hidden border border-emerald-500/30">
+              <div className="absolute top-0 right-0 w-80 h-80 bg-amber-500/15 blur-[100px] pointer-events-none rounded-full" />
+              <div className="absolute bottom-0 left-1/3 w-60 h-60 bg-teal-400/10 blur-[80px] pointer-events-none rounded-full" />
+              
+              <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+                <div className="max-w-2xl">
+                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/20 text-amber-300 text-xs font-bold border border-amber-400/30 mb-3 shadow-xs">
+                    <Palette className="w-3.5 h-3.5 text-amber-400" />
+                    <span>নির্বাচনী প্রচারণার ৩টি বিশেষ টেমপ্লেট ডিজাইন (Design Switcher)</span>
+                  </div>
+                  <h2 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
+                    ওয়েবসাইট ক্যাম্পেইন ডিজাইন ও থিম নিয়ন্ত্রণ
+                  </h2>
+                  <p className="mt-2 text-xs sm:text-sm text-emerald-100/90 leading-relaxed">
+                    আপনার পছন্দ এবং প্রচারণার মেজাজ অনুযায়ী ৩টি ভিন্নধর্মী প্রিমিয়াম ডিজাইন তৈরি করা হয়েছে। আপনি অ্যাডমিন প্যানেল থেকে যেকোনো একটিতে ক্লিক করে <strong>&ldquo;এই ডিজাইনটি লাইভ করুন&rdquo;</strong> চাপলেই সাথে সাথে মূল ওয়েবসাইটের হিরো ব্যানার, কালার স্কিম, অ্যানিমেশন এবং স্পেশাল ইফেক্ট স্বয়ংক্রিয়ভাবে পরিবর্তিত হবে।
+                  </p>
+                </div>
+
+                {/* Quick Live Preview Action */}
+                <div className="flex flex-col sm:flex-row lg:flex-col gap-3 shrink-0">
+                  <a
+                    href="/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-5 py-3 rounded-2xl bg-gradient-to-r from-emerald-400 via-teal-300 to-emerald-400 hover:from-emerald-300 hover:to-teal-200 text-slate-950 font-black text-xs sm:text-sm shadow-lg shadow-emerald-500/25 active:scale-95 transition flex items-center justify-center gap-2 group"
+                  >
+                    <ExternalLink className="w-4 h-4 text-slate-950 group-hover:scale-110 transition-transform" />
+                    <span>লাইভ ওয়েবসাইট ভিজিট করুন</span>
+                  </a>
+                  <div className="text-[11px] text-center text-slate-400">
+                    বর্তমান সক্রিয়: <strong className="text-amber-300">{templateOptions.find(t => t.id === activeTemplate)?.name.split(' (')[0]}</strong>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* 3 Template Selection Cards Grid */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              {templateOptions.map((tpl) => {
+                const isSelected = activeTemplate === tpl.id;
+                return (
+                  <div 
+                    key={tpl.id}
+                    className={`relative rounded-3xl overflow-hidden border-2 transition-all duration-300 flex flex-col justify-between ${
+                      isSelected
+                        ? 'border-emerald-500 shadow-2xl ring-2 ring-emerald-500/50 glow-emerald bg-white dark:bg-slate-900'
+                        : 'border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 bg-white/80 dark:bg-slate-900/80 shadow-md hover:shadow-xl'
+                    }`}
+                  >
+                    {/* Top Active Ribbon */}
+                    {isSelected && (
+                      <div className="bg-gradient-to-r from-emerald-600 via-emerald-500 to-teal-600 text-slate-950 font-black text-xs py-1.5 px-4 text-center flex items-center justify-center gap-2 shadow-xs">
+                        <span className="w-2 h-2 rounded-full bg-white animate-ping" />
+                        <span>✓ বর্তমানে ওয়েবসাইটে এই ডিজাইনটি লাইভ চলছে</span>
+                      </div>
+                    )}
+
+                    {/* Preview Mockup Header with Theme Gradient */}
+                    <div className={`p-6 text-white relative overflow-hidden bg-gradient-to-br ${tpl.previewGradient}`}>
+                      <div className="absolute top-0 right-0 w-36 h-36 bg-white/10 rounded-full blur-2xl pointer-events-none" />
+                      
+                      <div className="relative z-10 space-y-3">
+                        <div className="flex items-center justify-between">
+                          <span className="px-3 py-1 rounded-full text-[10px] font-black tracking-wide uppercase bg-black/40 border border-white/20 backdrop-blur-md">
+                            {tpl.badge}
+                          </span>
+                          <div className="flex items-center gap-1.5">
+                            <span 
+                              className="w-4 h-4 rounded-full border border-white/60 shadow-xs" 
+                              style={{ backgroundColor: tpl.accentColor }} 
+                              title={`কালার: ${tpl.accentColor}`}
+                            />
+                            <span 
+                              className="w-4 h-4 rounded-full border border-white/60 shadow-xs" 
+                              style={{ backgroundColor: tpl.secondaryColor }} 
+                              title={`কালার: ${tpl.secondaryColor}`}
+                            />
+                          </div>
+                        </div>
+
+                        <div>
+                          <h3 className="text-xl font-black text-white leading-tight">
+                            {tpl.name}
+                          </h3>
+                          <p className="text-xs text-white/80 font-medium mt-1">
+                            {tpl.tagline}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Card Body & Features */}
+                    <div className="p-6 space-y-4 flex-1 flex flex-col justify-between">
+                      <div className="space-y-3">
+                        <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+                          {tpl.description}
+                        </p>
+
+                        <div className="pt-2 border-t border-slate-100 dark:border-slate-800">
+                          <span className="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block mb-2">
+                            ডিজাইনের মূল বৈশিষ্ট্যসমূহ:
+                          </span>
+                          <ul className="space-y-1.5">
+                            {tpl.features.map((feat, idx) => (
+                              <li key={idx} className="flex items-center gap-2 text-xs text-slate-700 dark:text-slate-200">
+                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
+                                <span>{feat}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      </div>
+
+                      {/* Card Action Button */}
+                      <div className="pt-4 border-t border-slate-100 dark:border-slate-800">
+                        {isSelected ? (
+                          <div className="w-full py-3 rounded-2xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 font-bold text-xs sm:text-sm text-center border border-emerald-300 dark:border-emerald-800/80 flex items-center justify-center gap-2">
+                            <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                            <span>বর্তমানে এই ডিজাইনটি সক্রিয়</span>
+                          </div>
+                        ) : (
+                          <button
+                            onClick={() => {
+                              setActiveTemplate(tpl.id);
+                              setTemplateNotice(`🎉 "${tpl.name}" ডিজাইনটি সফলভাবে লাইভ করা হয়েছে! ওয়েবসাইটে পরিবর্তন দেখতে ভিজিট করুন।`);
+                              try {
+                                confetti({
+                                  particleCount: 100,
+                                  spread: 70,
+                                  origin: { y: 0.6 }
+                                });
+                              } catch (e) {
+                                console.log(e);
+                              }
+                              setTimeout(() => setTemplateNotice(null), 6000);
+                            }}
+                            className="w-full py-3 rounded-2xl bg-gradient-to-r from-slate-900 to-slate-800 hover:from-emerald-700 hover:to-teal-700 text-white font-extrabold text-xs sm:text-sm transition-all duration-200 shadow-md active:scale-95 flex items-center justify-center gap-2 cursor-pointer group"
+                          >
+                            <Sparkles className="w-4 h-4 text-amber-400 group-hover:rotate-12 transition-transform" />
+                            <span>এই ডিজাইনটি লাইভ করুন</span>
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Design Guideline & Philosophy Card */}
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 sm:p-8 shadow-sm space-y-4">
+              <div className="flex items-center gap-2.5">
+                <span className="p-2 rounded-xl bg-amber-500/10 text-amber-500 dark:text-amber-400">
+                  <Sparkles className="w-5 h-5" />
+                </span>
+                <div>
+                  <h4 className="font-black text-slate-900 dark:text-white text-base">
+                    টেমপ্লেট ইঞ্জিনের কারিগরি সুবিধা
+                  </h4>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">
+                    কোন ডিজাইনে কী বার্তা পৌঁছাবে ভোটারদের কাছে?
+                  </p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs text-slate-600 dark:text-slate-300">
+                <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/60 space-y-1.5">
+                  <strong className="text-emerald-700 dark:text-emerald-400 font-bold block text-sm">
+                    ১. ইনসাফ ও আমানত (ইসলামিক ক্লাসিক)
+                  </strong>
+                  <p>
+                    ধার্মিক, মুরুব্বি ও সাধারণ নীতিবান ভোটারদের আস্থা অর্জনে আদর্শ। সোনালী ক্যালিগ্রাফি ফ্রেম ও কোরআনিক আয়াতের ফোকাস সততা ও আমানতদারীর গভীর বার্তা দেয়।
+                  </p>
+                </div>
+                <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/60 space-y-1.5">
+                  <strong className="text-cyan-700 dark:text-cyan-400 font-bold block text-sm">
+                    ২. স্মার্ট যুগিখালী (মডার্ন সিভিক টেক)
+                  </strong>
+                  <p>
+                    শিক্ষিত তরুণ সমাজ, ফ্রিল্যান্সার ও প্রবাসী ভাইদের আকৃষ্ট করতে শ্রেষ্ঠ। সাইবার ডার্ক ও নিওন সায়ান লুক আধুনিক ২০২৬ সালের ডিজিটাল যুগিখালীর ছবি ফুটিয়ে তোলে।
+                  </p>
+                </div>
+                <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/60 space-y-1.5">
+                  <strong className="text-rose-700 dark:text-rose-400 font-bold block text-sm">
+                    ৩. জনতার গণজোয়ার (উদ্যমী নির্বাচনী প্রচার)
+                  </strong>
+                  <p>
+                    ভোটের মাঠ গরম করতে এবং জনসমাবেশের শক্তি প্রকাশে চূড়ান্ত উপযোগী। জাতীয় লাল-সবুজ রঙ, ব্যালট বিপ্লব ও নির্বাচনী জনসভার উত্তেজনাপূর্ণ আবহ তৈরি করে।
+                  </p>
+                </div>
+              </div>
+            </div>
+
           </div>
         )}
 

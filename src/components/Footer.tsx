@@ -15,14 +15,19 @@ import { useData } from '@/context/DataContext';
 import { jugikhaliWards } from '@/data/initialData';
 
 export const Footer: React.FC = () => {
-  const { candidate, openGrievanceModal } = useData();
+  const { candidate, openGrievanceModal, activeTemplate } = useData();
+
+  const isSmart = activeTemplate === 'smart-digital';
+  const isRally = activeTemplate === 'rally-energy';
 
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   return (
-    <footer className="bg-slate-950 text-slate-300 pt-16 pb-12 border-t border-emerald-950 relative">
+    <footer className={`bg-slate-950 text-slate-300 pt-16 pb-12 ${
+      isSmart ? 'border-t border-cyan-950' : isRally ? 'border-t border-rose-950' : 'border-t border-emerald-950'
+    } relative transition-colors`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Top Grid */}

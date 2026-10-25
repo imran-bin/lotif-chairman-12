@@ -22,8 +22,11 @@ import { useData } from '@/context/DataContext';
 const MarqueeTag = 'marquee' as unknown as React.ElementType;
 
 export const Navbar: React.FC = () => {
-  const { candidate, sectionVisibility, openGrievanceModal, theme, toggleTheme } = useData();
+  const { candidate, sectionVisibility, openGrievanceModal, theme, toggleTheme, activeTemplate } = useData();
   const [isOpen, setIsOpen] = useState(false);
+
+  const isSmart = activeTemplate === 'smart-digital';
+  const isRally = activeTemplate === 'rally-energy';
 
   const allNavLinks = [
     { label: sectionVisibility?.memberCandidates ? 'মেম্বার ইশতেহার ও ওয়ার্ড' : '৯টি ওয়ার্ড', href: '#member-manifesto', icon: MapPin, show: true },
@@ -51,17 +54,35 @@ export const Navbar: React.FC = () => {
   return (
     <header className="sticky top-0 z-50 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-emerald-100 dark:border-slate-800 shadow-xs transition-colors duration-300">
       {/* Top Banner Notice */}
-      <div className="bg-emerald-900 text-emerald-100 text-xs sm:text-sm py-1 px-4 font-medium flex justify-between items-center border-b border-emerald-800">
+      <div className={`${
+        isSmart 
+          ? 'bg-[#092233] text-cyan-100 border-[#0d344d]' 
+          : isRally 
+          ? 'bg-[#330c1a] text-rose-100 border-[#4a1226]' 
+          : 'bg-emerald-900 text-emerald-100 border-emerald-800'
+      } text-xs sm:text-sm py-1 px-4 font-medium flex justify-between items-center border-b transition-colors`}>
         <div className="max-w-7xl mx-auto w-full flex items-center justify-between">
           <div className="flex items-center gap-2 overflow-hidden text-ellipsis whitespace-nowrap">
-            <span className="bg-emerald-700 text-white px-2 py-0.5 rounded text-[11px] font-bold tracking-wide">
-              নির্বাচনী অঙ্গীকার
+            <span className={`${
+              isSmart 
+                ? 'bg-cyan-700 text-white' 
+                : isRally 
+                ? 'bg-rose-700 text-white' 
+                : 'bg-emerald-700 text-white'
+            } px-2 py-0.5 rounded text-[11px] font-bold tracking-wide`}>
+              {isSmart ? '⚡ স্মার্ট ভিশন' : isRally ? '🔥 জনতার গণজোয়ার' : 'নির্বাচনী অঙ্গীকার'}
             </span>
-            <span>&ldquo;আমার যুগিখালী&rdquo; - ইনসাফ, স্বচ্ছতা ও আধুনিক মডেল ইউনিয়ন গড়ার শপথ</span>
+            <span>
+              {isSmart 
+                ? '“স্মার্ট যুগিখালী ২০২৬” — তথ্যপ্রযুক্তি, যুব ফ্রিল্যান্সিং ও দুর্নীতিমুক্ত ডিজিটাল নাগরিক সেবা'
+                : isRally
+                ? '“পরিবর্তনের শপথ” — জনতার ভোটাধিকার প্রতিষ্ঠা ও ১২ নং যুগিখালীর সামগ্রিক উন্নয়ন'
+                : '“আমার যুগিখালী” - ইনসাফ, স্বচ্ছতা ও আধুনিক মডেল ইউনিয়ন গড়ার শপথ'}
+            </span>
           </div>
           <div className="hidden sm:flex items-center gap-4 text-xs">
             <a href="tel:+8801735885527" className="hover:text-emerald-300 flex items-center gap-1.5 transition font-medium">
-              <PhoneCall className="w-3.5 h-3.5 text-emerald-400" />
+              <PhoneCall className={`w-3.5 h-3.5 ${isSmart ? 'text-cyan-400' : isRally ? 'text-rose-400' : 'text-emerald-400'}`} />
               হটলাইন: +880 1735-885527
             </a>
           </div>

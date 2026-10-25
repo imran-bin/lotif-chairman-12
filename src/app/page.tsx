@@ -17,10 +17,10 @@ import { Footer } from '@/components/Footer';
 import { useData } from '@/context/DataContext';
 
 export default function Home() {
-  const { sectionVisibility } = useData();
+  const { sectionVisibility, activeTemplate } = useData();
 
   return (
-    <main className="min-h-screen flex flex-col bg-slate-50 dark:bg-[#0b0f19] text-slate-800 dark:text-slate-100 selection:bg-emerald-600 selection:text-white transition-colors duration-300">
+    <main data-template={activeTemplate} className={`min-h-screen flex flex-col bg-slate-50 dark:bg-[#0b0f19] text-slate-800 dark:text-slate-100 selection:bg-emerald-600 selection:text-white transition-colors duration-300 template-${activeTemplate || 'islamic-emerald'}`}>
       <Navbar />
       {sectionVisibility.hero && <Hero />}
       {sectionVisibility.memberCandidates !== false && <MemberCandidateBanner />}

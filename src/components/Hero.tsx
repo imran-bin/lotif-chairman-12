@@ -18,18 +18,23 @@ import {
   Flame,
   Award,
   Send,
-  Building2
+  Building2,
+  Zap
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { useData } from '@/context/DataContext';
 
 export const Hero: React.FC = () => {
-  const { candidate, pledgeSupport, openGrievanceModal } = useData();
+  const { candidate, pledgeSupport, openGrievanceModal, activeTemplate } = useData();
   const [hasPledged, setHasPledged] = useState(false);
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
 
   const totalSlides = 3;
+
+  // Template specific helpers
+  const isSmart = activeTemplate === 'smart-digital';
+  const isRally = activeTemplate === 'rally-energy';
 
   // Auto carousel timer (6 seconds per slide)
   useEffect(() => {
@@ -51,7 +56,11 @@ export const Hero: React.FC = () => {
           particleCount: 110,
           spread: 75,
           origin: { y: 0.6 },
-          colors: ['#059669', '#10b981', '#f59e0b', '#34d399', '#ffffff']
+          colors: isSmart 
+            ? ['#06b6d4', '#14b8a6', '#3b82f6', '#0ea5e9', '#ffffff']
+            : isRally
+            ? ['#e11d48', '#f43f5e', '#10b981', '#f59e0b', '#ffffff']
+            : ['#059669', '#10b981', '#f59e0b', '#34d399', '#ffffff']
         });
       } catch (e) {
         console.log(e);
@@ -64,30 +73,82 @@ export const Hero: React.FC = () => {
 
   return (
     <section 
-      className="relative overflow-hidden bg-gradient-to-b from-slate-950 via-emerald-950 to-slate-950 text-white pt-8 pb-16 lg:pt-14 lg:pb-24 select-none"
+      className={`relative overflow-hidden ${
+        isSmart 
+          ? 'bg-gradient-to-b from-slate-950 via-[#061826] to-slate-950'
+          : isRally
+          ? 'bg-gradient-to-b from-slate-950 via-[#260814] to-slate-950'
+          : 'bg-gradient-to-b from-slate-950 via-emerald-950 to-slate-950'
+      } text-white pt-8 pb-16 lg:pt-14 lg:pb-24 select-none transition-colors duration-500`}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
       {/* Dynamic Ambient Background Glows */}
-      <div className="absolute inset-0 bg-[radial-gradient(#10b981_1px,transparent_1px)] [background-size:26px_26px] opacity-15 pointer-events-none" />
-      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-emerald-500/15 rounded-full blur-[130px] pointer-events-none" />
-      <div className="absolute bottom-10 right-10 w-96 h-96 bg-amber-500/15 rounded-full blur-[110px] pointer-events-none" />
-      <div className="absolute top-10 left-10 w-80 h-80 bg-teal-500/15 rounded-full blur-[100px] pointer-events-none" />
+      <div 
+        className="absolute inset-0 opacity-15 pointer-events-none"
+        style={{
+          backgroundImage: `radial-gradient(${isSmart ? '#06b6d4' : isRally ? '#f43f5e' : '#10b981'} 1px, transparent 1px)`,
+          backgroundSize: '26px 26px'
+        }}
+      />
+      {isSmart ? (
+        <>
+          <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-cyan-500/15 rounded-full blur-[130px] pointer-events-none" />
+          <div className="absolute bottom-10 right-10 w-96 h-96 bg-teal-500/15 rounded-full blur-[110px] pointer-events-none" />
+          <div className="absolute top-10 left-10 w-80 h-80 bg-blue-500/15 rounded-full blur-[100px] pointer-events-none" />
+        </>
+      ) : isRally ? (
+        <>
+          <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-rose-500/20 rounded-full blur-[130px] pointer-events-none" />
+          <div className="absolute bottom-10 right-10 w-96 h-96 bg-emerald-500/15 rounded-full blur-[110px] pointer-events-none" />
+          <div className="absolute top-10 left-10 w-80 h-80 bg-amber-500/15 rounded-full blur-[100px] pointer-events-none" />
+        </>
+      ) : (
+        <>
+          <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-emerald-500/15 rounded-full blur-[130px] pointer-events-none" />
+          <div className="absolute bottom-10 right-10 w-96 h-96 bg-amber-500/15 rounded-full blur-[110px] pointer-events-none" />
+          <div className="absolute top-10 left-10 w-80 h-80 bg-teal-500/15 rounded-full blur-[100px] pointer-events-none" />
+        </>
+      )}
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Top Floating Glow Announcement Bar */}
         <div className="flex justify-center mb-6">
-          <div className="inline-flex items-center gap-2 sm:gap-3 px-3.5 py-1.5 sm:px-5 sm:py-2 rounded-full bg-slate-900/90 border border-emerald-500/50 text-emerald-200 text-xs sm:text-sm font-semibold shadow-lg shadow-emerald-950/60 backdrop-blur-md glow-emerald transition-all hover:scale-102">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
-            <span className="bg-emerald-800 text-white text-[10px] sm:text-xs font-bold px-2 py-0.5 rounded-full">
-              ১২ নং যুগিখালী
-            </span>
-            <span className="truncate max-w-[220px] sm:max-w-none text-emerald-100">
-              ইনসাফ, আমানত ও আধুনিক মডেল ইউনিয়ন গড়ার গণআহ্বান
-            </span>
-            <span className="text-amber-400 text-xs font-bold hidden sm:inline">✦ ২০২৬</span>
-          </div>
+          {isSmart ? (
+            <div className="inline-flex items-center gap-2 sm:gap-3 px-3.5 py-1.5 sm:px-5 sm:py-2 rounded-full bg-slate-900/90 border border-cyan-500/60 text-cyan-200 text-xs sm:text-sm font-semibold shadow-lg shadow-cyan-950/60 backdrop-blur-md glow-cyan transition-all hover:scale-102">
+              <span className="w-2 h-2 rounded-full bg-cyan-400 animate-ping" />
+              <span className="bg-cyan-800 text-white text-[10px] sm:text-xs font-bold px-2.5 py-0.5 rounded-full">
+                ⚡ স্মার্ট যুগিখালী ২০২৬
+              </span>
+              <span className="truncate max-w-[220px] sm:max-w-none text-cyan-100">
+                তথ্যপ্রযুক্তি, ফ্রিল্যান্সিং হাব ও দুর্নীতিমুক্ত ডিজিটাল মডেল ইউনিয়ন ভিশন
+              </span>
+              <span className="text-teal-300 text-xs font-bold hidden sm:inline">✦ সাইবার সিভিক পোর্টাল</span>
+            </div>
+          ) : isRally ? (
+            <div className="inline-flex items-center gap-2 sm:gap-3 px-3.5 py-1.5 sm:px-5 sm:py-2 rounded-full bg-slate-900/90 border border-rose-500/60 text-rose-200 text-xs sm:text-sm font-semibold shadow-lg shadow-rose-950/60 backdrop-blur-md glow-rose transition-all hover:scale-102">
+              <span className="w-2 h-2 rounded-full bg-rose-500 animate-ping" />
+              <span className="bg-rose-700 text-white text-[10px] sm:text-xs font-bold px-2.5 py-0.5 rounded-full">
+                🔥 জনতার গণজোয়ার ২০২৬
+              </span>
+              <span className="truncate max-w-[220px] sm:max-w-none text-rose-100">
+                ভোটাধিকার প্রতিষ্ঠা ও পরিবর্তনের গণজাগরণ • ১২ নং যুগিখালী ইউনিয়ন
+              </span>
+              <span className="text-amber-400 text-xs font-bold hidden sm:inline">✦ বিজয়ী ডাক</span>
+            </div>
+          ) : (
+            <div className="inline-flex items-center gap-2 sm:gap-3 px-3.5 py-1.5 sm:px-5 sm:py-2 rounded-full bg-slate-900/90 border border-emerald-500/50 text-emerald-200 text-xs sm:text-sm font-semibold shadow-lg shadow-emerald-950/60 backdrop-blur-md glow-emerald transition-all hover:scale-102">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
+              <span className="bg-emerald-800 text-white text-[10px] sm:text-xs font-bold px-2 py-0.5 rounded-full">
+                ১২ নং যুগিখালী
+              </span>
+              <span className="truncate max-w-[220px] sm:max-w-none text-emerald-100">
+                ইনসাফ, আমানত ও আধুনিক মডেল ইউনিয়ন গড়ার গণআহ্বান
+              </span>
+              <span className="text-amber-400 text-xs font-bold hidden sm:inline">✦ ২০২৬</span>
+            </div>
+          )}
         </div>
 
         {/* ===================== CAROUSEL SLIDES CONTAINER ===================== */}
@@ -101,7 +162,13 @@ export const Hero: React.FC = () => {
               <div className="lg:col-span-7 flex flex-col gap-5 sm:gap-6 text-center lg:text-left">
                 
                 {/* Nomination Badge with Official Jamaat Logo */}
-                <div className="inline-flex items-center gap-2.5 px-4 py-2 rounded-full bg-emerald-900/90 border border-emerald-400/60 text-emerald-100 text-xs sm:text-sm font-bold self-center lg:self-start shadow-xl glow-emerald">
+                <div className={`inline-flex items-center gap-2.5 px-4 py-2 rounded-full ${
+                  isSmart
+                    ? 'bg-cyan-950/90 border border-cyan-400/60 text-cyan-100 glow-cyan'
+                    : isRally
+                    ? 'bg-slate-900/90 border border-rose-500/70 text-rose-100 glow-rose'
+                    : 'bg-emerald-900/90 border border-emerald-400/60 text-emerald-100 glow-emerald'
+                } text-xs sm:text-sm font-bold self-center lg:self-start shadow-xl`}>
                   <div className="w-7 h-7 rounded-full overflow-hidden bg-white keep-white p-0.5 border border-emerald-300 shrink-0">
                     <img src="/jamaat-logo.svg" alt="বাংলাদেশ জামায়াতে ইসলামী" className="w-full h-full object-contain" />
                   </div>
@@ -110,24 +177,32 @@ export const Hero: React.FC = () => {
 
                 {/* Candidate Title & Slogan with CSS Glow */}
                 <div className="space-y-2 sm:space-y-3">
-                  <p className="text-amber-400 font-bold text-xs sm:text-base tracking-widest uppercase glow-text-amber">
+                  <p className={`font-bold text-xs sm:text-base tracking-widest uppercase ${
+                    isSmart ? 'text-cyan-400 glow-text-cyan' : isRally ? 'text-amber-400 glow-text-amber' : 'text-amber-400 glow-text-amber'
+                  }`}>
                     {candidate.union} • {candidate.designation}
                   </p>
                   <h1 className="text-3xl sm:text-5xl xl:text-6xl font-black tracking-tight leading-tight text-white drop-shadow-md">
                     {candidate.name}
                   </h1>
-                  <p className="text-lg sm:text-2xl text-emerald-200 font-semibold pt-1 glow-text-emerald">
+                  <p className={`text-lg sm:text-2xl font-semibold pt-1 ${
+                    isSmart ? 'text-cyan-200 glow-text-cyan' : isRally ? 'text-rose-200 glow-text-rose' : 'text-emerald-200 glow-text-emerald'
+                  }`}>
                     &ldquo;{candidate.slogan}&rdquo;
                   </p>
                 </div>
 
                 {/* Speech Quote Box */}
-                <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-4 sm:p-6 text-emerald-50 shadow-2xl relative overflow-hidden text-left border-l-4 border-l-amber-400">
-                  <p className="text-xs sm:text-base leading-relaxed italic text-emerald-100/95">
+                <div className={`bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-4 sm:p-6 text-white shadow-2xl relative overflow-hidden text-left border-l-4 ${
+                  isSmart ? 'border-l-cyan-400' : isRally ? 'border-l-rose-500' : 'border-l-amber-400'
+                }`}>
+                  <p className="text-xs sm:text-base leading-relaxed italic text-white/95">
                     {candidate.salam}
                   </p>
                   <div className="mt-3 pt-3 border-t border-white/10 flex items-center justify-between">
-                    <span className="text-[11px] sm:text-xs text-amber-300 font-bold">
+                    <span className={`text-[11px] sm:text-xs font-bold ${
+                      isSmart ? 'text-cyan-300' : isRally ? 'text-amber-300' : 'text-amber-300'
+                    }`}>
                       {candidate.mainPledge}
                     </span>
                   </div>
@@ -137,9 +212,15 @@ export const Hero: React.FC = () => {
                 <div className="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center justify-center lg:justify-start gap-2.5 sm:gap-4 pt-1 w-full">
                   <a
                     href="#manifesto"
-                    className="w-full sm:w-auto justify-center bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-400 hover:to-emerald-500 active:scale-95 text-slate-950 font-extrabold px-6 py-3.5 rounded-xl shadow-lg shadow-emerald-500/30 transition-all flex items-center gap-2 group glow-emerald"
+                    className={`w-full sm:w-auto justify-center ${
+                      isSmart
+                        ? 'bg-gradient-to-r from-cyan-500 to-teal-500 hover:from-cyan-400 hover:to-teal-400 text-slate-950 glow-cyan'
+                        : isRally
+                        ? 'bg-gradient-to-r from-rose-600 via-rose-500 to-emerald-600 hover:from-rose-500 hover:to-emerald-500 text-white glow-rose'
+                        : 'bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-400 hover:to-emerald-500 text-slate-950 glow-emerald'
+                    } active:scale-95 font-extrabold px-6 py-3.5 rounded-xl shadow-lg transition-all flex items-center gap-2 group`}
                   >
-                    <FileCheck2 className="w-5 h-5 group-hover:scale-110 transition-transform shrink-0 text-slate-950" />
+                    <FileCheck2 className={`w-5 h-5 group-hover:scale-110 transition-transform shrink-0 ${isRally ? 'text-white' : 'text-slate-950'}`} />
                     <span>নির্বাচনী ইশতেহার পড়ুন</span>
                     <ArrowRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform shrink-0" />
                   </a>
@@ -147,7 +228,13 @@ export const Hero: React.FC = () => {
                   {/* Grievance Modal Trigger Button */}
                   <button
                     onClick={openGrievanceModal}
-                    className="w-full sm:w-auto justify-center bg-amber-500 hover:bg-amber-400 active:scale-95 text-slate-950 font-bold px-5 py-3.5 rounded-xl shadow-lg shadow-amber-500/25 transition-all flex items-center gap-2 group glow-amber"
+                    className={`w-full sm:w-auto justify-center ${
+                      isSmart
+                        ? 'bg-teal-500 hover:bg-teal-400 text-slate-950 glow-cyan'
+                        : isRally
+                        ? 'bg-amber-500 hover:bg-amber-400 text-slate-950 glow-amber'
+                        : 'bg-amber-500 hover:bg-amber-400 text-slate-950 glow-amber'
+                    } active:scale-95 font-bold px-5 py-3.5 rounded-xl shadow-lg transition-all flex items-center gap-2 group`}
                   >
                     <AlertCircle className="w-5 h-5 text-slate-950 shrink-0 group-hover:rotate-12 transition-transform" />
                     <span>অভিযোগ ও সমস্যা জানান</span>
@@ -158,7 +245,7 @@ export const Hero: React.FC = () => {
                     href="#wards"
                     className="w-full sm:w-auto justify-center bg-white/10 hover:bg-white/20 active:scale-95 text-white font-semibold px-5 py-3.5 rounded-xl border border-white/20 backdrop-blur-sm transition-all flex items-center gap-2"
                   >
-                    <MapPin className="w-4 h-4 text-emerald-400 shrink-0" />
+                    <MapPin className={`w-4 h-4 shrink-0 ${isSmart ? 'text-cyan-400' : isRally ? 'text-rose-400' : 'text-emerald-400'}`} />
                     <span>৯টি ওয়ার্ড দেখুন</span>
                   </a>
                 </div>
@@ -171,6 +258,10 @@ export const Hero: React.FC = () => {
                     className={`w-full sm:w-auto justify-center flex items-center gap-3 px-5 py-3 rounded-2xl font-bold transition-all shadow-md ${
                       hasPledged 
                         ? 'bg-emerald-800 text-emerald-200 cursor-default border border-emerald-600'
+                        : isSmart
+                        ? 'bg-gradient-to-r from-cyan-400 via-teal-400 to-emerald-400 hover:from-cyan-300 hover:to-teal-300 text-slate-950 active:scale-95 glow-cyan'
+                        : isRally
+                        ? 'bg-gradient-to-r from-rose-500 via-amber-500 to-emerald-500 hover:from-rose-400 hover:to-emerald-400 text-slate-950 active:scale-95 glow-rose'
                         : 'bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600 hover:from-amber-300 hover:to-amber-400 text-slate-950 active:scale-95 hover:shadow-amber-500/30 glow-amber'
                     }`}
                   >
@@ -188,7 +279,7 @@ export const Hero: React.FC = () => {
                   </button>
 
                   <div className="w-full sm:w-auto justify-center flex items-center gap-2 text-xs sm:text-sm text-emerald-200 bg-white/5 px-4 py-2.5 rounded-xl border border-white/10 text-center">
-                    <Users className="w-4 h-4 text-emerald-400 shrink-0" />
+                    <Users className={`w-4 h-4 shrink-0 ${isSmart ? 'text-cyan-400' : isRally ? 'text-rose-400' : 'text-emerald-400'}`} />
                     <span>
                       <strong className="text-white font-bold text-sm sm:text-base">{candidate.totalSupporters.toLocaleString('bn-BD')}</strong> জন ভোটার সমর্থন জানিয়েছেন
                     </span>
@@ -202,10 +293,22 @@ export const Hero: React.FC = () => {
                 <div className="relative w-full max-w-sm sm:max-w-md lg:max-w-lg">
                   
                   {/* Outer Pulsing Glow Ring */}
-                  <div className="absolute -inset-2 rounded-3xl bg-gradient-to-tr from-amber-400 via-emerald-400 to-teal-500 opacity-70 blur-xl animate-pulse-glow" />
+                  <div className={`absolute -inset-2 rounded-3xl opacity-75 blur-xl animate-pulse-glow ${
+                    isSmart
+                      ? 'bg-gradient-to-tr from-cyan-400 via-teal-400 to-indigo-500'
+                      : isRally
+                      ? 'bg-gradient-to-tr from-rose-500 via-amber-400 to-emerald-500'
+                      : 'bg-gradient-to-tr from-amber-400 via-emerald-400 to-teal-500'
+                  }`} />
 
                   {/* Main Card Frame */}
-                  <div className="relative rounded-3xl overflow-hidden bg-slate-900 border-2 border-emerald-400/50 shadow-2xl glow-emerald-lg">
+                  <div className={`relative rounded-3xl overflow-hidden bg-slate-900 border-2 ${
+                    isSmart
+                      ? 'border-cyan-400/60 glow-cyan-lg'
+                      : isRally
+                      ? 'border-rose-500/60 glow-rose-lg'
+                      : 'border-emerald-400/50 glow-emerald-lg'
+                  } shadow-2xl`}>
                     
                     <div className="aspect-[4/4.8] w-full overflow-hidden relative bg-slate-800">
                       <img
@@ -216,9 +319,29 @@ export const Hero: React.FC = () => {
                       <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent" />
                       
                       {/* Floating Top Badge */}
-                      <div className="absolute top-4 left-4 bg-emerald-900/90 border border-emerald-400/60 backdrop-blur-md px-3.5 py-1.5 rounded-xl text-xs font-bold text-emerald-200 flex items-center gap-1.5 shadow-lg glow-emerald">
-                        <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-                        <span>মডেল ইউনিয়ন ভিশন</span>
+                      <div className={`absolute top-4 left-4 ${
+                        isSmart
+                          ? 'bg-cyan-950/90 border-cyan-400/60 text-cyan-200 glow-cyan'
+                          : isRally
+                          ? 'bg-rose-950/90 border-rose-400/60 text-rose-200 glow-rose'
+                          : 'bg-emerald-900/90 border-emerald-400/60 text-emerald-200 glow-emerald'
+                      } border backdrop-blur-md px-3.5 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-lg`}>
+                        {isSmart ? (
+                          <>
+                            <Zap className="w-3.5 h-3.5 text-cyan-300" />
+                            <span>স্মার্ট লিডারশিপ ২০২৬</span>
+                          </>
+                        ) : isRally ? (
+                          <>
+                            <Flame className="w-3.5 h-3.5 text-amber-400" />
+                            <span>জনতার বিজয়ী গণপ্রার্থী</span>
+                          </>
+                        ) : (
+                          <>
+                            <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+                            <span>মডেল ইউনিয়ন ভিশন</span>
+                          </>
+                        )}
                       </div>
 
                       {/* Floating Bottom Card */}
@@ -228,11 +351,19 @@ export const Hero: React.FC = () => {
                             <h3 className="text-xl font-bold text-white">
                               {candidate.name}
                             </h3>
-                            <p className="text-xs text-amber-400 font-semibold mt-0.5">
+                            <p className={`text-xs font-semibold mt-0.5 ${
+                              isSmart ? 'text-cyan-400' : isRally ? 'text-amber-400' : 'text-amber-400'
+                            }`}>
                               চেয়ারম্যান পদপ্রার্থী
                             </p>
                           </div>
-                          <span className="bg-emerald-500/25 text-emerald-300 border border-emerald-400/40 text-[11px] font-bold px-2.5 py-1 rounded-lg">
+                          <span className={`${
+                            isSmart
+                              ? 'bg-cyan-500/25 text-cyan-300 border-cyan-400/40'
+                              : isRally
+                              ? 'bg-rose-500/25 text-rose-300 border-rose-400/40'
+                              : 'bg-emerald-500/25 text-emerald-300 border-emerald-400/40'
+                          } border text-[11px] font-bold px-2.5 py-1 rounded-lg`}>
                             ১২ নং যুগিখালী
                           </span>
                         </div>
@@ -243,17 +374,19 @@ export const Hero: React.FC = () => {
                     </div>
 
                     {/* Card Footer Helpline */}
-                    <div className="bg-emerald-950 px-4 py-3 border-t border-emerald-800/80 flex items-center justify-between text-xs text-emerald-200">
+                    <div className={`${
+                      isSmart ? 'bg-[#071926] border-cyan-800/80 text-cyan-200' : isRally ? 'bg-[#200a12] border-rose-900/80 text-rose-200' : 'bg-emerald-950 border-emerald-800/80 text-emerald-200'
+                    } px-4 py-3 border-t flex items-center justify-between text-xs`}>
                       <a 
                         href={`tel:${candidate.phone.replace(/[^0-9+]/g, '')}`} 
-                        className="flex items-center gap-1.5 font-medium hover:text-emerald-300 transition"
+                        className="flex items-center gap-1.5 font-medium hover:underline transition"
                       >
-                        <PhoneCall className="w-3.5 h-3.5 text-emerald-400" />
+                        <PhoneCall className={`w-3.5 h-3.5 ${isSmart ? 'text-cyan-400' : isRally ? 'text-rose-400' : 'text-emerald-400'}`} />
                         হটলাইন: {candidate.phone}
                       </a>
                       <button
                         onClick={openGrievanceModal}
-                        className="text-amber-400 hover:text-amber-300 font-bold underline underline-offset-2 flex items-center gap-1"
+                        className={`${isSmart ? 'text-cyan-300 hover:text-cyan-200' : isRally ? 'text-amber-400 hover:text-amber-300' : 'text-amber-400 hover:text-amber-300'} font-bold underline underline-offset-2 flex items-center gap-1`}
                       >
                         সমস্যা জানান →
                       </button>

@@ -77,7 +77,7 @@ export default function RootLayout({
         />
         <script
           dangerouslySetInnerHTML={{
-            __html: `(function(){try{var t=localStorage.getItem('amr_theme_mode');if(t==='dark'||(!t&&window.matchMedia('(prefers-color-scheme: dark)').matches)){document.documentElement.classList.add('dark');}else{document.documentElement.classList.remove('dark');}}catch(e){}})();`,
+            __html: `(function(){try{var t=localStorage.getItem('amr_theme_mode');if(t==='dark'||(!t&&window.matchMedia('(prefers-color-scheme: dark)').matches)){document.documentElement.classList.add('dark');}else{document.documentElement.classList.remove('dark');}var p=localStorage.getItem('amr_jugikhali_active_template')||'islamic-emerald';document.documentElement.setAttribute('data-template',p);document.documentElement.classList.add('template-'+p);}catch(e){}})();`,
           }}
         />
       </head>
