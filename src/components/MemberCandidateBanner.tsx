@@ -240,7 +240,7 @@ export const MemberCandidateBanner: React.FC = () => {
                       className={`flex-1 py-2.5 px-3 rounded-xl font-bold text-xs transition flex items-center justify-center gap-1.5 cursor-pointer shadow-md active:scale-95 ${
                         hasSupported
                           ? 'bg-amber-500 text-slate-950 font-black'
-                          : 'bg-white hover:bg-emerald-50 text-emerald-950 font-black'
+                          : 'bg-white keep-white hover:bg-emerald-50 text-emerald-950 font-black'
                       }`}
                     >
                       <Heart className={`w-3.5 h-3.5 ${hasSupported ? 'fill-slate-950 text-slate-950' : 'text-rose-600 fill-rose-600'}`} />

@@ -47,7 +47,9 @@ import {
   Layers,
   ArrowUpRight,
   Bell,
-  Activity
+  Activity,
+  Sun,
+  Moon
 } from 'lucide-react';
 import { useData } from '@/context/DataContext';
 import { PromiseItem, Grievance, SectionVisibility, jugikhaliWards, SocialActivity, MemberCandidate, EducationRecord } from '@/data/initialData';
@@ -186,7 +188,9 @@ export default function AdminPage() {
     updateBudget,
     approveBloodDonor,
     deleteBloodDonor,
-    resetAllData
+    resetAllData,
+    theme: themeMode,
+    toggleTheme
   } = useData();
 
   // Authentication State (Credentials: abusaidmd012@gmail.com / abusaid_2026)
@@ -856,7 +860,11 @@ export default function AdminPage() {
   const menuGroups = ['কোর কন্ট্রোল', 'নির্বাচনী প্রচারণা', 'নাগরিক সেবা ও প্রশাসন'] as const;
 
   return (
-    <div className="min-h-screen bg-slate-900/5 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-100 via-slate-50 to-slate-100 flex selection:bg-emerald-600 selection:text-white">
+    <div className={`min-h-screen flex selection:bg-emerald-600 selection:text-white transition-colors duration-300 ${
+      themeMode === 'dark' 
+        ? 'bg-[#090d16] text-slate-100' 
+        : 'bg-slate-100/70 text-slate-800'
+    }`}>
       
       {/* Mobile Backdrop */}
       {isSidebarOpen && (
@@ -981,6 +989,28 @@ export default function AdminPage() {
 
         {/* Sidebar Footer Actions */}
         <div className="p-3 border-t border-slate-800 space-y-1.5 bg-slate-950/60">
+          {/* Theme Toggle Button in Sidebar */}
+          <button
+            type="button"
+            onClick={toggleTheme}
+            className="w-full text-xs font-bold text-slate-300 hover:text-white hover:bg-slate-800/90 p-2.5 rounded-xl transition flex items-center justify-between border border-slate-800 group cursor-pointer"
+            title={themeMode === 'dark' ? 'লাইট মোড চালু করুন' : 'ডার্ক মোড চালু করুন'}
+          >
+            <span className="flex items-center gap-2">
+              {themeMode === 'dark' ? (
+                <Sun className="w-3.5 h-3.5 text-amber-400 animate-spin-slow" />
+              ) : (
+                <Moon className="w-3.5 h-3.5 text-slate-400" />
+              )}
+              <span>থিম মোড ({themeMode === 'dark' ? 'ডার্ক' : 'লাইট'})</span>
+            </span>
+            <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${
+              themeMode === 'dark' ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30' : 'bg-slate-800 text-slate-300'
+            }`}>
+              {themeMode === 'dark' ? 'ডার্ক' : 'লাইট'}
+            </span>
+          </button>
+
           <Link
             href="/"
             target="_blank"
@@ -1010,12 +1040,20 @@ export default function AdminPage() {
       <div className="flex-1 flex flex-col min-w-0 min-h-screen overflow-x-hidden">
         
         {/* Top Header Bar */}
-        <header className="sticky top-0 z-30 bg-white/90 backdrop-blur-xl border-b border-slate-200/80 shadow-2xs h-16 sm:h-20 flex items-center justify-between px-4 sm:px-6 lg:px-8">
+        <header className={`sticky top-0 z-30 backdrop-blur-xl border-b h-16 sm:h-20 flex items-center justify-between px-4 sm:px-6 lg:px-8 transition-colors duration-300 ${
+          themeMode === 'dark'
+            ? 'bg-slate-900/95 border-slate-800/90 text-white shadow-md'
+            : 'bg-white/90 border-slate-200/80 text-slate-900 shadow-2xs'
+        }`}>
           <div className="flex items-center gap-3">
             {/* Mobile menu trigger */}
             <button
               onClick={() => setIsSidebarOpen(true)}
-              className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 lg:hidden transition cursor-pointer"
+              className={`p-2 rounded-xl lg:hidden transition cursor-pointer ${
+                themeMode === 'dark'
+                  ? 'bg-slate-800 hover:bg-slate-700 text-slate-200'
+                  : 'bg-slate-100 hover:bg-slate-200 text-slate-700'
+              }`}
               title="সাইড মেনু খুলুন"
             >
               <Menu className="w-5 h-5" />
@@ -1026,28 +1064,61 @@ export default function AdminPage() {
               <div className="flex items-center gap-1.5 text-[11px] text-slate-400 font-medium">
                 <span>সুপার অ্যাডমিন</span>
                 <span>/</span>
-                <span className="text-emerald-700 font-bold">
+                <span className="text-emerald-700 dark:text-emerald-400 font-bold">
                   {menuItems.find(m => m.id === activeTab)?.label || 'ড্যাশবোর্ড'}
                 </span>
               </div>
-              <h1 className="text-base sm:text-xl font-black text-slate-900 leading-tight flex items-center gap-2">
+              <h1 className="text-base sm:text-xl font-black text-slate-900 dark:text-white leading-tight flex items-center gap-2">
                 <span>{menuItems.find(m => m.id === activeTab)?.label || 'ড্যাশবোর্ড'}</span>
               </h1>
             </div>
 
             {/* Dynamic Clock Widget */}
-            <div className="hidden xl:flex items-center gap-2 px-3 py-1.5 bg-slate-100/90 border border-slate-200/90 rounded-xl text-xs font-bold text-slate-700 ml-4 shadow-2xs">
-              <Clock className="w-3.5 h-3.5 text-emerald-600 animate-pulse" />
+            <div className={`hidden xl:flex items-center gap-2 px-3 py-1.5 border rounded-xl text-xs font-bold ml-4 shadow-2xs ${
+              themeMode === 'dark'
+                ? 'bg-slate-800/90 border-slate-700/80 text-slate-200'
+                : 'bg-slate-100/90 border-slate-200/90 text-slate-700'
+            }`}>
+              <Clock className="w-3.5 h-3.5 text-emerald-500 animate-pulse" />
               <span>{currentTime || '২৫ অক্টোবর ২০২৬ • রাত ০৮:১৫'}</span>
             </div>
           </div>
 
           <div className="flex items-center gap-2 sm:gap-3">
             {/* Live System Status Indicator */}
-            <div className="hidden md:flex items-center gap-2 px-3 py-1.5 bg-emerald-50 border border-emerald-200/80 rounded-xl text-xs font-bold text-emerald-800">
+            <div className={`hidden md:flex items-center gap-2 px-3 py-1.5 border rounded-xl text-xs font-bold ${
+              themeMode === 'dark'
+                ? 'bg-emerald-950/70 border-emerald-800/80 text-emerald-300'
+                : 'bg-emerald-50 border-emerald-200/80 text-emerald-800'
+            }`}>
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
               <span>সিস্টেম সচল • সিঙ্কড</span>
             </div>
+
+            {/* Theme Toggle Button (Header) */}
+            <button
+              type="button"
+              onClick={toggleTheme}
+              title={themeMode === 'dark' ? 'লাইট মোড চালু করুন' : 'ডার্ক মোড চালু করুন'}
+              aria-label="Toggle Theme Mode"
+              className={`p-2 sm:px-3 sm:py-2 rounded-xl border transition-all flex items-center gap-2 cursor-pointer shadow-2xs active:scale-95 ${
+                themeMode === 'dark'
+                  ? 'bg-slate-800/90 hover:bg-slate-700/90 border-slate-700 text-amber-300'
+                  : 'bg-slate-100/90 hover:bg-slate-200/90 border-slate-200 text-slate-700'
+              }`}
+            >
+              {themeMode === 'dark' ? (
+                <>
+                  <Sun className="w-4 h-4 text-amber-400 animate-spin-slow" />
+                  <span className="text-xs font-bold hidden sm:inline text-amber-300">লাইট মোড</span>
+                </>
+              ) : (
+                <>
+                  <Moon className="w-4 h-4 text-slate-700" />
+                  <span className="text-xs font-bold hidden sm:inline text-slate-700">ডার্ক মোড</span>
+                </>
+              )}
+            </button>
 
             {/* Quick Action Button & Menu */}
             <div className="relative">
@@ -1062,8 +1133,10 @@ export default function AdminPage() {
 
               {/* Quick Launch Dropdown Popover */}
               {showQuickMenu && (
-                <div className="absolute right-0 mt-2 w-64 bg-white border border-slate-200 rounded-2xl shadow-2xl p-2 z-50 animate-in fade-in zoom-in-95 space-y-1">
-                  <div className="px-3 py-1.5 text-[10px] font-black uppercase text-slate-400 border-b border-slate-100 mb-1">
+                <div className={`absolute right-0 mt-2 w-64 border rounded-2xl shadow-2xl p-2 z-50 animate-in fade-in zoom-in-95 space-y-1 ${
+                  themeMode === 'dark' ? 'bg-slate-900 border-slate-700 text-white' : 'bg-white border-slate-200 text-slate-800'
+                }`}>
+                  <div className="px-3 py-1.5 text-[10px] font-black uppercase text-slate-400 border-b border-slate-700/50 mb-1">
                     দ্রুত অ্যাকশন শর্টকাট
                   </div>
                   <button
@@ -1072,9 +1145,9 @@ export default function AdminPage() {
                       setShowQuickMenu(false);
                       setActiveTab('activities');
                     }}
-                    className="w-full text-left px-3 py-2 text-xs font-bold text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 rounded-xl transition flex items-center gap-2"
+                    className="w-full text-left px-3 py-2 text-xs font-bold hover:bg-emerald-500/10 hover:text-emerald-400 rounded-xl transition flex items-center gap-2"
                   >
-                    <Film className="w-4 h-4 text-emerald-600" />
+                    <Film className="w-4 h-4 text-emerald-500" />
                     <span>নতুন ভিডিও কার্যক্রম যোগ করুন</span>
                   </button>
 
@@ -1084,9 +1157,9 @@ export default function AdminPage() {
                       setShowQuickMenu(false);
                       setActiveTab('memberCandidates');
                     }}
-                    className="w-full text-left px-3 py-2 text-xs font-bold text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 rounded-xl transition flex items-center gap-2"
+                    className="w-full text-left px-3 py-2 text-xs font-bold hover:bg-emerald-500/10 hover:text-emerald-400 rounded-xl transition flex items-center gap-2"
                   >
-                    <Award className="w-4 h-4 text-emerald-600" />
+                    <Award className="w-4 h-4 text-emerald-500" />
                     <span>নতুন মেম্বার প্রার্থী যোগ করুন</span>
                   </button>
 
@@ -1096,9 +1169,9 @@ export default function AdminPage() {
                       setShowQuickMenu(false);
                       setActiveTab('promises');
                     }}
-                    className="w-full text-left px-3 py-2 text-xs font-bold text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 rounded-xl transition flex items-center gap-2"
+                    className="w-full text-left px-3 py-2 text-xs font-bold hover:bg-blue-500/10 hover:text-blue-400 rounded-xl transition flex items-center gap-2"
                   >
-                    <FileText className="w-4 h-4 text-blue-600" />
+                    <FileText className="w-4 h-4 text-blue-500" />
                     <span>নতুন প্রতিশ্রুতি যোগ করুন</span>
                   </button>
 
@@ -1107,9 +1180,9 @@ export default function AdminPage() {
                       setShowQuickMenu(false);
                       setActiveTab('grievances');
                     }}
-                    className="w-full text-left px-3 py-2 text-xs font-bold text-slate-700 hover:bg-amber-50 hover:text-amber-800 rounded-xl transition flex items-center gap-2"
+                    className="w-full text-left px-3 py-2 text-xs font-bold hover:bg-amber-500/10 hover:text-amber-400 rounded-xl transition flex items-center gap-2"
                   >
-                    <AlertCircle className="w-4 h-4 text-amber-600" />
+                    <AlertCircle className="w-4 h-4 text-amber-500" />
                     <span>নাগরিক অভিযোগ বক্স দেখুন</span>
                   </button>
 
@@ -1118,9 +1191,9 @@ export default function AdminPage() {
                       setShowQuickMenu(false);
                       setActiveTab('blood');
                     }}
-                    className="w-full text-left px-3 py-2 text-xs font-bold text-slate-700 hover:bg-rose-50 hover:text-rose-800 rounded-xl transition flex items-center gap-2"
+                    className="w-full text-left px-3 py-2 text-xs font-bold hover:bg-rose-500/10 hover:text-rose-400 rounded-xl transition flex items-center gap-2"
                   >
-                    <Droplet className="w-4 h-4 text-rose-600" />
+                    <Droplet className="w-4 h-4 text-rose-500" />
                     <span>রক্তদাতা আবেদন যাচাই করুন</span>
                   </button>
                 </div>
@@ -1130,15 +1203,23 @@ export default function AdminPage() {
             <Link
               href="/"
               target="_blank"
-              className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-700 bg-slate-100 hover:bg-emerald-50 hover:text-emerald-800 border border-slate-200 px-3 py-2 rounded-xl transition shadow-2xs group"
+              className={`inline-flex items-center gap-1.5 text-xs font-bold border px-3 py-2 rounded-xl transition shadow-2xs group ${
+                themeMode === 'dark'
+                  ? 'text-slate-200 bg-slate-800/90 hover:bg-slate-700 border-slate-700'
+                  : 'text-slate-700 bg-slate-100 hover:bg-emerald-50 hover:text-emerald-800 border-slate-200'
+              }`}
             >
-              <ExternalLink className="w-3.5 h-3.5 text-emerald-600 group-hover:rotate-12 transition-transform" />
+              <ExternalLink className="w-3.5 h-3.5 text-emerald-500 group-hover:rotate-12 transition-transform" />
               <span className="hidden sm:inline">লাইভ সাইট</span>
             </Link>
 
             <button
               onClick={handleLogout}
-              className="inline-flex items-center gap-1.5 text-xs font-bold text-rose-700 bg-rose-50 hover:bg-rose-100 border border-rose-200 px-3 py-2 rounded-xl transition cursor-pointer"
+              className={`inline-flex items-center gap-1.5 text-xs font-bold border px-3 py-2 rounded-xl transition cursor-pointer ${
+                themeMode === 'dark'
+                  ? 'text-rose-300 bg-rose-950/50 hover:bg-rose-900/60 border-rose-800/70'
+                  : 'text-rose-700 bg-rose-50 hover:bg-rose-100 border-rose-200'
+              }`}
             >
               <LogOut className="w-3.5 h-3.5" />
               <span className="hidden sm:inline">লগআউট</span>

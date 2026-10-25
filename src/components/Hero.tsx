@@ -102,7 +102,7 @@ export const Hero: React.FC = () => {
                 
                 {/* Nomination Badge with Official Jamaat Logo */}
                 <div className="inline-flex items-center gap-2.5 px-4 py-2 rounded-full bg-emerald-900/90 border border-emerald-400/60 text-emerald-100 text-xs sm:text-sm font-bold self-center lg:self-start shadow-xl glow-emerald">
-                  <div className="w-7 h-7 rounded-full overflow-hidden bg-white p-0.5 border border-emerald-300 shrink-0">
+                  <div className="w-7 h-7 rounded-full overflow-hidden bg-white keep-white p-0.5 border border-emerald-300 shrink-0">
                     <img src="/jamaat-logo.svg" alt="বাংলাদেশ জামায়াতে ইসলামী" className="w-full h-full object-contain" />
                   </div>
                   <span>{candidate.party} মনোনীত প্রার্থী</span>

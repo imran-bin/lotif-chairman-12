@@ -64,7 +64,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="bn" className="scroll-smooth">
+    <html lang="bn" className="scroll-smooth" suppressHydrationWarning>
       <head>
         <link rel="icon" type="image/png" href="/candidate-icon.png?v=3" />
         <link rel="shortcut icon" href="/candidate-icon.png?v=3" />
@@ -75,8 +75,13 @@ export default function RootLayout({
           href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap"
           rel="stylesheet"
         />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var t=localStorage.getItem('amr_theme_mode');if(t==='dark'||(!t&&window.matchMedia('(prefers-color-scheme: dark)').matches)){document.documentElement.classList.add('dark');}else{document.documentElement.classList.remove('dark');}}catch(e){}})();`,
+          }}
+        />
       </head>
-      <body className="min-h-screen flex flex-col antialiased bg-slate-50 text-slate-800">
+      <body className="min-h-screen flex flex-col antialiased bg-slate-50 text-slate-800 dark:bg-[#0b0f19] dark:text-slate-100 transition-colors duration-300">
         <DataProvider>
           {children}
         </DataProvider>

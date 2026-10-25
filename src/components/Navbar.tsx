@@ -13,14 +13,16 @@ import {
   Coins, 
   Sprout,
   HeartHandshake,
-  MapPin
+  MapPin,
+  Sun,
+  Moon
 } from 'lucide-react';
 import { useData } from '@/context/DataContext';
 
 const MarqueeTag = 'marquee' as unknown as React.ElementType;
 
 export const Navbar: React.FC = () => {
-  const { candidate, sectionVisibility, openGrievanceModal } = useData();
+  const { candidate, sectionVisibility, openGrievanceModal, theme, toggleTheme } = useData();
   const [isOpen, setIsOpen] = useState(false);
 
   const allNavLinks = [
@@ -47,7 +49,7 @@ export const Navbar: React.FC = () => {
   const navLinks = allNavLinks.filter(l => l.show !== false);
 
   return (
-    <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-emerald-100 shadow-xs transition-all">
+    <header className="sticky top-0 z-50 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-emerald-100 dark:border-slate-800 shadow-xs transition-colors duration-300">
       {/* Top Banner Notice */}
       <div className="bg-emerald-900 text-emerald-100 text-xs sm:text-sm py-1 px-4 font-medium flex justify-between items-center border-b border-emerald-800">
         <div className="max-w-7xl mx-auto w-full flex items-center justify-between">
@@ -139,7 +141,7 @@ export const Navbar: React.FC = () => {
             </div>
 
             {/* Official Jamaat-e-Islami Logo */}
-            <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-full overflow-hidden border border-emerald-300 shadow-sm bg-white p-0.5 group-hover:scale-105 transition-transform duration-200 shrink-0">
+            <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-full overflow-hidden border border-emerald-300 shadow-sm bg-white keep-white p-0.5 group-hover:scale-105 transition-transform duration-200 shrink-0">
               <img 
                 src="/jamaat-logo.svg" 
                 alt="বাংলাদেশ জামায়াতে ইসলামী লোগো" 
@@ -149,27 +151,27 @@ export const Navbar: React.FC = () => {
 
             <div className="min-w-0">
               <div className="flex items-center gap-1.5 sm:gap-2">
-                <span className="font-bold text-base sm:text-2xl text-slate-900 group-hover:text-emerald-700 transition truncate leading-tight block">
+                <span className="font-bold text-base sm:text-2xl text-slate-900 dark:text-white group-hover:text-emerald-700 dark:group-hover:text-emerald-400 transition truncate leading-tight block">
                   {candidate.name}
                 </span>
-                <span className="hidden md:inline-flex bg-emerald-100 text-emerald-800 text-[11px] font-semibold px-2 py-0.5 rounded-full border border-emerald-200 shrink-0">
+                <span className="hidden md:inline-flex bg-emerald-100 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300 text-[11px] font-semibold px-2 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-800/80 shrink-0">
                   চেয়ারম্যান পদপ্রার্থী
                 </span>
               </div>
-              <p className="text-[11px] sm:text-xs text-slate-600 font-medium truncate">
-                {candidate.union} • <span className="text-emerald-700 font-semibold">{candidate.party}</span>
+              <p className="text-[11px] sm:text-xs text-slate-600 dark:text-slate-400 font-medium truncate">
+                {candidate.union} • <span className="text-emerald-700 dark:text-emerald-400 font-semibold">{candidate.party}</span>
               </p>
             </div>
           </Link>
 
           {/* Desktop Nav Items */}
-          <nav className="hidden lg:flex items-center gap-1 xl:gap-2 text-sm font-semibold text-slate-700">
+          <nav className="hidden lg:flex items-center gap-1 xl:gap-2 text-sm font-semibold">
             {navLinks.map((item) => (
               <a
                 key={item.label}
                 href={item.href}
                 onClick={item.onClick}
-                className="px-3 py-2 rounded-lg hover:text-emerald-700 hover:bg-emerald-50 transition-colors cursor-pointer"
+                className="px-3 py-2 rounded-lg text-slate-700 dark:text-slate-200 hover:text-emerald-700 dark:hover:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-slate-800/80 transition-colors cursor-pointer"
               >
                 {item.label}
               </a>
@@ -177,7 +179,28 @@ export const Navbar: React.FC = () => {
           </nav>
 
           {/* Desktop Right Action */}
-          <div className="hidden sm:flex items-center gap-3">
+          <div className="hidden sm:flex items-center gap-2.5">
+            {/* Theme Toggle Button (Desktop) */}
+            <button
+              type="button"
+              onClick={toggleTheme}
+              title={theme === 'dark' ? 'লাইট মোড চালু করুন' : 'ডার্ক মোড চালু করুন'}
+              aria-label="Toggle Dark/Light Theme"
+              className="px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700/90 bg-slate-100/80 dark:bg-slate-800 text-slate-700 dark:text-amber-400 hover:bg-slate-200/80 dark:hover:bg-slate-700 transition-all flex items-center gap-1.5 shadow-2xs active:scale-95 cursor-pointer"
+            >
+              {theme === 'dark' ? (
+                <>
+                  <Sun className="w-4 h-4 text-amber-400 animate-spin-slow" />
+                  <span className="text-xs font-bold text-slate-200 hidden md:inline">লাইট মোড</span>
+                </>
+              ) : (
+                <>
+                  <Moon className="w-4 h-4 text-slate-700" />
+                  <span className="text-xs font-bold text-slate-700 hidden md:inline">ডার্ক মোড</span>
+                </>
+              )}
+            </button>
+
             <button
               onClick={openGrievanceModal}
               className="bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white text-sm font-bold px-4 py-2.5 rounded-xl shadow-md hover:shadow-emerald-600/30 transition-all flex items-center gap-2 glow-emerald cursor-pointer"
@@ -187,11 +210,22 @@ export const Navbar: React.FC = () => {
             </button>
           </div>
 
-          {/* Mobile Hamburger Button */}
+          {/* Mobile Right Bar: Theme Toggle + Hamburger */}
           <div className="flex items-center gap-2 lg:hidden shrink-0">
+            {/* Mobile Theme Toggle Button */}
+            <button
+              type="button"
+              onClick={toggleTheme}
+              title={theme === 'dark' ? 'লাইট মোড' : 'ডার্ক মোড'}
+              aria-label="Toggle Theme Mode"
+              className="p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-amber-400 active:scale-95 transition cursor-pointer"
+            >
+              {theme === 'dark' ? <Sun className="w-5 h-5 text-amber-400" /> : <Moon className="w-5 h-5 text-slate-700" />}
+            </button>
+
             <button
               onClick={() => setIsOpen(!isOpen)}
-              className="p-2.5 rounded-xl text-slate-700 hover:bg-slate-100 active:scale-95 transition"
+              className="p-2.5 rounded-xl text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 active:scale-95 transition"
               aria-label="Toggle Navigation Menu"
             >
               {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
@@ -203,7 +237,7 @@ export const Navbar: React.FC = () => {
 
       {/* Mobile Drawer */}
       {isOpen && (
-        <div className="lg:hidden border-t border-slate-200 bg-white/98 backdrop-blur-md px-4 pt-3 pb-6 shadow-xl animate-in slide-in-from-top-2 max-h-[calc(100vh-120px)] overflow-y-auto">
+        <div className="lg:hidden border-t border-slate-200 dark:border-slate-800 bg-white/98 dark:bg-slate-900/98 backdrop-blur-md px-4 pt-3 pb-6 shadow-xl animate-in slide-in-from-top-2 max-h-[calc(100vh-120px)] overflow-y-auto">
           <div className="flex flex-col gap-1">
             {navLinks.map((item) => {
               const Icon = item.icon;
@@ -215,14 +249,31 @@ export const Navbar: React.FC = () => {
                     setIsOpen(false);
                     if (item.onClick) item.onClick(e);
                   }}
-                  className="flex items-center gap-3 px-3.5 py-3 rounded-xl text-slate-700 hover:bg-emerald-50 hover:text-emerald-700 font-bold text-sm transition active:bg-emerald-100 cursor-pointer"
+                  className="flex items-center gap-3 px-3.5 py-3 rounded-xl text-slate-700 dark:text-slate-200 hover:bg-emerald-50 dark:hover:bg-slate-800/80 hover:text-emerald-700 dark:hover:text-emerald-400 font-bold text-sm transition active:bg-emerald-100 cursor-pointer"
                 >
-                  <Icon className="w-4 h-4 text-emerald-600 shrink-0" />
+                  <Icon className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
                   <span>{item.label}</span>
                 </a>
               );
             })}
-            <div className="mt-3 pt-3 border-t border-slate-100 flex flex-col gap-2">
+
+            {/* Mobile Drawer Theme Switch Button */}
+            <button
+              onClick={() => {
+                toggleTheme();
+              }}
+              className="flex items-center justify-between px-3.5 py-3 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 font-bold text-sm transition mt-1 cursor-pointer"
+            >
+              <span className="flex items-center gap-2">
+                {theme === 'dark' ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-slate-700" />}
+                <span>থিম মোড</span>
+              </span>
+              <span className="text-xs px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 font-bold">
+                {theme === 'dark' ? 'ডার্ক সক্রিয়' : 'লাইট সক্রিয়'}
+              </span>
+            </button>
+
+            <div className="mt-3 pt-3 border-t border-slate-100 dark:border-slate-800 flex flex-col gap-2">
               <button
                 onClick={() => {
                   setIsOpen(false);
@@ -234,9 +285,9 @@ export const Navbar: React.FC = () => {
               </button>
               <a
                 href="tel:+8801735885527"
-                className="w-full text-center bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold py-2.5 rounded-xl transition flex items-center justify-center gap-2 text-xs"
+                className="w-full text-center bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-bold py-2.5 rounded-xl transition flex items-center justify-center gap-2 text-xs"
               >
-                <PhoneCall className="w-3.5 h-3.5 text-emerald-600" />
+                <PhoneCall className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
                 <span>হটলাইন: +880 1735-885527</span>
               </a>
             </div>

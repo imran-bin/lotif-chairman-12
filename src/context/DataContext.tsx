@@ -73,6 +73,11 @@ interface DataContextType {
   openGrievanceModal: () => void;
   closeGrievanceModal: () => void;
 
+  // Theme Mode (Dark / Light)
+  theme: 'light' | 'dark';
+  toggleTheme: () => void;
+  setTheme: (theme: 'light' | 'dark') => void;
+
   resetAllData: () => void;
   isLoaded: boolean;
 }
@@ -95,9 +100,57 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [memberCandidates, setMemberCandidates] = useState<MemberCandidate[]>(initialMemberCandidates);
   const [isGrievanceModalOpen, setIsGrievanceModalOpen] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [theme, setThemeState] = useState<'light' | 'dark'>('light');
 
   const openGrievanceModal = () => setIsGrievanceModalOpen(true);
   const closeGrievanceModal = () => setIsGrievanceModalOpen(false);
+
+  // Initialize theme from localStorage or system preference
+  useEffect(() => {
+    try {
+      const savedTheme = localStorage.getItem('amr_theme_mode') as 'light' | 'dark' | null;
+      if (savedTheme === 'dark' || savedTheme === 'light') {
+        setThemeState(savedTheme);
+        if (savedTheme === 'dark') {
+          document.documentElement.classList.add('dark');
+        } else {
+          document.documentElement.classList.remove('dark');
+        }
+      } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        setThemeState('dark');
+        document.documentElement.classList.add('dark');
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  }, []);
+
+  const toggleTheme = () => {
+    setThemeState(prev => {
+      const next = prev === 'dark' ? 'light' : 'dark';
+      try {
+        localStorage.setItem('amr_theme_mode', next);
+      } catch (e) {}
+      if (next === 'dark') {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+      return next;
+    });
+  };
+
+  const setTheme = (mode: 'light' | 'dark') => {
+    setThemeState(mode);
+    try {
+      localStorage.setItem('amr_theme_mode', mode);
+    } catch (e) {}
+    if (mode === 'dark') {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  };
 
   // Load from localStorage on client mount
   useEffect(() => {
@@ -438,7 +491,10 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
         openGrievanceModal,
         closeGrievanceModal,
         resetAllData,
-        isLoaded
+        isLoaded,
+        theme,
+        toggleTheme,
+        setTheme
       }}
     >
       {children}

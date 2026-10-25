@@ -398,7 +398,7 @@ export const UnionWards: React.FC = () => {
                   {selectedCandidate.phone && (
                     <a
                       href={`tel:${selectedCandidate.phone}`}
-                      className="px-4 py-2.5 rounded-xl bg-white text-emerald-950 font-black text-xs hover:bg-emerald-50 transition flex items-center gap-1.5 shadow-md active:scale-95"
+                      className="px-4 py-2.5 rounded-xl bg-white keep-white text-emerald-950 font-black text-xs hover:bg-emerald-50 transition flex items-center gap-1.5 shadow-md active:scale-95"
                     >
                       <PhoneCall className="w-3.5 h-3.5 text-emerald-600" />
                       <span>সরাসরি কথা বলুন</span>
@@ -446,7 +446,7 @@ export const UnionWards: React.FC = () => {
             <div className="flex flex-col sm:flex-row gap-3 shrink-0">
               <a
                 href="#manifesto"
-                className="bg-white hover:bg-emerald-50 text-emerald-950 font-bold px-6 py-3.5 rounded-xl shadow-md transition flex items-center justify-center gap-2 active:scale-95 text-xs sm:text-sm"
+                className="bg-white keep-white hover:bg-emerald-50 text-emerald-950 font-bold px-6 py-3.5 rounded-xl shadow-md transition flex items-center justify-center gap-2 active:scale-95 text-xs sm:text-sm"
               >
                 <span>নির্বাচনী ইশতেহার</span>
                 <ArrowRight className="w-4 h-4" />
